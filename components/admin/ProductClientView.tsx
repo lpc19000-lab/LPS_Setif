@@ -1,0 +1,346 @@
+"use client";
+
+import { useState } from "react";
+import { Plus, Search, Edit2, Trash2, X, Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
+import { createProduct, updateProduct, deleteProduct } from "@/app/admin/actions/product";
+
+type ProductWithCategory = any;
+
+const STATUS_COLORS: Record<string, string> = {
+    ACTIVE: "bg-emerald-50 text-emerald-600",
+    INACTIVE: "bg-gray-100 text-gray-500",
+    DRAFT: "bg-amber-50 text-amber-600",
+};
+
+export default function ProductClientView({
+    products,
+    categories,
+    collections = [],
+    tags = [],
+}: {
+    products: ProductWithCategory[];
+    categories: any[];
+    collections?: any[];
+    tags?: any[];
+}) {
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingProduct, setEditingProduct] = useState<ProductWithCategory | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const filteredProducts = products.filter((p) => {
+        const matchesSearch =
+            p.name.toLowerCase().includes(search.toLowerCase()) ||
+            p.brand.toLowerCase().includes(search.toLowerCase());
+        const matchesStatus = !statusFilter || p.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
+
+    const formatCurrency = (amount: number) =>
+        new Intl.NumberFormat("en-US", { style: "currency", currency: "DZD" }).format(amount);
+
+    const handleOpenModal = (product: ProductWithCategory | null = null) => {
+        setEditingProduct(product);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setEditingProduct(null);
+        setIsModalOpen(false);
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsLoading(true);
+        const formData = new FormData(e.currentTarget);
+        let res;
+        if (editingProduct) {
+            res = await updateProduct(editingProduct.id, formData);
+        } else {
+            res = await createProduct(formData);
+        }
+        setIsLoading(false);
+        if (res.success) {
+            handleCloseModal();
+        } else {
+            alert(res.error);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this product?")) return;
+        setIsLoading(true);
+        const res = await deleteProduct(id);
+        setIsLoading(false);
+        if (!res.success) alert(res.error);
+    };
+
+    // Get existing collection/tag ids for an editing product
+    const editCollectionIds = editingProduct?.collections?.map((c: any) => c.collectionId || c.collection?.id) || [];
+    const editTagIds = editingProduct?.tags?.map((t: any) => t.tagId || t.tag?.id) || [];
+
+    return (
+        <div className="space-y-6">
+            {/* Toolbar */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex gap-3 w-full sm:w-auto">
+                    <div className="relative flex-1 sm:w-80">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search products..."
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="bg-white border border-gray-200 rounded-xl text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+                    >
+                        <option value="">All Status</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="INACTIVE">Inactive</option>
+                        <option value="DRAFT">Draft</option>
+                    </select>
+                </div>
+                <button
+                    onClick={() => handleOpenModal()}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-primary-dark shadow-sm transition-all"
+                >
+                    <Plus className="w-4 h-4" />
+                    Add Product
+                </button>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className="text-xs text-gray-500 uppercase tracking-wider bg-gray-50/50">
+                            <tr>
+                                <th className="px-6 py-4 font-medium">Product</th>
+                                <th className="px-6 py-4 font-medium">Category</th>
+                                <th className="px-6 py-4 font-medium">Wholesale</th>
+                                <th className="px-6 py-4 font-medium">Stock</th>
+                                <th className="px-6 py-4 font-medium">Status</th>
+                                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {filteredProducts.map((product) => (
+                                <tr key={product.id} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 relative shrink-0">
+                                                <Image
+                                                    src={product.imageUrl || "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=100"}
+                                                    alt={product.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                            <div>
+                                                <div className="font-medium text-gray-900">{product.name}</div>
+                                                <div className="text-xs text-gray-500">{product.brand}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-500">
+                                        <span className="px-2.5 py-1 bg-gray-100 rounded-lg text-xs font-medium">
+                                            {product.category?.name || "Uncategorized"}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 font-medium text-gray-900">
+                                        {formatCurrency(product.wholesalePrice)}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span
+                                            className={`px-2.5 py-1 rounded-lg text-xs font-medium ${product.stockQuantity < 10 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-600"
+                                                }`}
+                                        >
+                                            {product.stockQuantity} in stock
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${STATUS_COLORS[product.status] || "bg-gray-100 text-gray-500"}`}>
+                                            {product.status}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={() => handleOpenModal(product)}
+                                                className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                            >
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(product.id)}
+                                                disabled={isLoading}
+                                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            {filteredProducts.length === 0 && (
+                                <tr>
+                                    <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
+                                        No products found.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {/* Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl relative">
+                        <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-gray-50/50">
+                            <h2 className="text-lg font-bold text-primary-dark font-serif">
+                                {editingProduct ? "Edit Product" : "Create New Product"}
+                            </h2>
+                            <button onClick={handleCloseModal} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-full transition-colors">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[75vh]">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                {/* Name */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Product Name</label>
+                                    <input name="name" defaultValue={editingProduct?.name} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="e.g. LPS Royal Gold" />
+                                </div>
+                                {/* Brand */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Brand</label>
+                                    <input name="brand" defaultValue={editingProduct?.brand} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="e.g. AURA Luxe" />
+                                </div>
+
+                                {/* Category */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Category</label>
+                                    <select name="categoryId" defaultValue={editingProduct?.categoryId} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none">
+                                        <option value="">Select Category</option>
+                                        {categories.map((c) => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Status */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Status</label>
+                                    <select name="status" defaultValue={editingProduct?.status || "ACTIVE"} className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none">
+                                        <option value="ACTIVE">Active</option>
+                                        <option value="INACTIVE">Inactive</option>
+                                        <option value="DRAFT">Draft</option>
+                                    </select>
+                                </div>
+
+                                {/* Image URL */}
+                                <div className="space-y-1.5 md:col-span-2">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Primary Image URL</label>
+                                    <input name="imageUrl" defaultValue={editingProduct?.imageUrl} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="https://..." />
+                                </div>
+
+                                {/* Pricing */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Wholesale Price (DZD)</label>
+                                    <input type="number" step="0.01" name="wholesalePrice" defaultValue={editingProduct?.wholesalePrice} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Retail Price (DZD)</label>
+                                    <input type="number" step="0.01" name="retailPrice" defaultValue={editingProduct?.retailPrice} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                </div>
+
+                                {/* Stock */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Current Stock</label>
+                                    <input type="number" name="stockQuantity" defaultValue={editingProduct?.stockQuantity || 0} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Min Order Qty</label>
+                                    <input type="number" name="minimumOrderQuantity" defaultValue={editingProduct?.minimumOrderQuantity || 12} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                </div>
+
+                                {/* Units per box */}
+                                <div className="space-y-1.5 md:col-span-2">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Units Per Box</label>
+                                    <input type="number" name="unitsPerBox" defaultValue={editingProduct?.unitsPerBox || 12} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                </div>
+
+                                {/* Collections */}
+                                {collections.length > 0 && (
+                                    <div className="space-y-1.5 md:col-span-2">
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Collections</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {collections.map((c) => (
+                                                <label key={c.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f8f9fa] border border-gray-200 rounded-lg text-sm cursor-pointer hover:border-[#D4AF37]/40 transition-colors has-[:checked]:bg-[#D4AF37]/10 has-[:checked]:border-[#D4AF37]/40">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="collectionIds"
+                                                        value={c.id}
+                                                        defaultChecked={editCollectionIds.includes(c.id)}
+                                                        className="accent-[#D4AF37]"
+                                                    />
+                                                    {c.name}
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Tags */}
+                                {tags.length > 0 && (
+                                    <div className="space-y-1.5 md:col-span-2">
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Tags</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {tags.map((t) => (
+                                                <label key={t.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f8f9fa] border border-gray-200 rounded-lg text-sm cursor-pointer hover:border-[#D4AF37]/40 transition-colors has-[:checked]:bg-[#D4AF37]/10 has-[:checked]:border-[#D4AF37]/40">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="tagIds"
+                                                        value={t.id}
+                                                        defaultChecked={editTagIds.includes(t.id)}
+                                                        className="accent-[#D4AF37]"
+                                                    />
+                                                    {t.name}
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Description */}
+                                <div className="space-y-1.5 md:col-span-2">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Description</label>
+                                    <textarea name="description" defaultValue={editingProduct?.description} required rows={3} className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                </div>
+                            </div>
+
+                            <div className="mt-8 flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
+                                <button type="button" onClick={handleCloseModal} className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" disabled={isLoading} className="px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-primary hover:bg-primary-dark shadow-md shadow-primary/20 transition-all disabled:opacity-50">
+                                    {isLoading ? "Saving..." : "Save Product"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

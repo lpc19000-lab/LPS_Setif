@@ -1,0 +1,9 @@
+node_modules
+.next
+.env*
+tsconfig.tsbuildinfo
+dist
+build
+out
+.DS_Store
+Thumbs.db
