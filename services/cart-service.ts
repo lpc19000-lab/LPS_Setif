@@ -1,7 +1,5 @@
 import prisma from "@/lib/db";
 
-// PriceTier is no longer used for volume-based selling
-
 // ── READ ──────────────────────────────────────────────────────────────────
 export const getCart = async (customerId: string) => {
     const cart = await prisma.cart.findUnique({
@@ -10,7 +8,10 @@ export const getCart = async (customerId: string) => {
             items: {
                 include: {
                     product: {
-                        include: { category: true, priceTiers: { orderBy: { minQuantity: "asc" } } },
+                        include: { 
+                            category: true, 
+                            volumes: true 
+                        },
                     },
                 },
             },
@@ -22,13 +23,22 @@ export const getCart = async (customerId: string) => {
     // Calculate total using volume-based pricing
     let totalPrice = 0;
     const enrichedItems = cart.items.map((item) => {
-        // Find the matching volume price
-        const volumeData = (item.product as any).volumes?.find((v: any) => v.ml === item.selectedVolume);
-        const unitPrice = volumeData ? Number(volumeData.price) : (Number(item.product.basePrice) / 100) * item.selectedVolume;
+        // Find matching volume price in database
+        const volumeData = item.product.volumes.find((v) => v.ml === item.selectedVolume);
+        
+        // Calculate unit price: fixed volume price OR calculated from basePrice
+        const unitPrice = volumeData 
+            ? Number(volumeData.price) 
+            : (Number(item.product.basePrice) / 100) * item.selectedVolume;
 
         const lineTotal = unitPrice * item.quantity;
         totalPrice += lineTotal;
-        return { ...item, unitPrice, lineTotal };
+        
+        return { 
+            ...item, 
+            unitPrice, 
+            lineTotal 
+        };
     });
 
     return { ...cart, items: enrichedItems, totalPrice };
@@ -38,28 +48,19 @@ export const getCart = async (customerId: string) => {
 export const addToCart = async (
     customerId: string,
     productId: string,
-    quantity: number
+    quantity: number,
+    selectedVolume: number = 100
 ) => {
-    // Validate product exists
-    const product = await prisma.product.findUnique({ where: { id: productId } });
+    // Validate product existence and fetch necessary fields
+    const product = await prisma.product.findUnique({ 
+        where: { id: productId },
+        select: { id: true, name: true, stockMl: true }
+    });
+    
     if (!product) throw new Error("Product not found");
 
-    // Validate minimum order quantity
-    if (quantity < product.minimumOrderQuantity) {
-        throw new Error(
-            `Minimum order quantity for "${product.name}" is ${product.minimumOrderQuantity}`
-        );
-    }
-
-    // Validate units per box
-    if (quantity % product.unitsPerBox !== 0) {
-        throw new Error(
-            `Quantity must be a multiple of ${product.unitsPerBox} (units per box)`
-        );
-    }
-
     // Validate stock availability (ml-based)
-    const requiredMl = quantity * (selectedVolume || 100);
+    const requiredMl = quantity * selectedVolume;
     if (product.stockMl < requiredMl) {
         throw new Error(
             `Insufficient stock for "${product.name}". Available: ${product.stockMl}ml`
@@ -72,12 +73,17 @@ export const addToCart = async (
         cart = await prisma.cart.create({ data: { customerId } });
     }
 
-    // Check if item with same volume is already in cart
+    // UNIQUE CONSTRAINT: Identify item by (cart, product, volume)
     const existingItem = await prisma.cartItem.findFirst({
-        where: { cartId: cart.id, productId, selectedVolume: selectedVolume || 100 },
+        where: { 
+            cartId: cart.id, 
+            productId, 
+            selectedVolume 
+        },
     });
 
     if (existingItem) {
+        // Update quantity
         return await prisma.cartItem.update({
             where: { id: existingItem.id },
             data: { quantity: existingItem.quantity + quantity },
@@ -85,21 +91,17 @@ export const addToCart = async (
         });
     }
 
+    // Create new line item
     return await prisma.cartItem.create({
-        data: { cartId: cart.id, productId, quantity, selectedVolume: selectedVolume || 100 },
+        data: { 
+            cartId: cart.id, 
+            productId, 
+            quantity, 
+            selectedVolume 
+        },
         include: { product: true },
     });
 };
-
-export const addToCart = async (
-    customerId: string,
-    productId: string,
-    quantity: number,
-    selectedVolume: number = 100
-) => {
-    // Validate product exists
-    const product = await prisma.product.findUnique({ where: { id: productId } });
-    if (!product) throw new Error("Product not found");
 
 // ── UPDATE CART ITEM ──────────────────────────────────────────────────────
 export const updateCartItem = async (cartItemId: string, quantity: number) => {
@@ -112,6 +114,14 @@ export const updateCartItem = async (cartItemId: string, quantity: number) => {
 
     if (quantity <= 0) {
         return await prisma.cartItem.delete({ where: { id: cartItemId } });
+    }
+
+    // Stock validation for update
+    const requiredMl = quantity * cartItem.selectedVolume;
+    if (cartItem.product.stockMl < requiredMl) {
+        throw new Error(
+            `Insufficient stock. Available: ${cartItem.product.stockMl}ml`
+        );
     }
 
     return await prisma.cartItem.update({

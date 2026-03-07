@@ -12,7 +12,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const { productId, quantity } = await request.json();
+        const { productId, quantity, selectedVolume } = await request.json();
 
         if (!productId || !quantity) {
             return NextResponse.json(
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const item = await addToCart(customer.id, productId, quantity);
+        const item = await addToCart(customer.id, productId, quantity, selectedVolume || 100);
         return NextResponse.json({ success: true, data: item }, { status: 201 });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : "Failed to add to cart";

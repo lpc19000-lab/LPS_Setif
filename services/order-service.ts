@@ -1,6 +1,5 @@
 import prisma from "@/lib/db";
 import { OrderStatus, Prisma } from "@prisma/client";
-import { getTieredPrice } from "./cart-service";
 import { notifyNewOrder, notifyLowStock } from "./notification-service";
 import { Errors } from "@/lib/errors";
 
@@ -8,6 +7,7 @@ import { Errors } from "@/lib/errors";
 interface OrderItemInput {
     productId: string;
     quantity: number;
+    selectedVolume: number; // Required for volume-based selling
 }
 
 interface CreateOrderInput {
@@ -32,7 +32,6 @@ export const createOrder = async (input: CreateOrderInput) => {
         const productIds = input.items.map((i) => i.productId);
         const products = await tx.product.findMany({
             where: { id: { in: productIds } },
-            include: { priceTiers: { orderBy: { minQuantity: "desc" } } },
         });
 
         if (products.length !== productIds.length) {
@@ -41,53 +40,37 @@ export const createOrder = async (input: CreateOrderInput) => {
             throw Errors.invalidInput(`Products not found: ${missing.join(", ")}`);
         }
 
-        // Step 2: Validate minimum order quantity
-        for (const item of input.items) {
-            const product = products.find((p) => p.id === item.productId)!;
-            if (item.quantity < product.minimumOrderQuantity) {
-                throw Errors.minimumNotMet(product.name, product.minimumOrderQuantity, item.quantity);
-            }
-        }
+        // Legacy validations removed
 
-        // Step 3: Validate units per box
+        // Step 4: Validate and update stock (ml-based)
         for (const item of input.items) {
             const product = products.find((p) => p.id === item.productId)!;
-            if (item.quantity % product.unitsPerBox !== 0) {
-                throw Errors.unitsPerBoxMismatch(product.name, product.unitsPerBox, item.quantity);
+            const requiredMl = item.quantity * item.selectedVolume;
+            
+            if (product.stockMl < requiredMl) {
+                throw Errors.outOfStock(product.name, product.stockMl, requiredMl);
             }
-        }
-
-        // Step 4: Validate and update stock
-        for (const item of input.items) {
-            const product = products.find((p) => p.id === item.productId)!;
-            if (product.stockQuantity < item.quantity) {
-                throw Errors.outOfStock(product.name, product.stockQuantity, item.quantity);
-            }
+            
             await tx.product.update({
                 where: { id: item.productId },
-                data: { stockQuantity: { decrement: item.quantity } },
+                data: { stockMl: { decrement: requiredMl } },
             });
         }
 
-        // Step 5: Calculate total with tiered pricing
+        // Step 5: Calculate total with volume prices
         let totalPrice = 0;
         const orderItemsData = input.items.map((item) => {
             const product = products.find((p) => p.id === item.productId)!;
 
-            // Apply best matching tier
-            let unitPrice = Number(product.wholesalePrice);
-            for (const tier of product.priceTiers) {
-                if (item.quantity >= tier.minQuantity) {
-                    unitPrice = Number(tier.price);
-                    break; // Already sorted desc, first match is best
-                }
-            }
+            // Calculate unit price from basePrice (per 100ml)
+            const unitPrice = (Number(product.basePrice) / 100) * item.selectedVolume;
 
             const lineTotal = unitPrice * item.quantity;
             totalPrice += lineTotal;
             return {
                 productId: item.productId,
                 quantity: item.quantity,
+                selectedVolume: item.selectedVolume,
                 price: unitPrice,
             };
         });
@@ -140,35 +123,27 @@ export const createOrder = async (input: CreateOrderInput) => {
         });
 
         // Step 9: Update ProductSales aggregation
-        for (const item of input.items) {
-            const product = products.find((p) => p.id === item.productId)!;
-            let unitPrice = Number(product.wholesalePrice);
-            for (const tier of product.priceTiers) {
-                if (item.quantity >= tier.minQuantity) {
-                    unitPrice = Number(tier.price);
-                    break;
-                }
-            }
+        for (const item of orderItemsData) {
             await tx.productSales.upsert({
                 where: { productId: item.productId },
                 update: {
                     unitsSold: { increment: item.quantity },
-                    revenue: { increment: unitPrice * item.quantity },
+                    revenue: { increment: Number(item.price) * item.quantity },
                 },
                 create: {
                     productId: item.productId,
                     unitsSold: item.quantity,
-                    revenue: unitPrice * item.quantity,
+                    revenue: Number(item.price) * item.quantity,
                 },
             });
         }
 
-        for (const item of input.items) {
+        for (const item of orderItemsData) {
             await tx.inventoryLog.create({
                 data: {
                     productId: item.productId,
                     changeType: "SALE",
-                    quantity: -item.quantity,
+                    quantity: -(item.quantity * item.selectedVolume), // Log in ml
                     source: "ORDER",
                     reason: `Sale from order ${order.id}`,
                 },
@@ -185,8 +160,8 @@ export const createOrder = async (input: CreateOrderInput) => {
         // Check for low stock alerts
         for (const item of order.items) {
             const product = await prisma.product.findUnique({ where: { id: item.productId } });
-            if (product && product.stockQuantity <= product.lowStockThreshold) {
-                await notifyLowStock(product.id, product.name, product.stockQuantity);
+            if (product && product.stockMl <= product.lowStockThreshold) {
+                await notifyLowStock(product.id, product.name, product.stockMl);
             }
         }
     } catch (e) {
@@ -216,16 +191,17 @@ export const updateOrderStatus = async (
         // Stock automation: restore stock if cancelling a non-cancelled order
         if (status === OrderStatus.CANCELLED && oldStatus !== OrderStatus.CANCELLED) {
             for (const item of order.items) {
+                const totalMl = item.quantity * item.selectedVolume;
                 await tx.product.update({
                     where: { id: item.productId },
-                    data: { stockQuantity: { increment: item.quantity } },
+                    data: { stockMl: { increment: totalMl } },
                 });
 
                 await tx.inventoryLog.create({
                     data: {
                         productId: item.productId,
                         changeType: "CANCEL",
-                        quantity: item.quantity,
+                        quantity: totalMl, // restored in ml
                         source: changedBy === "CUSTOMER" ? "ORDER" : "ADMIN",
                         reason: `Restock from cancelled order ${orderId}`,
                     },
@@ -351,6 +327,7 @@ export const getReorderItems = async (orderId: string) => {
         productId: item.productId,
         name: item.product.name,
         quantity: item.quantity,
-        currentPrice: Number(item.product.wholesalePrice),
+        selectedVolume: item.selectedVolume,
+        currentPrice: (Number(item.product.basePrice) / 100) * item.selectedVolume,
     }));
 };

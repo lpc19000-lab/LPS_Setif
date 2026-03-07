@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
         for (const item of items) {
             try {
-                await addToCart(customer.id, item.productId, item.quantity);
+                await addToCart(customer.id, item.productId, item.quantity, item.selectedVolume);
                 addedCount++;
             } catch (err: any) {
                 errors.push(`${item.name}: ${err.message}`);
