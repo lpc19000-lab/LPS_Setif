@@ -12,11 +12,10 @@ interface Product {
     name: string;
     brand: string;
     imageUrl: string;
-    wholesalePrice: number;
-    minimumOrderQuantity: number;
-    stockQuantity: number;
+    basePrice: number;
     category: { name: string } | null;
 }
+
 
 export default function CategoryPage() {
     const params = useParams();
@@ -92,7 +91,7 @@ export default function CategoryPage() {
                                         <div className="p-5">
                                             <h3 className="font-serif text-lg text-gray-800 mb-1 group-hover:text-primary-dark transition-colors">{product.name}</h3>
                                             <p className="text-gray-400 text-sm mb-3">{product.brand}</p>
-                                            <p className="text-primary-dark font-bold text-xl">{Number(product.wholesalePrice).toLocaleString()} DA</p>
+                                            <p className="text-primary-dark font-bold text-xl">{Number(product.basePrice).toLocaleString()} DA</p>
                                         </div>
                                     </div>
                                 </Link>

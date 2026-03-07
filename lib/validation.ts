@@ -2,20 +2,23 @@ import { z } from "zod";
 
 // ── Product Validation ─────────────────────────────────────────────────────
 
+export const volumeSchema = z.object({
+  ml: z.number().int().positive(),
+  price: z.number().positive(),
+});
+
 export const createProductSchema = z.object({
   name: z.string().min(1, "Product name is required").max(200),
-  slug: z.string().min(1).max(200),
+  slug: z.string().min(1).max(200).optional(),
   brand: z.string().min(1, "Brand is required").max(100),
   description: z.string().min(1, "Description is required"),
   categoryId: z.string().min(1, "Category is required"),
   imageUrl: z.string().url("Invalid image URL"),
-  wholesalePrice: z.number().positive("Wholesale price must be positive"),
-  retailPrice: z.number().positive("Retail price must be positive"),
-  costPrice: z.number().min(0).optional(),
-  stockQuantity: z.number().int().min(0).optional(),
-  minimumOrderQuantity: z.number().int().min(1).optional(),
-  unitsPerBox: z.number().int().min(1).optional(),
+  basePrice: z.number().positive("Base price must be positive"),
+  stockMl: z.number().int().min(0).optional(),
   lowStockThreshold: z.number().int().min(0).optional(),
+  status: z.enum(["ACTIVE", "INACTIVE", "DRAFT"]).optional(),
+  volumes: z.array(volumeSchema).optional(),
 });
 
 export const updateProductSchema = createProductSchema.partial();
@@ -43,6 +46,7 @@ export const customerLoginSchema = z.object({
 export const orderItemSchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
   quantity: z.number().int().positive("Quantity must be a positive integer"),
+  selectedVolume: z.number().int().positive("Volume is required"),
 });
 
 export const createOrderSchema = z.object({
@@ -63,6 +67,7 @@ export const createOrderSchema = z.object({
 export const cartItemSchema = z.object({
   productId: z.string().min(1),
   quantity: z.number().int().positive(),
+  selectedVolume: z.number().int().positive(),
 });
 
 // ── Category Validation ────────────────────────────────────────────────────
@@ -75,12 +80,11 @@ export const createCategorySchema = z.object({
 // ── Admin Data Validation ──────────────────────────────────────────────────
 
 export const stockUpdateSchema = z.object({
-  stockQuantity: z.number().int().min(0, "Stock cannot be negative"),
+  stockMl: z.number().int().min(0, "Stock cannot be negative"),
 });
 
 export const priceUpdateSchema = z.object({
-  wholesalePrice: z.number().positive("Price must be positive"),
-  retailPrice: z.number().positive("Price must be positive"),
+  basePrice: z.number().positive("Price must be positive"),
 });
 
 // ── Helper: Format Zod Errors ──────────────────────────────────────────────
@@ -88,3 +92,4 @@ export const priceUpdateSchema = z.object({
 export function formatZodErrors(error: z.ZodError): string {
   return error.issues.map((e) => `${e.path.join(".")}: ${e.message}`).join("; ");
 }
+

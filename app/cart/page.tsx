@@ -127,7 +127,7 @@ export default function CartPage() {
                                             <div className="text-right">
                                                 <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Subtotal</p>
                                                 <p className="font-bold text-primary text-xl">
-                                                    {(Number(item.product.wholesalePrice) * item.quantity).toLocaleString()} DA
+                                                    {(Number(item.product.basePrice) * item.quantity).toLocaleString()} DA
                                                 </p>
                                             </div>
                                         </div>

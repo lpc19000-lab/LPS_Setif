@@ -9,10 +9,9 @@ interface Product {
     name: string;
     brand: string;
     imageUrl: string;
-    wholesalePrice: number;
-    retailPrice: number;
-    minimumOrderQuantity: number;
-    stockQuantity: number;
+    basePrice: number;
+    stockMl: number;
+    lowStockThreshold: number;
     status: string;
     category: { id: string; name: string } | null;
 }
@@ -41,6 +40,10 @@ function CatalogContent() {
     useEffect(() => {
         fetchCategories();
     }, []);
+
+    useEffect(() => {
+        fetchProducts();
+    }, [search, categoryFilter, brandFilter, inStockOnly]);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -71,18 +74,6 @@ function CatalogContent() {
 
     const brands = Array.from(new Set(products.map((p) => p.brand).filter(Boolean)));
     
-    // ── REALTIME UPDATES ───────────────────────────────────────────────────
-    const { useRealtime } = require("@/hooks/use-realtime");
-    useRealtime("products", (payload: any) => {
-        if (payload.eventType === "UPDATE") {
-            setProducts((prev) =>
-                prev.map((p) =>
-                    p.id === payload.new.id ? { ...p, ...payload.new } : p
-                )
-            );
-        }
-    });
-
     return (
         <main className="pt-24 pb-20 min-h-screen bg-[#FAFAF8]">
             <div className="max-w-7xl mx-auto px-6">
@@ -92,7 +83,7 @@ function CatalogContent() {
                         Our Collection
                     </h1>
                     <p className="text-gray-500 max-w-md mx-auto">
-                        Premium fragrances at exclusive wholesale prices
+                        Premium fragrances with flexible volume options
                     </p>
                 </div>
 
@@ -164,12 +155,12 @@ function CatalogContent() {
                                                 fill
                                                 className="object-cover group-hover:scale-105 transition-transform duration-700"
                                             />
-                                            {product.stockQuantity <= 0 && (
+                                            {product.stockMl <= 0 && (
                                                 <span className="absolute top-3 right-3 bg-gray-900/80 text-white text-xs px-2.5 py-1 rounded-full">
                                                     Out of Stock
                                                 </span>
                                             )}
-                                            {product.stockQuantity > 0 && product.stockQuantity <= 10 && (
+                                            {product.stockMl > 0 && product.stockMl <= product.lowStockThreshold && (
                                                 <span className="absolute top-3 right-3 bg-red-500/90 text-white text-xs px-2.5 py-1 rounded-full">
                                                     Low Stock
                                                 </span>
@@ -188,10 +179,10 @@ function CatalogContent() {
                                             <div className="flex items-end justify-between">
                                                 <div>
                                                     <p className="text-primary-dark font-bold text-xl">
-                                                        {Number(product.wholesalePrice).toLocaleString()} DA
+                                                        {Number(product.basePrice).toLocaleString()} DA
                                                     </p>
                                                     <p className="text-gray-400 text-xs mt-0.5">
-                                                        MOQ: {product.minimumOrderQuantity} units
+                                                        Per 100ml reference
                                                     </p>
                                                 </div>
                                                 <span className="text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
@@ -209,6 +200,7 @@ function CatalogContent() {
         </main>
     );
 }
+
 
 export default function ShopPage() {
     return (

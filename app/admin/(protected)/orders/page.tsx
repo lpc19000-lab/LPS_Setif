@@ -15,8 +15,7 @@ export default async function AdminOrdersPage() {
             price: Number(i.price),
             product: {
                 ...i.product,
-                wholesalePrice: Number(i.product.wholesalePrice),
-                retailPrice: Number(i.product.retailPrice)
+                basePrice: Number(i.product.basePrice),
             }
         })),
         invoice: o.invoice ? {

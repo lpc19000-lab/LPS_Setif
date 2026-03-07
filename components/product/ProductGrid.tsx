@@ -10,9 +10,7 @@ interface Product {
     brand: string;
     description: string;
     imageUrl: string;
-    wholesalePrice: number;
-    minimumOrderQuantity: number;
-    unitsPerBox: number;
+    basePrice: number;
 }
 
 export default function ProductGrid({ products }: { products: Product[] }) {

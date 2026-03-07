@@ -16,22 +16,20 @@ interface Product {
     name: string;
     brand: string;
     imageUrl: string;
-    wholesalePrice: number;
-    minimumOrderQuantity: number;
-    stockQuantity: number;
+    basePrice: number;
     category: { name: string } | null;
 }
 
 const features = [
     {
         icon: "✦",
-        title: "Wholesale Pricing",
-        desc: "Exclusive B2B prices for registered distributors across Algeria.",
+        title: "Bulk Fragrances",
+        desc: "High-quality bulk perfumes for wholesalers across Algeria.",
     },
     {
         icon: "◆",
-        title: "Bulk Ordering",
-        desc: "Order by the box with minimum quantities designed for retailers.",
+        title: "Flexible Volume",
+        desc: "Order precisely the amount you need with our ml-based system.",
     },
     {
         icon: "❖",
@@ -67,7 +65,7 @@ function ProductCard({ product, i }: { product: Product; i: number }) {
                         </h3>
                         <p className="text-gray-400 text-sm mb-3">{product.brand}</p>
                         <p className="text-primary-dark font-bold text-xl">
-                            {Number(product.wholesalePrice).toLocaleString()} DA
+                            {Number(product.basePrice).toLocaleString()} DA
                         </p>
                     </div>
                 </div>
@@ -75,6 +73,7 @@ function ProductCard({ product, i }: { product: Product; i: number }) {
         </motion.div>
     );
 }
+
 
 function ProductSection({ title, subtitle, products }: { title: string; subtitle: string; products: Product[] }) {
     if (products.length === 0) return null;

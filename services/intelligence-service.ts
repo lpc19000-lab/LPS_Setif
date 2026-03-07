@@ -9,7 +9,7 @@ export const getRestockSuggestions = async () => {
             name: true,
             brand: true,
             imageUrl: true,
-            stockQuantity: true,
+            stockMl: true,
             lowStockThreshold: true,
         }
     });
@@ -18,7 +18,7 @@ export const getRestockSuggestions = async () => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const recentItems = await prisma.orderItem.groupBy({
-        by: ['productId'],
+        by: ['productId', 'selectedVolume'],
         _sum: { quantity: true },
         where: {
             order: {
@@ -28,28 +28,32 @@ export const getRestockSuggestions = async () => {
         }
     });
 
-    const recentDemandMap = new Map(recentItems.map(item => [item.productId, item._sum.quantity || 0]));
+    const recentDemandMap = new Map<string, number>();
+    recentItems.forEach(item => {
+        const totalMl = (item._sum.quantity || 0) * item.selectedVolume;
+        recentDemandMap.set(item.productId, (recentDemandMap.get(item.productId) || 0) + totalMl);
+    });
 
     return products.map(product => {
-        const unitsSold30d = recentDemandMap.get(product.id) || 0;
-        const avgDailySales = unitsSold30d / 30;
+        const mlSold30d = recentDemandMap.get(product.id) || 0;
+        const avgDailyMlSales = mlSold30d / 30;
 
-        // Handle infinity if avgDailySales is 0
-        const estimatedDaysLeft = avgDailySales > 0 ? Math.floor(product.stockQuantity / avgDailySales) : 999;
+        // Handle infinity if avgDailyMlSales is 0
+        const estimatedDaysLeft = avgDailyMlSales > 0 ? Math.floor(product.stockMl / avgDailyMlSales) : 999;
 
         let recommendation = "Healthy";
         let status = "NORMAL";
-        if (product.stockQuantity <= product.lowStockThreshold || estimatedDaysLeft < 7) {
+        if (product.stockMl <= product.lowStockThreshold || estimatedDaysLeft < 7) {
             recommendation = "Restock Soon";
             status = "WARNING";
-            if (product.stockQuantity === 0) {
+            if (product.stockMl === 0) {
                 recommendation = "Restock Immediately (OOS)";
                 status = "CRITICAL";
             }
-        } else if (estimatedDaysLeft > 60 && product.stockQuantity > 50) {
+        } else if (estimatedDaysLeft > 60 && product.stockMl > 5000) { // 5L overstock
             recommendation = "Overstock";
             status = "INFO";
-        } else if (avgDailySales === 0 && product.stockQuantity > 0) {
+        } else if (avgDailyMlSales === 0 && product.stockMl > 0) {
             recommendation = "No Recent Sales";
             status = "INFO";
         }
@@ -59,9 +63,9 @@ export const getRestockSuggestions = async () => {
             name: product.name,
             brand: product.brand,
             imageUrl: product.imageUrl,
-            currentStock: product.stockQuantity,
-            unitsSold30d,
-            avgDailySales: Number(avgDailySales.toFixed(2)),
+            currentStockMl: product.stockMl,
+            mlSold30d,
+            avgDailyMlSales: Number(avgDailyMlSales.toFixed(2)),
             estimatedDaysLeft,
             recommendation,
             status
@@ -91,22 +95,21 @@ export const getDeadStock = async () => {
     const deadProducts = await prisma.product.findMany({
         where: {
             id: { notIn: Array.from(activeProductIds) },
-            stockQuantity: { gt: 0 } // Only care if we actually have it in stock
+            stockMl: { gt: 0 } // Only care if we actually have it in stock
         },
         select: {
             id: true,
             name: true,
             brand: true,
             imageUrl: true,
-            stockQuantity: true,
-            wholesalePrice: true,
-            costPrice: true,
+            stockMl: true,
+            basePrice: true,
             createdAt: true
         }
     });
 
     return deadProducts.map(p => {
-        const valueTieUp = Number(p.costPrice) * p.stockQuantity;
+        const valueTieUp = Number(p.basePrice) * (p.stockMl / 100); // Rough estimate based on base price per 100ml
         return {
             ...p,
             valueTieUp,
@@ -125,7 +128,7 @@ export const getProfitAnalytics = async () => {
         where: { status: { not: OrderStatus.CANCELLED } },
         include: {
             items: {
-                include: { product: { select: { costPrice: true } } }
+                include: { product: { select: { basePrice: true } } }
             }
         },
         orderBy: { createdAt: "asc" }
@@ -143,16 +146,17 @@ export const getProfitAnalytics = async () => {
     }
 
     let overallRevenue = 0;
-    let overallCost = 0;
+    let overallCost = 0; // Since costPrice is missing, we'll estimate cost as 70% of basePrice for analytics purposes if needed, or just track revenue
 
     validOrders.forEach(order => {
         const dStr = order.createdAt.toISOString().split('T')[0];
 
-        let orderCost = 0;
         let orderRevenue = Number(order.totalPrice);
+        let orderCost = 0; 
 
         order.items.forEach(item => {
-            orderCost += Number(item.product.costPrice) * item.quantity;
+            // Placeholder: Estimate cost as 70% of price if costPrice is missing from schema
+            orderCost += (Number(item.price) * 0.7) * item.quantity;
         });
 
         const orderProfit = orderRevenue - orderCost;
@@ -185,15 +189,14 @@ export const getProfitAnalytics = async () => {
 
     // Top Profitable Products
     const sales = await prisma.productSales.findMany({
-        include: { product: { select: { id: true, name: true, imageUrl: true, costPrice: true, wholesalePrice: true } } }
+        include: { product: { select: { id: true, name: true, imageUrl: true, basePrice: true } } }
     });
 
     const productsProfit = sales.map(s => {
-        const costPrice = Number(s.product.costPrice);
-        const avgSellPrice = s.unitsSold > 0 ? Number(s.revenue) / s.unitsSold : Number(s.product.wholesalePrice);
-        const unitProfit = Math.max(0, avgSellPrice - costPrice); // avoid negative if cost > wholesale (shouldnt happen but just in case)
+        const avgSellPrice = s.unitsSold > 0 ? Number(s.revenue) / s.unitsSold : Number(s.product.basePrice);
+        const unitProfit = avgSellPrice * 0.3; // Estimating 30% margin
         const totalProfit = unitProfit * s.unitsSold;
-        const marginPercent = avgSellPrice > 0 ? (unitProfit / avgSellPrice) * 100 : 0;
+        const marginPercent = 30;
 
         return {
             id: s.product.id,
@@ -218,9 +221,11 @@ export const getInventoryHealthScore = async () => {
     let score = 100;
 
     // Low stock penalty
-    const lowStockCount = await prisma.product.count({
-        where: { stockQuantity: { lte: prisma.product.fields.lowStockThreshold } }
+    const products = await prisma.product.findMany({
+        select: { stockMl: true, lowStockThreshold: true }
     });
+    
+    const lowStockCount = products.filter(p => p.stockMl <= p.lowStockThreshold).length;
     score -= (lowStockCount * 2); // 2 points per low stock item
 
     // Dead stock penalty
@@ -228,9 +233,7 @@ export const getInventoryHealthScore = async () => {
     score -= (deadStock.length * 5); // 5 points per dead stock item
 
     // OOS penalty
-    const oosCount = await prisma.product.count({
-        where: { stockQuantity: 0 }
-    });
+    const oosCount = products.filter(p => p.stockMl === 0).length;
     score -= (oosCount * 5); // 5 points per OOS item
 
     return Math.max(0, score); // clamp to 0
@@ -251,7 +254,7 @@ export const getSmartAlerts = async () => {
         alerts.push({ type: "WARNING", message: `${urgentRestock.length} products are out of stock and need immediate restocking.` });
     }
 
-    const warningRestock = restock.filter(r => r.status === "WARNING" && r.currentStock > 0);
+    const warningRestock = restock.filter(r => r.status === "WARNING" && r.currentStockMl > 0);
     if (warningRestock.length > 0) {
         alerts.push({ type: "INFO", message: `${warningRestock.length} products are running low and will stock out within 7 days.` });
     }
@@ -263,3 +266,4 @@ export const getSmartAlerts = async () => {
 
     return alerts;
 };
+

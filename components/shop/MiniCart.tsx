@@ -120,7 +120,7 @@ export default function MiniCart() {
                                                     </button>
                                                 </div>
                                                 <p className="text-sm font-bold text-gray-950">
-                                                    {(Number(item.product.wholesalePrice) * item.quantity).toLocaleString()} DA
+                                                    {(Number(item.product.basePrice) * item.quantity).toLocaleString()} DA
                                                 </p>
                                             </div>
                                         </div>

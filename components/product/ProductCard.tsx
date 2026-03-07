@@ -11,9 +11,7 @@ interface ProductProps {
         brand: string;
         description: string;
         imageUrl: string;
-        wholesalePrice: number;
-        minimumOrderQuantity: number;
-        unitsPerBox: number;
+        basePrice: number;
     };
 }
 
@@ -46,18 +44,14 @@ export default function ProductCard({ product }: ProductProps) {
                 <div className="flex flex-col gap-4 mt-auto">
                     <div className="flex items-center justify-between">
                         <div className="flex flex-col">
-                            <span className="text-xs text-gray-400 uppercase tracking-widest">Wholesale Price</span>
-                            <span className="text-2xl font-semibold text-primary">{product.wholesalePrice} DZD</span>
-                        </div>
-                        <div className="text-right">
-                            <span className="text-[10px] text-gray-400 uppercase tracking-widest block">Min. Order</span>
-                            <span className="font-medium">{product.minimumOrderQuantity} box ({product.unitsPerBox} units)</span>
+                            <span className="text-xs text-gray-400 uppercase tracking-widest">Base Price (100ml)</span>
+                            <span className="text-2xl font-semibold text-primary">{product.basePrice} DZD</span>
                         </div>
                     </div>
 
                     <Button className="w-full gap-2 py-6">
                         <ShoppingCart size={18} />
-                        Add to Bulk Cart
+                        View Details
                     </Button>
                 </div>
             </div>

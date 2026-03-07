@@ -2,7 +2,6 @@
 
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { logEvent } from "@/lib/logger";
 
 function generateSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -18,25 +17,20 @@ export async function createProduct(formData: FormData) {
         description: formData.get("description") as string,
         categoryId: formData.get("categoryId") as string,
         imageUrl: formData.get("imageUrl") as string,
-        wholesalePrice: Number(formData.get("wholesalePrice")),
-        retailPrice: Number(formData.get("retailPrice")),
-        stockQuantity: Number(formData.get("stockQuantity")),
-        minimumOrderQuantity: Number(formData.get("minimumOrderQuantity")),
-        unitsPerBox: Number(formData.get("unitsPerBox")),
-        status: (formData.get("status") as string) || "ACTIVE",
+        basePrice: Number(formData.get("basePrice")),
+        stockMl: Number(formData.get("stockMl")),
+        lowStockThreshold: Number(formData.get("lowStockThreshold") || 500),
+        status: (formData.get("status") as any) || "ACTIVE",
     };
 
     const collectionIds = formData.getAll("collectionIds") as string[];
     const tagIds = formData.getAll("tagIds") as string[];
 
-    if (!data.name || !data.brand || !data.categoryId || !data.wholesalePrice || isNaN(data.wholesalePrice) || data.wholesalePrice <= 0) {
-        return { success: false, error: "Missing or invalid required fields (name, brand, categoryId, wholesalePrice)" };
+    if (!data.name || !data.brand || !data.categoryId || !data.basePrice || isNaN(data.basePrice) || data.basePrice <= 0) {
+        return { success: false, error: "Missing or invalid required fields (name, brand, categoryId, basePrice)" };
     }
-    if (!data.retailPrice || isNaN(data.retailPrice) || data.retailPrice <= 0) {
-        return { success: false, error: "Retail price must be a positive number" };
-    }
-    if (data.stockQuantity < 0 || isNaN(data.stockQuantity)) {
-        return { success: false, error: "Stock quantity cannot be negative" };
+    if (data.stockMl < 0 || isNaN(data.stockMl)) {
+        return { success: false, error: "Stock (ml) cannot be negative" };
     }
 
     try {
@@ -44,12 +38,12 @@ export async function createProduct(formData: FormData) {
             const product = await tx.product.create({ data: data as any });
 
             // Initial stock log
-            if (data.stockQuantity > 0) {
+            if (data.stockMl > 0) {
                 await tx.inventoryLog.create({
                     data: {
                         productId: product.id,
                         changeType: "INITIAL_STOCK",
-                        quantity: data.stockQuantity,
+                        quantity: data.stockMl,
                         source: "ADMIN",
                         reason: "Initial stock on product creation",
                     },
@@ -77,7 +71,6 @@ export async function createProduct(formData: FormData) {
             }
         });
 
-        await logEvent("PRODUCT_CREATED", "new", `Product "${data.name}" created with ${data.stockQuantity} units`);
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         revalidatePath("/");
@@ -95,12 +88,10 @@ export async function updateProduct(id: string, formData: FormData) {
         description: formData.get("description") as string,
         categoryId: formData.get("categoryId") as string,
         imageUrl: formData.get("imageUrl") as string,
-        wholesalePrice: Number(formData.get("wholesalePrice")),
-        retailPrice: Number(formData.get("retailPrice")),
-        stockQuantity: Number(formData.get("stockQuantity")),
-        minimumOrderQuantity: Number(formData.get("minimumOrderQuantity")),
-        unitsPerBox: Number(formData.get("unitsPerBox")),
-        status: (formData.get("status") as string) || "ACTIVE",
+        basePrice: Number(formData.get("basePrice")),
+        stockMl: Number(formData.get("stockMl")),
+        lowStockThreshold: Number(formData.get("lowStockThreshold") || 500),
+        status: (formData.get("status") as any) || "ACTIVE",
     };
 
     const collectionIds = formData.getAll("collectionIds") as string[];
@@ -146,7 +137,6 @@ export async function updateProduct(id: string, formData: FormData) {
 export async function deleteProduct(id: string) {
     try {
         await prisma.product.delete({ where: { id } });
-        await logEvent("PRODUCT_DELETED", id, `Product ${id} deleted`);
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         return { success: true };

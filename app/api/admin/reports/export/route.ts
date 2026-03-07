@@ -20,12 +20,13 @@ export async function GET(request: Request) {
                 orderBy: { name: "asc" }
             });
 
-            csvData = "ID,Name,Brand,Category,WholesalePrice,RetailPrice,StockQuantity,LowStockThreshold\n";
+            csvData = "ID,Name,Brand,Category,BasePrice,StockMl,LowStockThreshold\n";
             products.forEach(p => {
-                csvData += `${p.id},"${p.name}","${p.brand}","${p.category.name}",${p.wholesalePrice},${p.retailPrice},${p.stockQuantity},${p.lowStockThreshold}\n`;
+                csvData += `${p.id},"${p.name}","${p.brand}","${p.category.name}",${p.basePrice},${p.stockMl},${p.lowStockThreshold}\n`;
             });
             filename = `inventory_report_${new Date().toISOString().split('T')[0]}.csv`;
         }
+
         else if (type === "sales") {
             const orders = await prisma.order.findMany({
                 where: { status: { not: OrderStatus.CANCELLED } },

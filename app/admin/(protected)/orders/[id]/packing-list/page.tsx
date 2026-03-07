@@ -91,13 +91,13 @@ export default async function PackingListPage({ params }: { params: Promise<{ id
                                 <td className="py-6 text-gray-400 font-mono">{index + 1}</td>
                                 <td className="py-6">
                                     <div className="font-bold text-gray-900">{item.product.name}</div>
-                                    <div className="text-xs text-gray-400 uppercase tracking-widest">{item.product.brand} • {Number(item.product.wholesalePrice)} DZD</div>
+                                    <div className="text-xs text-gray-400 uppercase tracking-widest">{item.product.brand} • {Number(item.product.basePrice)} DZD</div>
                                 </td>
                                 <td className="py-6 text-center font-bold text-primary-dark text-lg">
                                     {item.quantity}
                                 </td>
                                 <td className="py-6 text-right text-gray-500 font-medium">
-                                    {Math.ceil(item.quantity / item.product.unitsPerBox)} Boxes
+                                    Standard Packaging
                                 </td>
                             </tr>
                         ))}

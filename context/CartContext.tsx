@@ -7,7 +7,7 @@ export interface CartProduct {
     name: string;
     brand: string;
     imageUrl: string;
-    wholesalePrice: number;
+    basePrice: number;
     selectedVolume: number; // For volume-based selling
     stockMl: number; // For ml-based validation
 }
@@ -58,7 +58,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }, [items, isMounted]);
 
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = items.reduce((sum, item) => sum + (Number(item.product.wholesalePrice) * item.quantity), 0);
+    const totalPrice = items.reduce((sum, item) => sum + (Number(item.product.basePrice) * item.quantity), 0);
 
     const addItem = (product: CartProduct, quantityToAdd: number) => {
         let error = "";

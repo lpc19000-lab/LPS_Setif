@@ -197,12 +197,12 @@ export default function CheckoutPage() {
                                                     {item.product.name}
                                                 </p>
                                                 <p className="text-gray-400 text-sm">
-                                                    Qty: {item.quantity} × {Number(item.product.wholesalePrice).toLocaleString()} DA
+                                                    Qty: {item.quantity} × {Number(item.product.basePrice).toLocaleString()} DA
                                                 </p>
                                             </div>
                                             <p className="font-bold text-gray-700">
                                                 {(
-                                                    Number(item.product.wholesalePrice) * item.quantity
+                                                    Number(item.product.basePrice) * item.quantity
                                                 ).toLocaleString()}{" "}
                                                 DA
                                             </p>

@@ -76,7 +76,7 @@ export default function ProductPage() {
             name: product.name,
             brand: product.brand,
             imageUrl: product.imageUrl,
-            wholesalePrice: Number(currentVolumePrice),
+            basePrice: Number(currentVolumePrice),
             selectedVolume: selectedVolume,
             stockMl: product.stockMl,
         }, quantity);
@@ -270,7 +270,7 @@ export default function ProductPage() {
                                 <div className="flex flex-col gap-4">
                                     <button
                                         onClick={handleAddToCart}
-                                        disabled={adding || product.stockQuantity === 0}
+                                        disabled={adding || product.stockMl === 0}
                                         className="w-full bg-primary text-white py-6 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-primary-dark transition-all transform active:scale-[0.99] shadow-xl shadow-primary/20 disabled:opacity-50"
                                     >
                                         {adding ? (
@@ -282,6 +282,7 @@ export default function ProductPage() {
                                             </>
                                         )}
                                     </button>
+
 
                                     <div className="flex items-center gap-2 justify-center text-gray-400 text-[10px] font-medium uppercase tracking-[0.2em]">
                                         <Info className="w-3 h-3 text-primary" />
