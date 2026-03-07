@@ -23,8 +23,8 @@ interface CartContextType {
     totalQuantity: number;
     totalPrice: number;
     addItem: (product: CartProduct, quantity: number) => { success: boolean; error?: string };
-    removeItem: (productId: string) => void;
-    updateQuantity: (productId: string, quantity: number) => { success: boolean; error?: string };
+    removeItem: (cartItemId: string) => void;
+    updateQuantity: (cartItemId: string, newQuantity: number) => { success: boolean; error?: string };
     clearCart: () => void;
     isCartOpen: boolean;
     setIsCartOpen: (open: boolean) => void;
@@ -97,8 +97,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return { success: true };
     };
 
-    const removeItem = (productId: string) => {
-        setItems(prev => prev.filter(i => i.product.id !== productId));
+    const removeItem = (cartItemId: string) => {
+        setItems(prev => prev.filter(i => i.id !== cartItemId));
     };
 
     const updateQuantity = (cartItemId: string, newQuantity: number) => {

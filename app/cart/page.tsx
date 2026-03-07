@@ -95,7 +95,7 @@ export default function CartPage() {
                                                 </div>
                                             </div>
                                             <button
-                                                onClick={() => removeItem(item.product.id)}
+                                                onClick={() => removeItem(item.id)}
                                                 className="w-8 h-8 rounded-full flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all"
                                                 aria-label="Remove item"
                                             >

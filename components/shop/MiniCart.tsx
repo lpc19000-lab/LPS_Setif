@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import SafeImage from "@/components/SafeImage";
 
 export default function MiniCart() {
-    const { isCartOpen, setIsCartOpen, items, totalQuantity, totalPrice } = useCart();
+    const { isCartOpen, setIsCartOpen, items, totalQuantity, totalPrice, removeItem, updateQuantity } = useCart();
 
     // Prevent body scroll when open
     useEffect(() => {
@@ -88,7 +88,7 @@ export default function MiniCart() {
                                                     {item.product.name}
                                                 </h3>
                                                 <button 
-                                                    onClick={() => removeItem(item.product.id)}
+                                                    onClick={() => removeItem(item.id)}
                                                     className="p-1 hover:bg-red-50 text-gray-300 hover:text-red-500 rounded-lg transition-all flex-shrink-0"
                                                 >
                                                     <X className="w-3.5 h-3.5" />

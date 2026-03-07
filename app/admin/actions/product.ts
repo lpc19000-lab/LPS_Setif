@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { logEvent } from "@/lib/logger";
 
 function generateSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -71,6 +72,7 @@ export async function createProduct(formData: FormData) {
             }
         });
 
+        await logEvent("PRODUCT_CREATED", "new", `Product "${data.name}" created with ${data.stockMl}ml`);
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         revalidatePath("/");
@@ -124,6 +126,7 @@ export async function updateProduct(id: string, formData: FormData) {
             }
         });
 
+        await logEvent("PRODUCT_UPDATED", id, `Product "${data.name}" updated`);
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         revalidatePath("/");
@@ -137,6 +140,7 @@ export async function updateProduct(id: string, formData: FormData) {
 export async function deleteProduct(id: string) {
     try {
         await prisma.product.delete({ where: { id } });
+        await logEvent("PRODUCT_DELETED", id, `Product ${id} deleted`);
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         return { success: true };
@@ -144,3 +148,4 @@ export async function deleteProduct(id: string) {
         return { success: false, error: "Failed to delete product (might be referenced in orders)" };
     }
 }
+
