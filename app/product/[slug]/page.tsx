@@ -47,6 +47,14 @@ export default function ProductPage() {
             .catch(() => setLoading(false));
     }, [params.slug]);
 
+    // ── REALTIME UPDATES ───────────────────────────────────────────────────
+    const { useRealtime } = require("@/hooks/use-realtime");
+    useRealtime("products", (payload: any) => {
+        if (payload.eventType === "UPDATE" && product && payload.new.id === product.id) {
+            setProduct((prev) => prev ? { ...prev, ...payload.new } : null);
+        }
+    });
+
     const adjustQuantity = (delta: number) => {
         if (!product) return;
         const next = quantity + delta * product.unitsPerBox;

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import LogoutButton from "@/components/shop/LogoutButton";
+import RealtimeOrderList from "@/components/shop/RealtimeOrderList";
 
 export const dynamic = "force-dynamic";
 
@@ -114,45 +115,8 @@ export default async function AccountPage() {
                             </Link>
                         </div>
 
-                        {orders.length === 0 ? (
-                            <div className="p-16 text-center">
-                                <ShoppingBag className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                                <p className="text-gray-500">No orders placed yet.</p>
-                                <Link href="/catalog" className="text-primary font-bold mt-4 inline-block">Start Shopping</Link>
-                            </div>
-                        ) : (
-                            <div className="divide-y divide-gray-50">
-                                {orders.slice(0, 5).map((order) => (
-                                    <Link
-                                        key={order.id}
-                                        href={`/account/orders/${order.id}`}
-                                        className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors group"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                                                <ShoppingBag className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-bold text-gray-900">Order #{order.id.slice(-6).toUpperCase()}</p>
-                                                <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString()}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-6 text-right">
-                                            <div>
-                                                <p className="text-sm font-bold text-gray-900">{Number(order.totalPrice).toLocaleString()} DA</p>
-                                                <span className={`text-[10px] font-black uppercase tracking-widest ${order.status === "DELIVERED" ? "text-emerald-600" :
-                                                    order.status === "CANCELLED" ? "text-red-600" :
-                                                        "text-amber-500"
-                                                    }`}>
-                                                    {order.status}
-                                                </span>
-                                            </div>
-                                            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
+                        {/* Realtime Orders List */}
+                        <RealtimeOrderList initialOrders={orders} customerId={customer.id} />
                     </div>
                 </div>
             </div>

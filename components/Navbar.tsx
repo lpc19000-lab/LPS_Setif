@@ -5,7 +5,11 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Shield, User, ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import MiniCart from "./shop/MiniCart";
+import dynamic from "next/dynamic";
+
+const MiniCart = dynamic(() => import("./shop/MiniCart"), {
+    ssr: false,
+});
 
 interface NavbarProps {
     customerName?: string | null;

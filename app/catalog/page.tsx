@@ -69,12 +69,19 @@ function CatalogContent() {
         }
     };
 
-    useEffect(() => {
-        const debounce = setTimeout(fetchProducts, 400);
-        return () => clearTimeout(debounce);
-    }, [search, categoryFilter, brandFilter, inStockOnly]);
-
     const brands = Array.from(new Set(products.map((p) => p.brand).filter(Boolean)));
+    
+    // ── REALTIME UPDATES ───────────────────────────────────────────────────
+    const { useRealtime } = require("@/hooks/use-realtime");
+    useRealtime("products", (payload: any) => {
+        if (payload.eventType === "UPDATE") {
+            setProducts((prev) =>
+                prev.map((p) =>
+                    p.id === payload.new.id ? { ...p, ...payload.new } : p
+                )
+            );
+        }
+    });
 
     return (
         <main className="pt-24 pb-20 min-h-screen bg-[#FAFAF8]">

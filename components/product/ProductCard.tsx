@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { ShoppingCart } from "lucide-react";
+import SafeImage from "@/components/SafeImage";
 
 interface ProductProps {
     product: {
@@ -22,8 +22,8 @@ export default function ProductCard({ product }: ProductProps) {
         <div className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-xl flex flex-col h-full">
             {/* Image Container */}
             <div className="relative aspect-square overflow-hidden bg-gray-50">
-                <Image
-                    src={product.imageUrl || "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=500&auto=format&fit=crop"}
+                <SafeImage
+                    src={product.imageUrl}
                     alt={product.name}
                     fill
                     className="object-contain p-8 group-hover:scale-110 transition-transform duration-500"
