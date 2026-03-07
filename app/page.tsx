@@ -3,8 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import FragranceScroll from "@/components/FragranceScroll";
+import dynamic from "next/dynamic";
 import SafeImage from "@/components/SafeImage";
+
+const FragranceScroll = dynamic(() => import("@/components/FragranceScroll"), {
+    ssr: false,
+    loading: () => <div className="h-screen bg-[#121212] animate-pulse" />
+});
 
 interface Product {
     id: string;
@@ -43,7 +48,7 @@ function ProductCard({ product, i }: { product: Product; i: number }) {
             viewport={{ once: true }}
             transition={{ delay: i * 0.08, duration: 0.5 }}
         >
-            <Link href={`/product/${product.id}`}>
+            <Link href={`/product/${product.id}`} prefetch={true}>
                 <div className="product-card group cursor-pointer">
                     <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
                         <SafeImage
@@ -94,6 +99,7 @@ function ProductSection({ title, subtitle, products }: { title: string; subtitle
                 <div className="text-center mt-10">
                     <Link
                         href="/catalog"
+                        prefetch={true}
                         className="inline-block px-8 py-3 border border-primary/30 text-primary rounded-full text-sm uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-300"
                     >
                         View All
@@ -110,9 +116,10 @@ export default function HomePage() {
     const [featured, setFeatured] = useState<Product[]>([]);
 
     useEffect(() => {
-        fetch("/api/products?limit=8").then(r => r.json()).then(d => { if (d.success) setFeatured(d.data.slice(0, 4)); });
-        fetch("/api/products").then(r => r.json()).then(d => { if (d.success) setNewArrivals(d.data.slice(0, 8)); });
-        fetch("/api/products?limit=4").then(r => r.json()).then(d => { if (d.success) setBestSellers(d.data.slice(0, 4)); });
+        const fetchOptions = { next: { revalidate: 3600 } };
+        fetch("/api/products?limit=8", fetchOptions).then(r => r.json()).then(d => { if (d.success) setFeatured(d.data.slice(0, 4)); });
+        fetch("/api/products", fetchOptions).then(r => r.json()).then(d => { if (d.success) setNewArrivals(d.data.slice(0, 8)); });
+        fetch("/api/products?limit=4", fetchOptions).then(r => r.json()).then(d => { if (d.success) setBestSellers(d.data.slice(0, 4)); });
     }, []);
 
     return (
@@ -201,12 +208,14 @@ export default function HomePage() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
                             href="/register"
+                            prefetch={true}
                             className="px-8 py-3.5 bg-[#D4AF37] text-white rounded-full font-medium hover:bg-[#B8860B] transition-all duration-300 text-sm uppercase tracking-widest"
                         >
                             Register Now
                         </Link>
                         <Link
                             href="/catalog"
+                            prefetch={true}
                             className="px-8 py-3.5 border border-white/20 text-white/80 rounded-full font-medium hover:border-[#D4AF37]/50 hover:text-[#D4AF37] transition-all duration-300 text-sm uppercase tracking-widest"
                         >
                             Browse Catalog
@@ -223,9 +232,9 @@ export default function HomePage() {
                         <span className="text-white/30 text-xs tracking-[0.3em] uppercase">Perfume</span>
                     </div>
                     <div className="flex gap-8 text-white/40 text-sm">
-                        <Link href="/catalog" className="hover:text-[#D4AF37] transition-colors">Catalog</Link>
-                        <Link href="/register" className="hover:text-[#D4AF37] transition-colors">Register</Link>
-                        <Link href="/login" className="hover:text-[#D4AF37] transition-colors">Login</Link>
+                        <Link href="/catalog" prefetch={true} className="hover:text-[#D4AF37] transition-colors">Catalog</Link>
+                        <Link href="/register" prefetch={true} className="hover:text-[#D4AF37] transition-colors">Register</Link>
+                        <Link href="/login" prefetch={true} className="hover:text-[#D4AF37] transition-colors">Login</Link>
                     </div>
                     <p className="text-white/20 text-xs">
                         © {new Date().getFullYear()} LPS Perfume. All rights reserved.

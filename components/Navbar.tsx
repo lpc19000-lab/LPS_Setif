@@ -36,7 +36,7 @@ export default function Navbar({ customerName }: NavbarProps) {
         >
             <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2">
+                <Link href="/" className="flex items-center gap-2" prefetch={true}>
                     <span
                         className={`font-serif text-2xl font-bold tracking-wider ${isHeroPage ? "text-[#D4AF37]" : "text-primary-dark"
                             }`}
@@ -57,6 +57,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                         <Link
                             key={link.href}
                             href={link.href}
+                            prefetch={true}
                             className={`text-sm tracking-wide transition-colors duration-300 ${pathname === link.href
                                 ? isHeroPage
                                     ? "text-[#D4AF37]"
@@ -73,6 +74,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                     {!customerName && (
                         <Link
                             href="/register"
+                            prefetch={true}
                             className={`text-sm px-5 py-2 rounded-full font-medium transition-all duration-300 ${isHeroPage
                                 ? "border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10"
                                 : "bg-primary text-white hover:bg-primary-dark"
@@ -85,6 +87,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                     {customerName && (
                         <Link
                             href="/account"
+                            prefetch={true}
                             className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300 ${isHeroPage
                                 ? "border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10"
                                 : "border-primary/10 bg-primary/5 text-primary hover:bg-primary/10"
@@ -115,6 +118,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                     <Link
                         href="/admin/login"
                         title="Admin Portal"
+                        prefetch={true}
                         className={`p-2 rounded-full transition-all duration-300 ${isHeroPage
                             ? "text-white/50 hover:text-[#D4AF37] hover:bg-white/5"
                             : "text-gray-400 hover:text-primary hover:bg-primary/5"
@@ -140,6 +144,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                     </button>
                     <Link
                         href="/admin/login"
+                        prefetch={true}
                         className={`p-1.5 rounded-full ${isHeroPage ? "text-white/70" : "text-gray-500"}`}
                     >
                         <Shield className="w-5 h-5" strokeWidth={1.5} />
@@ -164,6 +169,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                             <Link
                                 key={link.href}
                                 href={link.href}
+                                prefetch={true}
                                 onClick={() => setMobileOpen(false)}
                                 className={`block py-3 text-sm tracking-wide border-b ${isHeroPage
                                     ? "text-white/80 border-white/10"
@@ -176,6 +182,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                         {!customerName && (
                             <Link
                                 href="/register"
+                                prefetch={true}
                                 onClick={() => setMobileOpen(false)}
                                 className="block mt-4 text-center text-sm px-5 py-2.5 rounded-full bg-primary text-white"
                             >
@@ -185,6 +192,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                         {customerName && (
                             <Link
                                 href="/account"
+                                prefetch={true}
                                 onClick={() => setMobileOpen(false)}
                                 className="block mt-4 text-center text-sm px-5 py-2.5 rounded-full bg-primary text-white"
                             >

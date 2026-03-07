@@ -2,6 +2,7 @@ import prisma from "@/lib/db";
 import { DollarSign, Package, Users, ShoppingCart, Clock, Trophy, AlertTriangle, Bell, Activity } from "lucide-react";
 import { getInventoryHealthScore } from "@/services/intelligence-service";
 import SafeImage from "@/components/SafeImage";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -219,16 +220,16 @@ export default async function AdminDashboard() {
             {(unreadNotifications > 0 || lowStockProducts > 0) && (
                 <div className="flex gap-4">
                     {unreadNotifications > 0 && (
-                        <a href="/admin/notifications" className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition-colors">
+                        <Link href="/admin/notifications" prefetch={true} className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition-colors">
                             <Bell className="w-4 h-4 text-blue-600" />
                             <span className="text-sm font-semibold text-blue-700">{unreadNotifications} Unread Notification{unreadNotifications > 1 ? 's' : ''}</span>
-                        </a>
+                        </Link>
                     )}
                     {lowStockProducts > 0 && (
-                        <a href="/admin/inventory" className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-100 rounded-xl hover:bg-amber-100 transition-colors">
+                        <Link href="/admin/inventory" prefetch={true} className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-100 rounded-xl hover:bg-amber-100 transition-colors">
                             <AlertTriangle className="w-4 h-4 text-amber-600" />
                             <span className="text-sm font-semibold text-amber-700">{lowStockProducts} Low Stock Alert{lowStockProducts > 1 ? 's' : ''}</span>
-                        </a>
+                        </Link>
                     )}
                 </div>
             )}

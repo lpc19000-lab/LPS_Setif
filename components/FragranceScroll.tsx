@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback, ReactNode } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import NextImage from "next/image";
 
 /* ── Asset Config ─────────────────────────────────────────── */
 const TOTAL_FRAMES = 240;
@@ -23,7 +24,14 @@ const storyBeats = [
 /* ── Error Boundary Fallback ────────────────────────────────── */
 function StaticHeroFallback() {
     return (
-        <div className="relative h-screen w-full bg-[#121212] flex items-center justify-center">
+        <div className="relative h-screen w-full bg-[#121212] flex items-center justify-center overflow-hidden">
+            <NextImage
+                src="/hero/ezgif-frame-001.jpg"
+                alt="LPS Perfume Hero"
+                fill
+                priority
+                className="object-cover opacity-60"
+            />
             <div className="text-center z-10 px-6">
                 <h1 className="text-[#D4AF37] text-5xl md:text-7xl font-serif font-bold tracking-wide mb-6">
                     LPS Perfume
@@ -179,16 +187,18 @@ export default function FragranceScroll() {
                     </div>
                 )}
 
-                {/* Canvas */}
-                <canvas
-                    ref={canvasRef}
-                    className="absolute inset-0 w-full h-full"
-                    style={{
-                        display: isLoaded ? "block" : "none",
-                        opacity: isLoaded ? 1 : 0,
-                        transition: "opacity 1.5s ease"
-                    }}
-                />
+                {/* Canvas Container - Restricted size for performance/quality */}
+                <div className="max-w-[900px] w-[88%] aspect-square md:aspect-video flex items-center justify-center relative">
+                    <canvas
+                        ref={canvasRef}
+                        className="w-full h-full object-contain"
+                        style={{
+                            display: isLoaded ? "block" : "none",
+                            opacity: isLoaded ? 1 : 0,
+                            transition: "opacity 1.5s ease"
+                        }}
+                    />
+                </div>
 
                 {/* Dark overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70 pointer-events-none" />
