@@ -187,18 +187,16 @@ export default function FragranceScroll() {
                     </div>
                 )}
 
-                {/* Canvas Container - Restricted size for performance/quality */}
-                <div className="max-w-[900px] w-[88%] aspect-square md:aspect-video flex items-center justify-center relative">
-                    <canvas
-                        ref={canvasRef}
-                        className="w-full h-full object-contain"
-                        style={{
-                            display: isLoaded ? "block" : "none",
-                            opacity: isLoaded ? 1 : 0,
-                            transition: "opacity 1.5s ease"
-                        }}
-                    />
-                </div>
+                {/* Canvas */}
+                <canvas
+                    ref={canvasRef}
+                    className="absolute inset-0 w-full h-full"
+                    style={{
+                        display: isLoaded ? "block" : "none",
+                        opacity: isLoaded ? 1 : 0,
+                        transition: "opacity 1.5s ease"
+                    }}
+                />
 
                 {/* Dark overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70 pointer-events-none" />
