@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 // ── Standardized Application Error Classes ─────────────────────────────────
 // Used by all API routes and services for consistent error responses.
 
@@ -49,14 +51,14 @@ export const Errors = {
 
 export function errorResponse(error: unknown) {
   if (error instanceof AppError) {
-    return {
-      body: { success: false, error_code: error.code, message: error.message },
-      status: error.statusCode,
-    };
+    return NextResponse.json(
+      { success: false, error_code: error.code, message: error.message },
+      { status: error.statusCode }
+    );
   }
   const message = error instanceof Error ? error.message : "An unexpected error occurred";
-  return {
-    body: { success: false, error_code: "INTERNAL_ERROR" as ErrorCode, message },
-    status: 500,
-  };
+  return NextResponse.json(
+    { success: false, error_code: "INTERNAL_ERROR" as ErrorCode, message },
+    { status: 500 }
+  );
 }
