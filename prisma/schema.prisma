@@ -64,20 +64,16 @@ model Product {
   description          String
   categoryId           String              @map("category_id")
   imageUrl             String              @map("image_url")
-  wholesalePrice       Decimal             @map("wholesale_price") @db.Decimal(10, 2)
-  retailPrice          Decimal             @map("retail_price") @db.Decimal(10, 2)
-  costPrice            Decimal             @default(0) @map("cost_price") @db.Decimal(10, 2)
-  stockQuantity        Int                 @default(0) @map("stock_quantity")
-  minimumOrderQuantity Int                 @default(1) @map("minimum_order_quantity")
-  unitsPerBox          Int                 @default(1) @map("units_per_box")
-  lowStockThreshold    Int                 @default(10) @map("low_stock_threshold")
+  basePrice            Decimal             @map("base_price") @db.Decimal(10, 2)
+  stockMl              Int                 @default(0) @map("stock_ml")
+  lowStockThreshold    Int                 @default(500) @map("low_stock_threshold")
   status               ProductStatus       @default(ACTIVE)
   createdAt            DateTime            @default(now()) @map("created_at")
   updatedAt            DateTime            @default(now()) @updatedAt @map("updated_at")
   cartItems            CartItem[]
   orderItems           OrderItem[]
   category             Category            @relation(fields: [categoryId], references: [id])
-  priceTiers           PriceTier[]
+  volumes              ProductVolume[]
   sales                ProductSales?
   inventoryLogs        InventoryLog[]
   images               ProductImage[]
@@ -89,6 +85,17 @@ model Product {
   @@index([slug])
   @@index([status])
   @@map("products")
+}
+
+model ProductVolume {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  ml        Int
+  price     Decimal @db.Decimal(10, 2)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, ml])
+  @@map("product_volumes")
 }
 
 model ProductImage {
@@ -161,12 +168,13 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String  @map("order_id")
-  productId String  @map("product_id")
-  quantity  Int
-  price     Decimal @db.Decimal(10, 2)
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id             String  @id @default(cuid())
+  orderId        String  @map("order_id")
+  productId      String  @map("product_id")
+  quantity       Int
+  selectedVolume Int     @default(100) @map("selected_volume")
+  price          Decimal @db.Decimal(10, 2)
+  order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
 
   @@index([orderId])
@@ -185,11 +193,12 @@ model Cart {
 }
 
 model CartItem {
-  id        String  @id @default(cuid())
-  cartId    String  @map("cart_id")
-  productId String  @map("product_id")
-  quantity  Int
-  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  id             String  @id @default(cuid())
+  cartId         String  @map("cart_id")
+  productId      String  @map("product_id")
+  quantity       Int
+  selectedVolume Int     @default(100) @map("selected_volume")
+  cart           Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
 
   @@index([cartId])
@@ -231,17 +240,6 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
-}
-
-model PriceTier {
-  id          String  @id @default(cuid())
-  productId   String  @map("product_id")
-  minQuantity Int     @map("min_quantity")
-  price       Decimal @db.Decimal(10, 2)
-  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@index([productId])
-  @@map("price_tiers")
 }
 
 model ProductSales {

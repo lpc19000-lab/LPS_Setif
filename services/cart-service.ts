@@ -1,18 +1,6 @@
 import prisma from "@/lib/db";
 
-// ── TIERED PRICING HELPER ────────────────────────────────────────────────
-export const getTieredPrice = async (productId: string, quantity: number): Promise<number | null> => {
-    const tiers = await prisma.priceTier.findMany({
-        where: { productId },
-        orderBy: { minQuantity: "desc" },
-    });
-    for (const tier of tiers) {
-        if (quantity >= tier.minQuantity) {
-            return Number(tier.price);
-        }
-    }
-    return null; // No tier matched — use default wholesale price
-};
+// PriceTier is no longer used for volume-based selling
 
 // ── READ ──────────────────────────────────────────────────────────────────
 export const getCart = async (customerId: string) => {
@@ -31,19 +19,12 @@ export const getCart = async (customerId: string) => {
 
     if (!cart) return { items: [], totalPrice: 0 };
 
-    // Calculate total using tiered pricing
+    // Calculate total using volume-based pricing
     let totalPrice = 0;
     const enrichedItems = cart.items.map((item) => {
-        const tiers = item.product.priceTiers;
-        let unitPrice = Number(item.product.wholesalePrice);
-
-        // Apply the best matching tier (sorted desc by minQuantity)
-        for (let i = tiers.length - 1; i >= 0; i--) {
-            if (item.quantity >= tiers[i].minQuantity) {
-                unitPrice = Number(tiers[i].price);
-                break;
-            }
-        }
+        // Find the matching volume price
+        const volumeData = (item.product as any).volumes?.find((v: any) => v.ml === item.selectedVolume);
+        const unitPrice = volumeData ? Number(volumeData.price) : (Number(item.product.basePrice) / 100) * item.selectedVolume;
 
         const lineTotal = unitPrice * item.quantity;
         totalPrice += lineTotal;
@@ -77,10 +58,11 @@ export const addToCart = async (
         );
     }
 
-    // Validate stock availability
-    if (product.stockQuantity < quantity) {
+    // Validate stock availability (ml-based)
+    const requiredMl = quantity * (selectedVolume || 100);
+    if (product.stockMl < requiredMl) {
         throw new Error(
-            `Only ${product.stockQuantity} units available for "${product.name}"`
+            `Insufficient stock for "${product.name}". Available: ${product.stockMl}ml`
         );
     }
 
@@ -90,9 +72,9 @@ export const addToCart = async (
         cart = await prisma.cart.create({ data: { customerId } });
     }
 
-    // Check if item is already in cart
+    // Check if item with same volume is already in cart
     const existingItem = await prisma.cartItem.findFirst({
-        where: { cartId: cart.id, productId },
+        where: { cartId: cart.id, productId, selectedVolume: selectedVolume || 100 },
     });
 
     if (existingItem) {
@@ -104,10 +86,20 @@ export const addToCart = async (
     }
 
     return await prisma.cartItem.create({
-        data: { cartId: cart.id, productId, quantity },
+        data: { cartId: cart.id, productId, quantity, selectedVolume: selectedVolume || 100 },
         include: { product: true },
     });
 };
+
+export const addToCart = async (
+    customerId: string,
+    productId: string,
+    quantity: number,
+    selectedVolume: number = 100
+) => {
+    // Validate product exists
+    const product = await prisma.product.findUnique({ where: { id: productId } });
+    if (!product) throw new Error("Product not found");
 
 // ── UPDATE CART ITEM ──────────────────────────────────────────────────────
 export const updateCartItem = async (cartItemId: string, quantity: number) => {
@@ -120,20 +112,6 @@ export const updateCartItem = async (cartItemId: string, quantity: number) => {
 
     if (quantity <= 0) {
         return await prisma.cartItem.delete({ where: { id: cartItemId } });
-    }
-
-    // Validate units per box
-    if (quantity % cartItem.product.unitsPerBox !== 0) {
-        throw new Error(
-            `Quantity must be a multiple of ${cartItem.product.unitsPerBox} (units per box)`
-        );
-    }
-
-    // Validate minimum order quantity
-    if (quantity < cartItem.product.minimumOrderQuantity) {
-        throw new Error(
-            `Minimum order quantity is ${cartItem.product.minimumOrderQuantity}`
-        );
     }
 
     return await prisma.cartItem.update({

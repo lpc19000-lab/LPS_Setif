@@ -1,24 +1,26 @@
 import prisma from "@/lib/db";
 
 // ── STOCK ADJUSTMENTS ─────────────────────────────────────────────────────
-export const decrementStock = async (productId: string, quantity: number) => {
+export const decrementStock = async (productId: string, quantity: number, volume: number = 100) => {
+    const totalMl = quantity * volume;
     const product = await prisma.product.findUnique({ where: { id: productId } });
     if (!product) throw new Error(`Product ${productId} not found`);
-    if (product.stockQuantity < quantity) {
+    if (product.stockMl < totalMl) {
         throw new Error(
-            `Insufficient stock for "${product.name}". Available: ${product.stockQuantity}, Requested: ${quantity}`
+            `Insufficient stock for "${product.name}". Available: ${product.stockMl}ml, Requested: ${totalMl}ml`
         );
     }
     return await prisma.product.update({
         where: { id: productId },
-        data: { stockQuantity: { decrement: quantity } },
+        data: { stockMl: { decrement: totalMl } },
     });
 };
 
-export const incrementStock = async (productId: string, quantity: number) => {
+export const incrementStock = async (productId: string, quantity: number, volume: number = 100) => {
+    const totalMl = quantity * volume;
     return await prisma.product.update({
         where: { id: productId },
-        data: { stockQuantity: { increment: quantity } },
+        data: { stockMl: { increment: totalMl } },
     });
 };
 
@@ -26,44 +28,44 @@ export const incrementStock = async (productId: string, quantity: number) => {
 export const getStockLevel = async (productId: string) => {
     const product = await prisma.product.findUnique({
         where: { id: productId },
-        select: { id: true, name: true, stockQuantity: true, minimumOrderQuantity: true },
+        select: { id: true, name: true, stockMl: true },
     });
     return product;
 };
 
-export const getLowStockProducts = async (threshold = 10) => {
+export const getLowStockProducts = async (threshold = 500) => {
     return await prisma.product.findMany({
-        where: { stockQuantity: { lte: threshold } },
+        where: { stockMl: { lte: threshold } },
         include: { category: true },
-        orderBy: { stockQuantity: "asc" },
+        orderBy: { stockMl: "asc" },
     });
 };
 
 // ── ADMIN ADJUSTMENTS ─────────────────────────────────────────────────────
 export const adjustStock = async (
     productId: string,
-    quantity: number, // can be positive or negative
+    mlAmount: number, // can be positive or negative
     reason: string
 ) => {
     return await prisma.$transaction(async (tx) => {
         const product = await tx.product.findUnique({ where: { id: productId } });
         if (!product) throw new Error("Product not found");
 
-        const newStock = product.stockQuantity + quantity;
+        const newStock = product.stockMl + mlAmount;
         if (newStock < 0) {
-            throw new Error("Cannot adjust stock below 0.");
+            throw new Error("Cannot adjust stock below 0ml.");
         }
 
         const updated = await tx.product.update({
             where: { id: productId },
-            data: { stockQuantity: { increment: quantity } },
+            data: { stockMl: { increment: mlAmount } },
         });
 
         await tx.inventoryLog.create({
             data: {
                 productId,
                 changeType: "MANUAL_ADJUSTMENT",
-                quantity,
+                quantity: mlAmount,
                 source: "ADMIN",
                 reason,
             },

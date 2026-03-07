@@ -82,12 +82,44 @@ export default function MiniCart() {
                                                 className="object-contain"
                                             />
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-bold text-gray-900 text-sm truncate">{item.product.name}</h3>
-                                            <p className="text-xs text-gray-500 mb-1">{item.product.brand}</p>
-                                            <div className="flex items-center justify-between mt-2">
-                                                <p className="text-xs font-medium text-gray-500">Qty: {item.quantity}</p>
-                                                <p className="text-sm font-bold text-primary">
+                                        <div className="flex-1 min-w-0 group relative pr-4">
+                                            <div className="flex items-center justify-between gap-2 mb-1">
+                                                <h3 className="font-bold text-gray-900 text-sm truncate group-hover:text-primary transition-colors">
+                                                    {item.product.name}
+                                                </h3>
+                                                <button 
+                                                    onClick={() => removeItem(item.product.id)}
+                                                    className="p-1 hover:bg-red-50 text-gray-300 hover:text-red-500 rounded-lg transition-all flex-shrink-0"
+                                                >
+                                                    <X className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <p className="text-[10px] text-gray-400 font-serif italic truncate">{item.product.brand}</p>
+                                                <span className="w-1 h-1 rounded-full bg-gray-200"></span>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-primary">
+                                                    {item.product.selectedVolume}ml
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center justify-between mt-3">
+                                                <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-100/50">
+                                                    <button
+                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                        className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-primary transition-colors font-bold"
+                                                    >
+                                                        −
+                                                    </button>
+                                                    <span className="w-8 text-center text-[11px] font-bold text-gray-900">
+                                                        {item.quantity}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                        className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-primary transition-colors font-bold"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                                <p className="text-sm font-bold text-gray-950">
                                                     {(Number(item.product.wholesalePrice) * item.quantity).toLocaleString()} DA
                                                 </p>
                                             </div>

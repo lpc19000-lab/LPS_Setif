@@ -14,12 +14,10 @@ interface Product {
     brand: string;
     description: string;
     imageUrl: string;
-    wholesalePrice: number;
-    retailPrice: number;
-    minimumOrderQuantity: number;
-    unitsPerBox: number;
-    stockQuantity: number;
+    basePrice: number;
+    stockMl: number;
     category: { id: string; name: string } | null;
+    volumes: { ml: number; price: number }[];
 }
 
 export default function ProductPage() {
@@ -27,7 +25,8 @@ export default function ProductPage() {
     const router = useRouter();
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
-    const [quantity, setQuantity] = useState(0);
+    const [selectedVolume, setSelectedVolume] = useState(100);
+    const [quantity, setQuantity] = useState(1);
     const [message, setMessage] = useState("");
     const [adding, setAdding] = useState(false);
 
@@ -40,7 +39,7 @@ export default function ProductPage() {
             .then((json) => {
                 if (json.success) {
                     setProduct(json.data);
-                    setQuantity(json.data.minimumOrderQuantity);
+                    setQuantity(1);
                 }
                 setLoading(false);
             })
@@ -57,8 +56,9 @@ export default function ProductPage() {
 
     const adjustQuantity = (delta: number) => {
         if (!product) return;
-        const next = quantity + delta * product.unitsPerBox;
-        if (next >= product.minimumOrderQuantity && next <= product.stockQuantity) {
+        const next = quantity + delta;
+        const requiredMl = next * selectedVolume;
+        if (next >= 1 && requiredMl <= product.stockMl) {
             setQuantity(next);
         }
     };
@@ -68,15 +68,17 @@ export default function ProductPage() {
         setAdding(true);
         setMessage("");
 
+        const currentVolumePrice = product.volumes?.find(v => v.ml === selectedVolume)?.price 
+            || (product.basePrice / 100) * selectedVolume;
+
         const result = addItem({
             id: product.id,
             name: product.name,
             brand: product.brand,
             imageUrl: product.imageUrl,
-            wholesalePrice: product.wholesalePrice,
-            unitsPerBox: product.unitsPerBox,
-            minimumOrderQuantity: product.minimumOrderQuantity,
-            stockQuantity: product.stockQuantity,
+            wholesalePrice: Number(currentVolumePrice),
+            selectedVolume: selectedVolume,
+            stockMl: product.stockMl,
         }, quantity);
 
         if (result.success) {
@@ -161,14 +163,14 @@ export default function ProductPage() {
                             <div className="flex items-center gap-4 mb-10">
                                 <p className="text-xl text-gray-400 font-light font-serif italic">{product.brand}</p>
                                 <div className="h-4 w-px bg-gray-200"></div>
-                                {product.stockQuantity > 0 ? (
+                                {product.stockMl > 0 ? (
                                     <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
-                                        product.stockQuantity <= 10 ? "bg-amber-50 text-amber-600" : "bg-green-50 text-green-600"
+                                        product.stockMl <= 500 ? "bg-amber-50 text-amber-600" : "bg-green-50 text-green-600"
                                     }`}>
                                         <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-                                            product.stockQuantity <= 10 ? "bg-amber-500" : "bg-green-500"
+                                            product.stockMl <= 500 ? "bg-amber-500" : "bg-green-500"
                                         }`}></div>
-                                        {product.stockQuantity <= 10 ? `Low Stock (${product.stockQuantity} left)` : "In Stock"}
+                                        {product.stockMl <= 500 ? `Low Stock (${product.stockMl}ml left)` : "In Stock"}
                                     </div>
                                 ) : (
                                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest">
@@ -185,34 +187,29 @@ export default function ProductPage() {
                             {/* Price Card */}
                             <div className="bg-[#1A1A1A] rounded-[2.5rem] p-10 mb-12 text-white relative overflow-hidden group">
                                 <div className="relative z-10">
-                                    <p className="text-[#D4AF37] text-xs font-black uppercase tracking-[0.3em] mb-3">Wholesale Price</p>
+                                    <p className="text-[#D4AF37] text-xs font-black uppercase tracking-[0.3em] mb-3">Professional Grade</p>
                                     <div className="flex items-baseline gap-3 mb-8">
-                                        <span className="text-5xl font-bold">{Number(product.wholesalePrice).toLocaleString()}</span>
+                                        <span className="text-5xl font-bold">
+                                            {((product.volumes?.find(v => v.ml === selectedVolume)?.price || (product.basePrice / 100) * selectedVolume)).toLocaleString()}
+                                        </span>
                                         <span className="text-xl text-gray-500 font-serif">DA</span>
-                                        <span className="ml-4 text-gray-500 line-through text-lg font-light">
-                                            {Number(product.retailPrice).toLocaleString()} DA
+                                        <span className="ml-4 text-gray-400 text-sm font-light tracking-wide italic">
+                                            Per {selectedVolume}ml Unit
                                         </span>
                                     </div>
 
-                                    <div className="grid grid-cols-3 gap-6">
+                                    <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-1">
-                                            <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Min. Units</p>
-                                            <p className="text-lg font-bold flex items-center gap-2">
-                                                <Package className="w-4 h-4 text-[#D4AF37]" />
-                                                {product.minimumOrderQuantity}
-                                            </p>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Box Units</p>
+                                            <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Selected Size</p>
                                             <p className="text-lg font-bold flex items-center gap-2">
                                                 <Box className="w-4 h-4 text-[#D4AF37]" />
-                                                {product.unitsPerBox}
+                                                {selectedVolume}ml
                                             </p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Subtotal</p>
+                                            <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Order Total</p>
                                             <p className="text-lg font-bold text-[#D4AF37]">
-                                                {(Number(product.wholesalePrice) * quantity).toLocaleString()} DA
+                                                {((product.volumes?.find(v => v.ml === selectedVolume)?.price || (product.basePrice / 100) * selectedVolume) * quantity).toLocaleString()} DA
                                             </p>
                                         </div>
                                     </div>
@@ -221,32 +218,54 @@ export default function ProductPage() {
                             </div>
 
                             {/* Controls */}
-                            <div className="space-y-8">
-                                <div className="flex flex-wrap items-center gap-8">
-                                    <div className="space-y-3">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Specify Bulk Quantity</p>
-                                        <div className="flex items-center bg-white border border-gray-100 rounded-2xl p-1.5 shadow-sm">
-                                            <button
-                                                onClick={() => adjustQuantity(-1)}
-                                                disabled={quantity <= product.minimumOrderQuantity}
-                                                className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
-                                            >
-                                                −
-                                            </button>
-                                            <div className="px-8 text-center min-w-[100px]">
-                                                <span className="block text-2xl font-bold text-gray-950">{quantity}</span>
-                                                <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest">Units Selected</span>
-                                            </div>
-                                            <button
-                                                onClick={() => adjustQuantity(1)}
-                                                disabled={quantity + product.unitsPerBox > product.stockQuantity}
-                                                className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
-                                            >
-                                                +
-                                            </button>
+                                <div className="space-y-8">
+                                    <div className="space-y-4">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Select Bottle Size</p>
+                                        <div className="flex flex-wrap gap-3">
+                                            {(product.volumes || [30, 50, 100, 150, 200]).map((v: any) => {
+                                                const ml = typeof v === 'number' ? v : v.ml;
+                                                return (
+                                                    <button
+                                                        key={ml}
+                                                        onClick={() => setSelectedVolume(ml)}
+                                                        className={`px-6 py-4 rounded-2xl border transition-all font-bold text-sm ${
+                                                            selectedVolume === ml 
+                                                            ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105" 
+                                                            : "bg-white border-gray-100 text-gray-600 hover:border-primary/30"
+                                                        }`}
+                                                    >
+                                                        {ml}ml
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                     </div>
-                                </div>
+
+                                    <div className="flex flex-wrap items-center gap-8">
+                                        <div className="space-y-3">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Configure Quantity</p>
+                                            <div className="flex items-center bg-white border border-gray-100 rounded-2xl p-1.5 shadow-sm">
+                                                <button
+                                                    onClick={() => adjustQuantity(-1)}
+                                                    disabled={quantity <= 1}
+                                                    className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
+                                                >
+                                                    −
+                                                </button>
+                                                <div className="px-8 text-center min-w-[120px]">
+                                                    <span className="block text-2xl font-bold text-gray-950">{quantity}</span>
+                                                    <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest">Units of {selectedVolume}ml</span>
+                                                </div>
+                                                <button
+                                                    onClick={() => adjustQuantity(1)}
+                                                    disabled={(quantity + 1) * selectedVolume > product.stockMl}
+                                                    className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                 <div className="flex flex-col gap-4">
                                     <button
@@ -266,7 +285,7 @@ export default function ProductPage() {
 
                                     <div className="flex items-center gap-2 justify-center text-gray-400 text-[10px] font-medium uppercase tracking-[0.2em]">
                                         <Info className="w-3 h-3 text-primary" />
-                                        Increments restricted to boxes of {product.unitsPerBox} units
+                                        Professional wholesale packaging for selected size
                                     </div>
                                 </div>
                             </div>

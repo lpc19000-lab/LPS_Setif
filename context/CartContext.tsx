@@ -8,9 +8,8 @@ export interface CartProduct {
     brand: string;
     imageUrl: string;
     wholesalePrice: number;
-    unitsPerBox: number;
-    minimumOrderQuantity: number;
-    stockQuantity: number;
+    selectedVolume: number; // For volume-based selling
+    stockMl: number; // For ml-based validation
 }
 
 export interface CartItem {
@@ -59,25 +58,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }, [items, isMounted]);
 
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = items.reduce((sum, item) => sum + Number(item.product.wholesalePrice) * item.quantity, 0);
+    const totalPrice = items.reduce((sum, item) => sum + (Number(item.product.wholesalePrice) * item.quantity), 0);
 
     const addItem = (product: CartProduct, quantityToAdd: number) => {
         let error = "";
 
         setItems(prev => {
-            const existing = prev.find(i => i.product.id === product.id);
+            // Check for existing item WITH SAME VOLUME
+            const existing = prev.find(i => 
+                i.product.id === product.id && 
+                i.product.selectedVolume === product.selectedVolume
+            );
+            
             const currentQty = existing ? existing.quantity : 0;
             const newQty = currentQty + quantityToAdd;
 
-            if (newQty > product.stockQuantity) {
-                error = `Cannot add more. Only ${product.stockQuantity} in stock.`;
+            const totalMlRequired = newQty * product.selectedVolume;
+            if (totalMlRequired > product.stockMl) {
+                error = `Insufficient stock. Only ${product.stockMl}ml available.`;
                 return prev;
             }
 
             if (existing) {
-                return prev.map(i => i.product.id === product.id ? { ...i, quantity: newQty } : i);
+                return prev.map(i => 
+                    (i.product.id === product.id && i.product.selectedVolume === product.selectedVolume)
+                    ? { ...i, quantity: newQty } 
+                    : i
+                );
             } else {
-                return [...prev, { id: product.id, product, quantity: newQty }];
+                return [...prev, { id: `${product.id}-${product.selectedVolume}`, product, quantity: newQty }];
             }
         });
 
@@ -92,23 +101,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setItems(prev => prev.filter(i => i.product.id !== productId));
     };
 
-    const updateQuantity = (productId: string, newQuantity: number) => {
+    const updateQuantity = (cartItemId: string, newQuantity: number) => {
         let error = "";
         setItems(prev => {
-            const existing = prev.find(i => i.product.id === productId);
+            const existing = prev.find(i => i.id === cartItemId);
             if (!existing) return prev;
 
-            if (newQuantity > existing.product.stockQuantity) {
-                error = `Cannot update. Only ${existing.product.stockQuantity} in stock.`;
+            const totalMlRequired = newQuantity * existing.product.selectedVolume;
+            if (totalMlRequired > existing.product.stockMl) {
+                error = `Insufficient stock. Only ${existing.product.stockMl}ml available.`;
                 return prev;
             }
 
-            if (newQuantity < existing.product.minimumOrderQuantity) {
-                error = `Minimum order quantity is ${existing.product.minimumOrderQuantity}.`;
+            if (newQuantity < 1) {
+                error = `Minimum quantity is 1 unit.`;
                 return prev;
             }
 
-            return prev.map(i => i.product.id === productId ? { ...i, quantity: newQuantity } : i);
+            return prev.map(i => i.id === cartItemId ? { ...i, quantity: newQuantity } : i);
         });
 
         if (error) return { success: false, error };

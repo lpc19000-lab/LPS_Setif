@@ -86,7 +86,13 @@ export default function CartPage() {
                                                 <h3 className="font-serif text-xl text-gray-900 font-bold truncate">
                                                     {item.product.name}
                                                 </h3>
-                                                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">{item.product.brand}</p>
+                                                <div className="flex items-center gap-3">
+                                                    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">{item.product.brand}</p>
+                                                    <span className="w-1 h-3 border-l border-gray-200"></span>
+                                                    <p className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest">
+                                                        {item.product.selectedVolume}ml Edition
+                                                    </p>
+                                                </div>
                                             </div>
                                             <button
                                                 onClick={() => removeItem(item.product.id)}
@@ -100,17 +106,18 @@ export default function CartPage() {
                                         <div className="flex flex-wrap items-center justify-between gap-4">
                                             <div className="flex items-center bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
                                                 <button
-                                                    onClick={() => handleUpdateQuantity(item.product.id, item.quantity - item.product.unitsPerBox)}
-                                                    disabled={item.quantity <= item.product.minimumOrderQuantity}
+                                                    onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                                    disabled={item.quantity <= 1}
                                                     className="px-4 py-2 text-gray-400 hover:text-primary disabled:opacity-30 transition-colors"
                                                 >
                                                     −
                                                 </button>
-                                                <span className="px-4 py-2 text-sm font-black text-gray-900 border-x border-gray-100 min-w-[60px] text-center">
-                                                    {item.quantity}
-                                                </span>
+                                                <div className="px-4 py-2 text-center min-w-[80px]">
+                                                    <span className="block text-sm font-black text-gray-900">{item.quantity}</span>
+                                                    <span className="text-[7px] text-gray-400 uppercase font-black">Units of {item.product.selectedVolume}ml</span>
+                                                </div>
                                                 <button
-                                                    onClick={() => handleUpdateQuantity(item.product.id, item.quantity + item.product.unitsPerBox)}
+                                                    onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                                                     className="px-4 py-2 text-gray-400 hover:text-primary transition-colors"
                                                 >
                                                     +

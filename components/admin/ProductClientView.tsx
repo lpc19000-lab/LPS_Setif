@@ -124,8 +124,8 @@ export default function ProductClientView({
                             <tr>
                                 <th className="px-6 py-4 font-medium">Product</th>
                                 <th className="px-6 py-4 font-medium">Category</th>
-                                <th className="px-6 py-4 font-medium">Wholesale</th>
-                                <th className="px-6 py-4 font-medium">Stock</th>
+                                <th className="px-6 py-4 font-medium">Base Price (100ml)</th>
+                                <th className="px-6 py-4 font-medium">Total Stock (ml)</th>
                                 <th className="px-6 py-4 font-medium">Status</th>
                                 <th className="px-6 py-4 font-medium text-right">Actions</th>
                             </tr>
@@ -155,14 +155,14 @@ export default function ProductClientView({
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 font-medium text-gray-900">
-                                        {formatCurrency(product.wholesalePrice)}
+                                        {formatCurrency(product.basePrice)}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span
-                                            className={`px-2.5 py-1 rounded-lg text-xs font-medium ${product.stockQuantity < 10 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-600"
+                                            className={`px-2.5 py-1 rounded-lg text-xs font-medium ${product.stockMl < 500 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-600"
                                                 }`}
                                         >
-                                            {product.stockQuantity} in stock
+                                            {product.stockMl}ml available
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
@@ -254,30 +254,19 @@ export default function ProductClientView({
                                     <input name="imageUrl" defaultValue={editingProduct?.imageUrl} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="https://..." />
                                 </div>
 
-                                {/* Pricing */}
+                                {/* Pricing & Stock */}
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Wholesale Price (DZD)</label>
-                                    <input type="number" step="0.01" name="wholesalePrice" defaultValue={editingProduct?.wholesalePrice} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Base Price (Per 100ml) (DZD)</label>
+                                    <input type="number" step="0.01" name="basePrice" defaultValue={editingProduct?.basePrice} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Retail Price (DZD)</label>
-                                    <input type="number" step="0.01" name="retailPrice" defaultValue={editingProduct?.retailPrice} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
-                                </div>
-
-                                {/* Stock */}
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Current Stock</label>
-                                    <input type="number" name="stockQuantity" defaultValue={editingProduct?.stockQuantity || 0} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Min Order Qty</label>
-                                    <input type="number" name="minimumOrderQuantity" defaultValue={editingProduct?.minimumOrderQuantity || 12} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Total Stock (Milliliters)</label>
+                                    <input type="number" name="stockMl" defaultValue={editingProduct?.stockMl || 5000} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
                                 </div>
 
-                                {/* Units per box */}
-                                <div className="space-y-1.5 md:col-span-2">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Units Per Box</label>
-                                    <input type="number" name="unitsPerBox" defaultValue={editingProduct?.unitsPerBox || 12} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                {/* Info */}
+                                <div className="space-y-1.5 md:col-span-2 p-4 bg-amber-50 rounded-2xl border border-amber-100 italic text-[11px] text-amber-700">
+                                    Note: Products will automatically be available in 30ml, 50ml, 100ml, 150ml, and 200ml variants based on the base price.
                                 </div>
 
                                 {/* Collections */}
