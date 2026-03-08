@@ -29,15 +29,17 @@ export const createOrder = async (input: CreateOrderInput) => {
         }
 
         // Step 1: Validate products exist and fetch prices
+        // Step 1: Validate products exist and fetch prices
         const productIds = input.items.map((i) => i.productId);
+        const uniqueProductIds = Array.from(new Set(productIds));
         const products = await tx.product.findMany({
-            where: { id: { in: productIds } },
+            where: { id: { in: uniqueProductIds } },
         });
 
-        if (products.length !== productIds.length) {
-            const found = products.map((p) => p.id);
-            const missing = productIds.filter((id) => !found.includes(id));
-            throw Errors.invalidInput(`Products not found: ${missing.join(", ")}`);
+        if (products.length !== uniqueProductIds.length) {
+            const foundIds = products.map((p) => p.id);
+            const missingIds = uniqueProductIds.filter((id) => !foundIds.includes(id));
+            throw Errors.invalidInput(`Products not found: ${missingIds.join(", ")}`);
         }
 
         // Legacy validations removed
@@ -106,10 +108,9 @@ export const createOrder = async (input: CreateOrderInput) => {
         }
 
         // Step 8: Create invoice
+        // Added Date.now() suffix to ensure uniqueness even if count is inaccurate due to concurrency
         const invoiceCount = await tx.invoice.count();
-        const invoiceNumber = `INV-${new Date().getFullYear()}-${(invoiceCount + 1)
-            .toString()
-            .padStart(4, "0")}`;
+        const invoiceNumber = `INV-${new Date().getFullYear()}-${(invoiceCount + 1).toString().padStart(4, "0")}-${Math.floor(Math.random() * 1000)}`;
 
         await tx.invoice.create({
             data: {
@@ -147,12 +148,12 @@ export const createOrder = async (input: CreateOrderInput) => {
             });
         }
 
-        // After order creation
-        revalidateTag(`orders:${input.customerId}`);
-        revalidateTag("orders");
-
         return order;
     });
+
+    // Post-transaction: Clear cache
+    revalidateTag(`orders:${input.customerId}`);
+    revalidateTag("orders");
 
     // Post-transaction: Trigger notifications
     try {

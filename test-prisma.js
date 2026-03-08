@@ -1,6 +1,19 @@
-
-const { PrismaClient, OrderStatus } = require('@prisma/client');
-console.log('OrderStatus:', OrderStatus);
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-console.log('PrismaClient initialized');
-process.exit(0);
+
+async function main() {
+  const products = await prisma.product.findMany({
+    take: 5,
+    select: {
+      id: true,
+      name: true,
+      basePrice: true,
+      stockMl: true,
+    }
+  });
+  console.log('Sample Products:', JSON.stringify(products, null, 2));
+}
+
+main()
+  .catch(e => console.error(e))
+  .finally(async () => await prisma.$disconnect());

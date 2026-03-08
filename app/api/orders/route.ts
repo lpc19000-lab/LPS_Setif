@@ -62,6 +62,10 @@ export async function POST(request: Request) {
             releaseOrderLock(customer.id);
         }
     } catch (error: unknown) {
+        console.error("[CRITICAL] Order Placement Failed:", error);
+        if (error instanceof Error) {
+            console.error("Stack trace:", error.stack);
+        }
         const { body, status } = errorResponse(error);
         return NextResponse.json(body, { status });
     }

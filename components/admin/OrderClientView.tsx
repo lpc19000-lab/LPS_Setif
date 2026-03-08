@@ -1,14 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Search, ChevronDown, CheckCircle2, Clock, Truck, PackageCheck, XCircle, FileText, X } from "lucide-react";
 import { adminUpdateOrderStatus } from "@/app/admin/actions/order";
 import { OrderStatus } from "@prisma/client";
 
 export default function OrderClientView({ orders }: { orders: any[] }) {
+    const router = useRouter();
     const [search, setSearch] = useState("");
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+
+    // Dynamic data refreshing (Polling) for real-time feel
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.refresh();
+        }, 15000); // Poll every 15s to keep it fresh
+        return () => clearInterval(interval);
+    }, [router]);
 
     const filteredOrders = orders.filter(o =>
         o.id.toLowerCase().includes(search.toLowerCase()) ||

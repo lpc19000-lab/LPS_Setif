@@ -37,6 +37,7 @@ export default function CheckoutPage() {
             const orderItems = items.map((item) => ({
                 productId: item.product.id,
                 quantity: item.quantity,
+                selectedVolume: item.product.selectedVolume,
             }));
             const res = await fetch("/api/orders", {
                 method: "POST",
@@ -49,7 +50,7 @@ export default function CheckoutPage() {
                 router.push("/order-confirmation");
             } else {
                 setStatus("error");
-                setErrorMsg(json.error || "Order failed");
+                setErrorMsg(json.message || json.error || "Order failed");
             }
         } catch {
             setStatus("error");
