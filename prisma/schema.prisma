@@ -84,6 +84,7 @@ model Product {
   @@index([brand])
   @@index([slug])
   @@index([status])
+  @@index([createdAt(sort: Desc)])
   @@map("products")
 }
 
@@ -164,6 +165,7 @@ model Order {
   logs            OrderLog[]
 
   @@index([customerId])
+  @@index([createdAt(sort: Desc)])
   @@map("orders")
 }
 

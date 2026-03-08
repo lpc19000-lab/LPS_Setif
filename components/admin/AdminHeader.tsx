@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, AlertCircle, Info, ChevronRight, Activity } from "lucide-react";
+import { AlertTriangle, AlertCircle, Info, ChevronRight, Activity, Bell } from "lucide-react";
 import Link from "next/link";
 
 type Alert = {
@@ -12,6 +12,7 @@ type Alert = {
 export default function AdminHeader() {
     const [alerts, setAlerts] = useState<Alert[]>([]);
     const [healthScore, setHealthScore] = useState<number>(100);
+    const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -30,7 +31,24 @@ export default function AdminHeader() {
             }
         };
 
+        const fetchUnreadCount = async () => {
+            try {
+                const res = await fetch("/api/admin/notifications/unread-count");
+                const data = await res.json();
+                if (data.success) {
+                    setUnreadCount(data.count);
+                }
+            } catch (e) {
+                console.error("Failed to fetch unread count:", e);
+            }
+        };
+
         fetchDashboardData();
+        fetchUnreadCount();
+
+        // Polling for realtime-ish feel
+        const interval = setInterval(fetchUnreadCount, 15000); // 15 seconds
+        return () => clearInterval(interval);
     }, []);
 
     if (loading) return null;
@@ -62,7 +80,7 @@ export default function AdminHeader() {
     };
 
     return (
-        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-8">
+        <header className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-8">
             <div className="flex items-center gap-4 flex-1">
                 {highestAlert ? (
                     <Link href="/admin/restock" className={`flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-colors group ${getAlertStyle(highestAlert.type)} hover:opacity-90`}>
@@ -85,22 +103,34 @@ export default function AdminHeader() {
                 )}
             </div>
 
-            {/* Global Inventory Health Score */}
-            <div className="shrink-0 flex items-center gap-4 pl-4 sm:border-l border-gray-100">
-                <div className="text-right">
-                    <span className="block text-[10px] uppercase tracking-widest font-bold text-gray-400">Inventory Health</span>
-                    <span className={`font-serif text-2xl font-bold ${healthScore >= 90 ? "text-emerald-500" :
-                            healthScore >= 70 ? "text-amber-500" :
-                                "text-red-500"
+            {/* Notifications and Health */}
+            <div className="shrink-0 flex items-center gap-6 pl-4 sm:border-l border-gray-100">
+                {/* Notification Bell */}
+                <Link href="/admin/notifications" className="relative p-2 text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-xl">
+                    <Bell className="w-6 h-6" />
+                    {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white ring-2 ring-red-500/10">
+                            {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                    )}
+                </Link>
+
+                <div className="flex items-center gap-4">
+                    <div className="text-right">
+                        <span className="block text-[10px] uppercase tracking-widest font-bold text-gray-400">Inventory Health</span>
+                        <span className={`font-serif text-2xl font-bold ${healthScore >= 90 ? "text-emerald-500" :
+                                healthScore >= 70 ? "text-amber-500" :
+                                    "text-red-500"
+                            }`}>
+                            {healthScore}%
+                        </span>
+                    </div>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center border-4 ${healthScore >= 90 ? "border-emerald-100 bg-emerald-50 text-emerald-500" :
+                            healthScore >= 70 ? "border-amber-100 bg-amber-50 text-amber-500" :
+                                "border-red-100 bg-red-50 text-red-500"
                         }`}>
-                        {healthScore}%
-                    </span>
-                </div>
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center border-4 ${healthScore >= 90 ? "border-emerald-100 bg-emerald-50 text-emerald-500" :
-                        healthScore >= 70 ? "border-amber-100 bg-amber-50 text-amber-500" :
-                            "border-red-100 bg-red-50 text-red-500"
-                    }`}>
-                    <Activity className="w-5 h-5" />
+                        <Activity className="w-5 h-5" />
+                    </div>
                 </div>
             </div>
         </header>

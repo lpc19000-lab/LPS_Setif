@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import ReorderButton from "@/components/shop/ReorderButton";
+import CancelOrderButton from "@/components/shop/CancelOrderButton";
 import SafeImage from "@/components/SafeImage";
 
 export const dynamic = "force-dynamic";
@@ -34,6 +35,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
 
     const currentStepIndex = STATUS_STEPS.indexOf(order.status);
     const isCancelled = order.status === "CANCELLED";
+    const canCancel = order.status === "PENDING";
 
     return (
         <div className="max-w-7xl mx-auto px-6 pt-32 pb-20">
@@ -63,6 +65,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                         <FileText className="w-4 h-4" />
                         Download Invoice
                     </Link>
+                    {canCancel && <CancelOrderButton orderId={order.id} />}
                     <ReorderButton orderId={order.id} />
                 </div>
             </div>

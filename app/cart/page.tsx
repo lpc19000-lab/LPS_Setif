@@ -161,27 +161,11 @@ export default function CartPage() {
                                         </div>
                                         <span className="text-xs text-gray-400 mb-1">DA</span>
                                     </div>
-                                    {totalPrice < MIN_ORDER_BILL && (
-                                        <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                                            <p className="text-[10px] text-red-400 font-bold uppercase tracking-wider">
-                                                Minimum Order Required: {MIN_ORDER_BILL.toLocaleString()} DA
-                                            </p>
-                                            <p className="text-[9px] text-gray-400 mt-1">
-                                                Please add {(MIN_ORDER_BILL - totalPrice).toLocaleString()} DA more to proceed.
-                                            </p>
-                                        </div>
-                                    )}
                                 </div>
 
                                 <Link
-                                    href={totalPrice >= MIN_ORDER_BILL ? "/checkout" : "#"}
-                                    className={`block w-full text-center py-5 rounded-2xl font-bold transition-all transform active:scale-[0.98] shadow-lg ${totalPrice >= MIN_ORDER_BILL
-                                        ? "bg-[#D4AF37] text-black hover:bg-white shadow-[#D4AF37]/10"
-                                        : "bg-gray-800 text-gray-500 cursor-not-allowed opacity-50"
-                                        }`}
-                                    onClick={(e) => {
-                                        if (totalPrice < MIN_ORDER_BILL) e.preventDefault();
-                                    }}
+                                    href="/checkout"
+                                    className="block w-full text-center py-5 rounded-2xl font-bold transition-all transform active:scale-[0.98] shadow-lg bg-[#D4AF37] text-black hover:bg-white shadow-[#D4AF37]/10"
                                 >
                                     Proceed to Checkout
                                 </Link>

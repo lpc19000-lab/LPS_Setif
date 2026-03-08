@@ -32,34 +32,56 @@ function CatalogContent() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [search, setSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState(initialCategory);
     const [brandFilter, setBrandFilter] = useState("");
     const [inStockOnly, setInStockOnly] = useState(false);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
         fetchCategories();
     }, []);
 
     useEffect(() => {
-        fetchProducts();
+        setPage(1);
+        fetchProducts(true);
     }, [search, categoryFilter, brandFilter, inStockOnly]);
 
-    const fetchProducts = async () => {
-        setLoading(true);
+    const fetchProducts = async (reset = false) => {
+        if (reset) {
+            setLoading(true);
+        } else {
+            setLoadingMore(true);
+        }
+        
         try {
             const params = new URLSearchParams();
             if (search) params.set("search", search);
             if (categoryFilter) params.set("categoryId", categoryFilter);
             if (brandFilter) params.set("brand", brandFilter);
             if (inStockOnly) params.set("inStock", "true");
+            params.set("page", reset ? "1" : (page + 1).toString());
+            params.set("limit", "16");
+
             const res = await fetch(`/api/products?${params}`);
             const json = await res.json();
-            if (json.success) setProducts(json.data);
+            
+            if (json.success) {
+                if (reset) {
+                    setProducts(json.data);
+                } else {
+                    setProducts(prev => [...prev, ...json.data]);
+                    setPage(prev => prev + 1);
+                }
+                setTotalPages(json.pagination.totalPages);
+            }
         } catch (e) {
             console.error(e);
         }
         setLoading(false);
+        setLoadingMore(false);
     };
 
     const fetchCategories = async () => {
@@ -194,6 +216,22 @@ function CatalogContent() {
                                 </Link>
                             </motion.div>
                         ))}
+                    </div>
+                )}
+
+                {/* Pagination */}
+                {!loading && page < totalPages && (
+                    <div className="mt-16 text-center">
+                        <button
+                            onClick={() => fetchProducts(false)}
+                            disabled={loadingMore}
+                            className="bg-white border border-gray-200 px-10 py-4 rounded-2xl text-primary font-medium hover:border-primary/40 hover:shadow-lg transition-all duration-300 disabled:opacity-50 flex items-center gap-3 mx-auto"
+                        >
+                            {loadingMore ? (
+                                <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                            ) : null}
+                            {loadingMore ? "Loading..." : "Discover More"}
+                        </button>
                     </div>
                 )}
             </div>

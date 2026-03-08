@@ -59,10 +59,26 @@ export default function CategoryPage() {
                 <Link href="/catalog" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary mb-8 transition-colors">
                     <ArrowLeft className="w-4 h-4" /> Back to Shop
                 </Link>
-                <div className="text-center mb-12">
-                    <h1 className="text-3xl md:text-5xl font-serif text-primary-dark mb-3">{category.name}</h1>
-                    {category.description && <p className="text-gray-500 max-w-md mx-auto">{category.description}</p>}
-                    <p className="text-gray-400 text-sm mt-2">{products.length} products</p>
+                {/* Category Banner */}
+                <div className="relative h-48 md:h-64 rounded-[2rem] overflow-hidden mb-12 group shadow-xl">
+                    <SafeImage
+                        src={`/images/categories/banner-${slug}.png`}
+                        alt={category.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-1000"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                    <div className="absolute bottom-6 left-8 md:bottom-10 md:left-12">
+                        <h1 className="text-3xl md:text-5xl font-serif text-white mb-2 leading-tight">{category.name}</h1>
+                        {category.description && (
+                            <p className="text-white/80 text-sm md:text-base max-w-md font-medium">
+                                {category.description}
+                            </p>
+                        )}
+                        <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-4">
+                            Archive Collection — {products.length} Fragrances
+                        </p>
+                    </div>
                 </div>
 
                 {products.length === 0 ? (

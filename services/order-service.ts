@@ -18,7 +18,6 @@ interface CreateOrderInput {
 }
 
 // ── CONSTANTS ─────────────────────────────────────────────────────────────
-const MIN_ORDER_BILL = 5000;
 
 // ── ATOMIC ORDER CREATION (with Tiered Pricing + Notifications + Logs) ─────
 export const createOrder = async (input: CreateOrderInput) => {
@@ -75,10 +74,7 @@ export const createOrder = async (input: CreateOrderInput) => {
             };
         });
 
-        // Step 5.5: Validate Total Bill Minimum
-        if (totalPrice < MIN_ORDER_BILL) {
-            throw Errors.invalidInput(`Minimum order total is ${MIN_ORDER_BILL.toLocaleString()} DA. Your total is ${totalPrice.toLocaleString()} DA.`);
-        }
+        // Step 5.5: Validate Total Bill Minimum (Removed as per Phase 4)
 
         // Step 6: Create order with items (Status: PENDING by default for System 7)
         const order = await tx.order.create({

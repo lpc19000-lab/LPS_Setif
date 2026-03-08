@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { unstable_cache } from "next/cache";
 import { ProductStatus } from "@prisma/client";
 
 // ── Utility ───────────────────────────────────────────────────────────────
@@ -7,7 +7,94 @@ function generateSlug(name: string): string {
 }
 
 // ── READ ──────────────────────────────────────────────────────────────────
-export const getProducts = async (filters?: {
+export const getActiveProducts = (filters?: {
+    categoryId?: string;
+    brand?: string;
+    search?: string;
+    collectionSlug?: string;
+    tagSlug?: string;
+    inStock?: boolean;
+    limit?: number;
+    skip?: number;
+}) => {
+    const fetchFunc = async () => {
+        const where: Record<string, any> = { status: "ACTIVE" };
+
+        if (filters?.categoryId) where.categoryId = filters.categoryId;
+        if (filters?.brand) where.brand = filters.brand;
+        if (filters?.search) {
+            where.OR = [
+                { name: { contains: filters.search, mode: "insensitive" } },
+                { brand: { contains: filters.search, mode: "insensitive" } },
+            ];
+        }
+        if (filters?.collectionSlug) {
+            where.collections = { some: { collection: { slug: filters.collectionSlug } } };
+        }
+        if (filters?.tagSlug) {
+            where.tags = { some: { tag: { slug: filters.tagSlug } } };
+        }
+        if (filters?.inStock) {
+            where.stockMl = { gt: 0 };
+        }
+
+        const [products, total] = await Promise.all([
+            prisma.product.findMany({
+                where,
+                take: filters?.limit || 50,
+                skip: filters?.skip || 0,
+                select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    brand: true,
+                    imageUrl: true,
+                    basePrice: true,
+                    stockMl: true,
+                    category: {
+                        select: {
+                            id: true,
+                            name: true,
+                            slug: true
+                        }
+                    },
+                    images: {
+                        select: {
+                            imageUrl: true,
+                            position: true
+                        },
+                        orderBy: { position: "asc" },
+                        take: 1
+                    },
+                    volumes: {
+                        select: {
+                            ml: true,
+                            price: true
+                        }
+                    }
+                },
+                orderBy: { createdAt: "desc" },
+            }),
+            prisma.product.count({ where })
+        ]);
+
+        return { products, total };
+    };
+
+    // Cache key for the specific filter set
+    const cacheKey = JSON.stringify(filters || {});
+    
+    return unstable_cache(
+        fetchFunc,
+        ['products', cacheKey],
+        {
+            revalidate: 300, // 5 minutes fallback
+            tags: ['products']
+        }
+    )();
+};
+
+export const getProducts = (filters?: {
     categoryId?: string;
     brand?: string;
     search?: string;
@@ -16,139 +103,180 @@ export const getProducts = async (filters?: {
     tagSlug?: string;
     limit?: number;
 }) => {
-    const where: Record<string, any> = {};
+    const fetchFunc = async () => {
+        const where: Record<string, any> = {};
 
-    if (filters?.categoryId) where.categoryId = filters.categoryId;
-    if (filters?.brand) where.brand = filters.brand;
-    if (filters?.status) where.status = filters.status as ProductStatus;
-    if (filters?.search) {
-        where.OR = [
-            { name: { contains: filters.search, mode: "insensitive" } },
-            { brand: { contains: filters.search, mode: "insensitive" } },
-        ];
-    }
-    if (filters?.collectionSlug) {
-        where.collections = { some: { collection: { slug: filters.collectionSlug } } };
-    }
-    if (filters?.tagSlug) {
-        where.tags = { some: { tag: { slug: filters.tagSlug } } };
-    }
+        if (filters?.categoryId) where.categoryId = filters.categoryId;
+        if (filters?.brand) where.brand = filters.brand;
+        if (filters?.status) where.status = filters.status as ProductStatus;
+        if (filters?.search) {
+            where.OR = [
+                { name: { contains: filters.search, mode: "insensitive" } },
+                { brand: { contains: filters.search, mode: "insensitive" } },
+            ];
+        }
+        if (filters?.collectionSlug) {
+            where.collections = { some: { collection: { slug: filters.collectionSlug } } };
+        }
+        if (filters?.tagSlug) {
+            where.tags = { some: { tag: { slug: filters.tagSlug } } };
+        }
 
-    return await prisma.product.findMany({
-        where,
-        take: filters?.limit || 100,
-        include: {
-            category: true,
-            images: { orderBy: { position: "asc" } },
-            tags: { include: { tag: true } },
-            collections: { include: { collection: true } },
-            volumes: true,
-        },
-        orderBy: { createdAt: "desc" },
-    });
+        return await prisma.product.findMany({
+            where,
+            take: filters?.limit || 100,
+            select: {
+                id: true,
+                name: true,
+                slug: true,
+                brand: true,
+                imageUrl: true,
+                basePrice: true,
+                stockMl: true,
+                status: true,
+                category: {
+                    select: {
+                        id: true,
+                        name: true,
+                        slug: true
+                    }
+                },
+                images: { orderBy: { position: "asc" } },
+                tags: { select: { tag: true } },
+                collections: { select: { collection: true } },
+                volumes: true,
+            },
+            orderBy: { createdAt: "desc" },
+        });
+    };
+
+    const cacheKey = JSON.stringify(filters || {});
+    return unstable_cache(
+        fetchFunc,
+        ['admin-products', cacheKey],
+        { tags: ['products'] }
+    )();
 };
 
-// ── Active products only (for storefront) ─────────────────────────────────
-export const getActiveProducts = async (filters?: {
-    categoryId?: string;
-    brand?: string;
-    search?: string;
-    collectionSlug?: string;
-    tagSlug?: string;
-    inStock?: boolean;
-    limit?: number;
-}) => {
-    const where: Record<string, any> = { status: "ACTIVE" };
-
-    if (filters?.categoryId) where.categoryId = filters.categoryId;
-    if (filters?.brand) where.brand = filters.brand;
-    if (filters?.search) {
-        where.OR = [
-            { name: { contains: filters.search, mode: "insensitive" } },
-            { brand: { contains: filters.search, mode: "insensitive" } },
-        ];
-    }
-    if (filters?.collectionSlug) {
-        where.collections = { some: { collection: { slug: filters.collectionSlug } } };
-    }
-    if (filters?.tagSlug) {
-        where.tags = { some: { tag: { slug: filters.tagSlug } } };
-    }
-    if (filters?.inStock) {
-        where.stockMl = { gt: 0 };
-    }
-
-    return await prisma.product.findMany({
-        where,
-        take: filters?.limit || 50,
-        include: {
-            category: true,
-            images: { orderBy: { position: "asc" }, take: 1 },
-            volumes: true,
+export const getProductById = (id: string) => {
+    return unstable_cache(
+        async () => {
+            return await prisma.product.findUnique({
+                where: { id },
+                include: {
+                    category: true,
+                    images: { orderBy: { position: "asc" } },
+                    tags: { include: { tag: true } },
+                    collections: { include: { collection: true } },
+                    volumes: true,
+                },
+            });
         },
-        orderBy: { createdAt: "desc" },
-    });
+        ['product-id', id],
+        { tags: ['products', `product-${id}`] }
+    )();
 };
 
-export const getProductById = async (id: string) => {
-    return await prisma.product.findUnique({
-        where: { id },
-        include: {
-            category: true,
-            images: { orderBy: { position: "asc" } },
-            tags: { include: { tag: true } },
-            collections: { include: { collection: true } },
-            volumes: true,
+export const getProductBySlug = (slug: string) => {
+    return unstable_cache(
+        async () => {
+            return await prisma.product.findUnique({
+                where: { slug },
+                include: {
+                    category: true,
+                    images: { orderBy: { position: "asc" } },
+                    tags: { include: { tag: true } },
+                    collections: { include: { collection: true } },
+                    volumes: true,
+                },
+            });
         },
-    });
-};
-
-export const getProductBySlug = async (slug: string) => {
-    return await prisma.product.findUnique({
-        where: { slug },
-        include: {
-            category: true,
-            images: { orderBy: { position: "asc" } },
-            tags: { include: { tag: true } },
-            collections: { include: { collection: true } },
-            volumes: true,
-        },
-    });
+        ['product-slug', slug],
+        { tags: ['products', `product-slug-${slug}`] }
+    )();
 };
 
 // ── Featured / New Arrivals / Best Sellers ────────────────────────────────
-export const getFeaturedProducts = async (limit = 8) => {
-    return await prisma.product.findMany({
-        where: {
-            status: "ACTIVE",
-            tags: { some: { tag: { slug: "featured" } } },
+export const getFeaturedProducts = (limit = 8) => {
+    return unstable_cache(
+        async () => {
+            return await prisma.product.findMany({
+                where: {
+                    status: "ACTIVE",
+                    tags: { some: { tag: { slug: "featured" } } },
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    brand: true,
+                    imageUrl: true,
+                    basePrice: true,
+                    volumes: true,
+                    category: { select: { name: true } },
+                    images: { select: { imageUrl: true }, orderBy: { position: "asc" }, take: 1 }
+                },
+                take: limit,
+            });
         },
-        include: { category: true, images: { orderBy: { position: "asc" }, take: 1 }, volumes: true },
-        take: limit,
-    });
+        ['featured-products', String(limit)],
+        { tags: ['products', 'featured'] }
+    )();
 };
 
-export const getNewArrivals = async (limit = 8) => {
-    return await prisma.product.findMany({
-        where: { status: "ACTIVE" },
-        include: { category: true, images: { orderBy: { position: "asc" }, take: 1 }, volumes: true },
-        orderBy: { createdAt: "desc" },
-        take: limit,
-    });
+export const getNewArrivals = (limit = 8) => {
+    return unstable_cache(
+        async () => {
+            return await prisma.product.findMany({
+                where: { status: "ACTIVE" },
+                select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    brand: true,
+                    imageUrl: true,
+                    basePrice: true,
+                    volumes: true,
+                    category: { select: { name: true } },
+                    images: { select: { imageUrl: true }, orderBy: { position: "asc" }, take: 1 }
+                },
+                orderBy: { createdAt: "desc" },
+                take: limit,
+            });
+        },
+        ['new-arrivals', String(limit)],
+        { tags: ['products', 'new-arrivals'] }
+    )();
 };
 
-export const getBestSellers = async (limit = 8) => {
-    const salesData = await prisma.productSales.findMany({
-        where: { product: { status: "ACTIVE" } },
-        include: {
-            product: {
-                include: { category: true, images: { orderBy: { position: "asc" }, take: 1 }, volumes: true },
-            },
+export const getBestSellers = (limit = 8) => {
+    return unstable_cache(
+        async () => {
+            const salesData = await prisma.productSales.findMany({
+                where: { product: { status: "ACTIVE" } },
+                include: {
+                    product: {
+                        select: {
+                            id: true,
+                            name: true,
+                            slug: true,
+                            brand: true,
+                            imageUrl: true,
+                            basePrice: true,
+                            volumes: true,
+                            category: { select: { name: true } },
+                            images: { select: { imageUrl: true }, orderBy: { position: "asc" }, take: 1 }
+                        },
+                    },
+                },
+                orderBy: { unitsSold: "desc" },
+                take: limit,
+            });
+            return salesData.map((s) => s.product);
         },
-        orderBy: { unitsSold: "desc" },
-        take: limit,
-    });
-    return salesData.map((s) => s.product);
+        ['best-sellers', String(limit)],
+        { tags: ['products', 'best-sellers'] }
+    )();
 };
 
 // ── CREATE ────────────────────────────────────────────────────────────────

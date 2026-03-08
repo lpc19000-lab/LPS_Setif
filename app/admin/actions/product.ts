@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { logEvent } from "@/lib/logger";
 
 function generateSlug(name: string): string {
@@ -76,6 +76,7 @@ export async function createProduct(formData: FormData) {
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         revalidatePath("/");
+        revalidateTag("products");
         return { success: true };
     } catch (error) {
         console.error("Create product error:", error);
@@ -130,6 +131,7 @@ export async function updateProduct(id: string, formData: FormData) {
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         revalidatePath("/");
+        revalidateTag("products");
         return { success: true };
     } catch (error) {
         console.error("Update product error:", error);
@@ -143,6 +145,7 @@ export async function deleteProduct(id: string) {
         await logEvent("PRODUCT_DELETED", id, `Product ${id} deleted`);
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
+        revalidateTag("products");
         return { success: true };
     } catch (error) {
         return { success: false, error: "Failed to delete product (might be referenced in orders)" };
