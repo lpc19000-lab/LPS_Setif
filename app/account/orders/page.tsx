@@ -1,5 +1,5 @@
 import { requireCustomerSession } from "@/lib/customer-auth";
-import { getOrdersByCustomer } from "@/services/order-service";
+import { getOrdersByCustomer, countOrdersByCustomer } from "@/services/order-service";
 import {
     ShoppingBag,
     Calendar,
@@ -10,7 +10,9 @@ import {
     CheckCircle2,
     Truck,
     XCircle,
-    Package
+    Package,
+    ArrowLeft,
+    ArrowRight
 } from "lucide-react";
 import Link from "next/link";
 
@@ -42,9 +44,23 @@ const getStatusIcon = (status: string) => {
     }
 };
 
-export default async function OrderHistoryPage() {
+interface PageProps {
+    searchParams: Promise<{ page?: string }>;
+}
+
+export default async function OrderHistoryPage({ searchParams }: PageProps) {
     const customer = await requireCustomerSession();
-    const orders = await getOrdersByCustomer(customer.id);
+    const resolvedSearchParams = await searchParams;
+    const page = parseInt(resolvedSearchParams.page || "1");
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const [orders, totalOrders] = await Promise.all([
+        getOrdersByCustomer(customer.id, limit, skip),
+        countOrdersByCustomer(customer.id)
+    ]);
+
+    const totalPages = Math.ceil(totalOrders / limit);
 
     return (
         <div className="max-w-7xl mx-auto px-6 pt-32 pb-20">
@@ -73,7 +89,7 @@ export default async function OrderHistoryPage() {
                     </Link>
                 </div>
             ) : (
-                <div className="space-y-4">
+                <div className="space-y-8">
                     {/* Desktop View Table */}
                     <div className="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <table className="w-full text-left">
@@ -175,6 +191,40 @@ export default async function OrderHistoryPage() {
                             );
                         })}
                     </div>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+                            <p className="text-xs text-gray-500 font-medium">
+                                Showing <span className="text-gray-900 font-bold">{skip + 1}</span> to <span className="text-gray-900 font-bold">{Math.min(skip + limit, totalOrders)}</span> of <span className="text-gray-900 font-bold">{totalOrders}</span> orders
+                            </p>
+                            <div className="flex items-center gap-2">
+                                <Link
+                                    href={`/account/orders?page=${page - 1}`}
+                                    className={`w-10 h-10 rounded-xl border border-gray-100 flex items-center justify-center transition-all ${page <= 1 ? "opacity-30 pointer-events-none" : "hover:bg-gray-50 hover:border-gray-200 active:scale-95"}`}
+                                >
+                                    <ArrowLeft className="w-4 h-4" />
+                                </Link>
+                                <div className="flex items-center gap-1">
+                                    {[...Array(totalPages)].map((_, i) => (
+                                        <Link
+                                            key={i}
+                                            href={`/account/orders?page=${i + 1}`}
+                                            className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${page === i + 1 ? "bg-primary text-white shadow-lg shadow-primary/20" : "hover:bg-gray-50 text-gray-500"}`}
+                                        >
+                                            {i + 1}
+                                        </Link>
+                                    ))}
+                                </div>
+                                <Link
+                                    href={`/account/orders?page=${page + 1}`}
+                                    className={`w-10 h-10 rounded-xl border border-gray-100 flex items-center justify-center transition-all ${page >= totalPages ? "opacity-30 pointer-events-none" : "hover:bg-gray-50 hover:border-gray-200 active:scale-95"}`}
+                                >
+                                    <ArrowRight className="w-4 h-4" />
+                                </Link>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

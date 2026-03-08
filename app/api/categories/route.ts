@@ -5,7 +5,9 @@ import { errorResponse, Errors } from "@/lib/errors";
 export async function GET() {
     try {
         const categories = await getCategories();
-        return NextResponse.json({ success: true, data: categories });
+        const response = NextResponse.json({ success: true, data: categories });
+        response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=60');
+        return response;
     } catch (error) {
         const { body, status } = errorResponse(error);
         return NextResponse.json(body, { status });

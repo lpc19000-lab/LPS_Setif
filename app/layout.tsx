@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { getCustomerSession } from "@/lib/customer-auth";
 import { CartProvider } from "@/context/CartContext";
+import ToastContainer from "@/components/ui/Toast";
 
 const playfair = Playfair_Display({
     subsets: ["latin"],
@@ -36,6 +37,7 @@ export default async function RootLayout({
                 <CartProvider>
                     <Navbar customerName={customer?.name} />
                     {children}
+                    <ToastContainer />
                 </CartProvider>
             </body>
         </html>

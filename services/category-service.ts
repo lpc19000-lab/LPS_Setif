@@ -1,15 +1,22 @@
 import prisma from "@/lib/db";
+import { unstable_cache, revalidateTag } from "next/cache";
 
 function generateSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-// ── READ ──────────────────────────────────────────────────────────────────
-export const getCategories = async () => {
-    return await prisma.category.findMany({
-        include: { products: { select: { id: true } } },
-        orderBy: { name: "asc" },
-    });
+// ── READ (cached) ─────────────────────────────────────────────────────────
+export const getCategories = () => {
+    return unstable_cache(
+        async () => {
+            return await prisma.category.findMany({
+                include: { products: { select: { id: true } } },
+                orderBy: { name: "asc" },
+            });
+        },
+        ['categories-list'],
+        { revalidate: 300, tags: ['categories'] }
+    )();
 };
 
 export const getCategoryById = async (id: string) => {
@@ -44,7 +51,9 @@ export const createCategory = async (data: {
     description?: string;
 }) => {
     const slug = generateSlug(data.name);
-    return await prisma.category.create({ data: { ...data, slug } });
+    const result = await prisma.category.create({ data: { ...data, slug } });
+    revalidateTag('categories');
+    return result;
 };
 
 // ── UPDATE ────────────────────────────────────────────────────────────────
@@ -56,10 +65,14 @@ export const updateCategory = async (
     if (data.name) {
         updateData.slug = generateSlug(data.name);
     }
-    return await prisma.category.update({ where: { id }, data: updateData });
+    const result = await prisma.category.update({ where: { id }, data: updateData });
+    revalidateTag('categories');
+    return result;
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteCategory = async (id: string) => {
-    return await prisma.category.delete({ where: { id } });
+    const result = await prisma.category.delete({ where: { id } });
+    revalidateTag('categories');
+    return result;
 };

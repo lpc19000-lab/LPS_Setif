@@ -7,17 +7,24 @@ import {
     ShoppingBag,
     TrendingUp,
     ArrowRight,
-    LogOut
+    LogOut,
+    ShoppingCart,
+    Trash2
 } from "lucide-react";
 import Link from "next/link";
 import LogoutButton from "@/components/shop/LogoutButton";
 import RealtimeOrderList from "@/components/shop/RealtimeOrderList";
+import { getCart } from "@/services/cart-service";
+import SafeImage from "@/components/SafeImage";
 
 export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
     const customer = await requireCustomerSession();
-    const orders = await getOrdersByCustomer(customer.id);
+    const [orders, cart] = await Promise.all([
+        getOrdersByCustomer(customer.id),
+        getCart(customer.id)
+    ]);
 
     const totalSpent = orders
         .filter(o => o.status !== "CANCELLED")
@@ -39,7 +46,7 @@ export default async function AccountPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Profile Card */}
+                {/* Profile Card & Saved Cart */}
                 <div className="lg:col-span-1 space-y-6">
                     <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
                         <div className="flex items-center gap-4 mb-8">
@@ -77,13 +84,53 @@ export default async function AccountPage() {
                         </div>
                     </div>
 
+                    {/* Saved Cart Preview */}
+                    {cart.items.length > 0 && (
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                    <ShoppingCart className="w-4 h-4 text-primary" />
+                                    Saved Cart
+                                </h3>
+                                <span className="text-[10px] font-black bg-gray-100 px-2 py-0.5 rounded-full uppercase text-gray-400">
+                                    {cart.items.length} Items
+                                </span>
+                            </div>
+                            <div className="space-y-4 mb-6">
+                                {cart.items.slice(0, 3).map((item) => (
+                                    <div key={item.id} className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-gray-50 rounded-lg border border-gray-100 p-1 flex-shrink-0 relative overflow-hidden">
+                                            <SafeImage src={item.product.imageUrl} alt={item.product.name} fill className="object-contain" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs font-bold text-gray-900 truncate">{item.product.name}</p>
+                                            <p className="text-[10px] text-gray-400">Qty: {item.quantity} · {item.selectedVolume}ml</p>
+                                        </div>
+                                    </div>
+                                ))}
+                                {cart.items.length > 3 && (
+                                    <p className="text-[10px] text-center text-gray-400 font-medium">
+                                        + {cart.items.length - 3} more items
+                                    </p>
+                                )}
+                            </div>
+                            <Link
+                                href="/cart"
+                                className="w-full flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all"
+                            >
+                                <ShoppingCart className="w-3.5 h-3.5" />
+                                Review & Checkout
+                            </Link>
+                        </div>
+                    )}
+
                     <Link
                         href="/catalog"
                         className="flex items-center justify-between p-6 bg-primary rounded-2xl text-white group hover:bg-primary-dark transition-all shadow-lg shadow-primary/20"
                     >
                         <div>
                             <p className="text-sm font-medium opacity-80 mb-1">Stock is ready</p>
-                            <p className="text-lg font-bold">Browze Catalog</p>
+                            <p className="text-lg font-bold">Browse Catalog</p>
                         </div>
                         <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                     </Link>

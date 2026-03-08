@@ -1,4 +1,5 @@
-import { unstable_cache } from "next/cache";
+import prisma from "@/lib/db";
+import { unstable_cache, revalidateTag } from "next/cache";
 import { ProductStatus } from "@prisma/client";
 
 // ── Utility ───────────────────────────────────────────────────────────────
@@ -83,7 +84,7 @@ export const getActiveProducts = (filters?: {
 
     // Cache key for the specific filter set
     const cacheKey = JSON.stringify(filters || {});
-    
+
     return unstable_cache(
         fetchFunc,
         ['products', cacheKey],
@@ -385,10 +386,10 @@ export const updateProduct = async (
     return await prisma.$transaction(async (tx) => {
         const updateData: any = { ...productData };
         if (productData.status) updateData.status = productData.status as ProductStatus;
-        
-        const product = await tx.product.update({ 
-            where: { id }, 
-            data: updateData 
+
+        const product = await tx.product.update({
+            where: { id },
+            data: updateData
         });
 
         // Sync volumes if provided
@@ -437,7 +438,9 @@ export const updateProduct = async (
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteProduct = async (id: string) => {
-    return await prisma.product.delete({ where: { id } });
+    const result = await prisma.product.delete({ where: { id } });
+    revalidateTag('products');
+    return result;
 };
 
 // ── LOW STOCK ─────────────────────────────────────────────────────────────

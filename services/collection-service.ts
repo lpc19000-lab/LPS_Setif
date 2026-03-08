@@ -1,15 +1,22 @@
 import prisma from "@/lib/db";
+import { unstable_cache, revalidateTag } from "next/cache";
 
 function generateSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-// ── READ ──────────────────────────────────────────────────────────────────
-export const getCollections = async () => {
-    return await prisma.collection.findMany({
-        include: { products: { select: { id: true } } },
-        orderBy: { name: "asc" },
-    });
+// ── READ (cached) ─────────────────────────────────────────────────────────
+export const getCollections = () => {
+    return unstable_cache(
+        async () => {
+            return await prisma.collection.findMany({
+                include: { products: { select: { id: true } } },
+                orderBy: { name: "asc" },
+            });
+        },
+        ['collections-list'],
+        { revalidate: 300, tags: ['collections'] }
+    )();
 };
 
 export const getCollectionBySlug = async (slug: string) => {
@@ -34,16 +41,22 @@ export const getCollectionBySlug = async (slug: string) => {
 // ── CREATE ────────────────────────────────────────────────────────────────
 export const createCollection = async (data: { name: string }) => {
     const slug = generateSlug(data.name);
-    return await prisma.collection.create({ data: { name: data.name, slug } });
+    const result = await prisma.collection.create({ data: { name: data.name, slug } });
+    revalidateTag('collections');
+    return result;
 };
 
 // ── UPDATE ────────────────────────────────────────────────────────────────
 export const updateCollection = async (id: string, data: { name: string }) => {
     const slug = generateSlug(data.name);
-    return await prisma.collection.update({ where: { id }, data: { name: data.name, slug } });
+    const result = await prisma.collection.update({ where: { id }, data: { name: data.name, slug } });
+    revalidateTag('collections');
+    return result;
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteCollection = async (id: string) => {
-    return await prisma.collection.delete({ where: { id } });
+    const result = await prisma.collection.delete({ where: { id } });
+    revalidateTag('collections');
+    return result;
 };

@@ -2,6 +2,7 @@ import prisma from "@/lib/db";
 import { OrderStatus, Prisma } from "@prisma/client";
 import { notifyNewOrder, notifyLowStock } from "./notification-service";
 import { Errors } from "@/lib/errors";
+import { unstable_cache, revalidateTag } from "next/cache";
 
 // ── TYPES ─────────────────────────────────────────────────────────────────
 interface OrderItemInput {
@@ -45,11 +46,11 @@ export const createOrder = async (input: CreateOrderInput) => {
         for (const item of input.items) {
             const product = products.find((p) => p.id === item.productId)!;
             const requiredMl = item.quantity * item.selectedVolume;
-            
+
             if ((product as any).stockMl < requiredMl) {
                 throw Errors.outOfStock(product.name, (product as any).stockMl, requiredMl);
             }
-            
+
             await tx.product.update({
                 where: { id: item.productId },
                 data: { stockMl: { decrement: requiredMl } } as any,
@@ -146,6 +147,10 @@ export const createOrder = async (input: CreateOrderInput) => {
             });
         }
 
+        // After order creation
+        revalidateTag(`orders:${input.customerId}`);
+        revalidateTag("orders");
+
         return order;
     });
 
@@ -227,6 +232,10 @@ export const updateOrderStatus = async (
             },
         });
 
+        // After status update
+        revalidateTag(`orders:${order.customerId}`);
+        revalidateTag("orders");
+
         return await tx.order.update({
             where: { id: orderId },
             data: { status },
@@ -290,16 +299,29 @@ export const getOrderById = async (id: string) => {
     });
 };
 
-export const getOrdersByCustomer = async (customerId: string, limit = 50) => {
-    return await prisma.order.findMany({
-        where: { customerId },
-        take: limit,
-        include: {
-            items: { include: { product: true } },
-            invoice: true,
-            logs: { orderBy: { createdAt: "desc" } }
+export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0) => {
+    return unstable_cache(
+        async () => {
+            return await prisma.order.findMany({
+                where: { customerId },
+                take: limit,
+                skip: skip,
+                include: {
+                    items: { include: { product: true } },
+                    invoice: true,
+                    logs: { orderBy: { createdAt: "desc" } }
+                },
+                orderBy: { createdAt: "desc" },
+            });
         },
-        orderBy: { createdAt: "desc" },
+        [`orders-${customerId}-${limit}-${skip}`],
+        { tags: [`orders:${customerId}`, "orders"], revalidate: 3600 }
+    )();
+};
+
+export const countOrdersByCustomer = async (customerId: string) => {
+    return await prisma.order.count({
+        where: { customerId },
     });
 };
 

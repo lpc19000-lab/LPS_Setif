@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { ShoppingCart, ArrowLeft, Info, Package, ShieldCheck, Box } from "lucide-react";
 import SafeImage from "@/components/SafeImage";
+import { useRealtime } from "@/hooks/use-realtime";
+import { showToast } from "@/components/ui/Toast";
 
 interface Product {
     id: string;
@@ -47,7 +49,6 @@ export default function ProductPage() {
     }, [params.slug]);
 
     // ── REALTIME UPDATES ───────────────────────────────────────────────────
-    const { useRealtime } = require("@/hooks/use-realtime");
     useRealtime("products", (payload: any) => {
         if (payload.eventType === "UPDATE" && product && payload.new.id === product.id) {
             setProduct((prev) => prev ? { ...prev, ...payload.new } : null);
@@ -68,7 +69,7 @@ export default function ProductPage() {
         setAdding(true);
         setMessage("");
 
-        const currentVolumePrice = product.volumes?.find(v => v.ml === selectedVolume)?.price 
+        const currentVolumePrice = product.volumes?.find(v => v.ml === selectedVolume)?.price
             || (product.basePrice / 100) * selectedVolume;
 
         const result = addItem({
@@ -83,8 +84,10 @@ export default function ProductPage() {
 
         if (result.success) {
             setMessage("Added to cart successfully!");
+            showToast(`${product.name} added to cart!`, "success");
         } else {
             setMessage(result.error || "Failed to add to cart");
+            showToast(result.error || "Failed to add to cart", "error");
         }
 
         setAdding(false);
@@ -164,12 +167,10 @@ export default function ProductPage() {
                                 <p className="text-xl text-gray-400 font-light font-serif italic">{product.brand}</p>
                                 <div className="h-4 w-px bg-gray-200"></div>
                                 {product.stockMl > 0 ? (
-                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
-                                        product.stockMl <= 500 ? "bg-amber-50 text-amber-600" : "bg-green-50 text-green-600"
-                                    }`}>
-                                        <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-                                            product.stockMl <= 500 ? "bg-amber-500" : "bg-green-500"
-                                        }`}></div>
+                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${product.stockMl <= 500 ? "bg-amber-50 text-amber-600" : "bg-green-50 text-green-600"
+                                        }`}>
+                                        <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${product.stockMl <= 500 ? "bg-amber-500" : "bg-green-500"
+                                            }`}></div>
                                         {product.stockMl <= 500 ? `Low Stock (${product.stockMl}ml left)` : "In Stock"}
                                     </div>
                                 ) : (
@@ -218,54 +219,53 @@ export default function ProductPage() {
                             </div>
 
                             {/* Controls */}
-                                <div className="space-y-8">
-                                    <div className="space-y-4">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Select Bottle Size</p>
-                                        <div className="flex flex-wrap gap-3">
-                                            {(product.volumes || [30, 50, 100, 150, 200]).map((v: any) => {
-                                                const ml = typeof v === 'number' ? v : v.ml;
-                                                return (
-                                                    <button
-                                                        key={ml}
-                                                        onClick={() => setSelectedVolume(ml)}
-                                                        className={`px-6 py-4 rounded-2xl border transition-all font-bold text-sm ${
-                                                            selectedVolume === ml 
-                                                            ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105" 
+                            <div className="space-y-8">
+                                <div className="space-y-4">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Select Bottle Size</p>
+                                    <div className="flex flex-wrap gap-3">
+                                        {(product.volumes || [30, 50, 100, 150, 200]).map((v: any) => {
+                                            const ml = typeof v === 'number' ? v : v.ml;
+                                            return (
+                                                <button
+                                                    key={ml}
+                                                    onClick={() => setSelectedVolume(ml)}
+                                                    className={`px-6 py-4 rounded-2xl border transition-all font-bold text-sm ${selectedVolume === ml
+                                                            ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105"
                                                             : "bg-white border-gray-100 text-gray-600 hover:border-primary/30"
                                                         }`}
-                                                    >
-                                                        {ml}ml
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
+                                                >
+                                                    {ml}ml
+                                                </button>
+                                            );
+                                        })}
                                     </div>
+                                </div>
 
-                                    <div className="flex flex-wrap items-center gap-8">
-                                        <div className="space-y-3">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Configure Quantity</p>
-                                            <div className="flex items-center bg-white border border-gray-100 rounded-2xl p-1.5 shadow-sm">
-                                                <button
-                                                    onClick={() => adjustQuantity(-1)}
-                                                    disabled={quantity <= 1}
-                                                    className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
-                                                >
-                                                    −
-                                                </button>
-                                                <div className="px-8 text-center min-w-[120px]">
-                                                    <span className="block text-2xl font-bold text-gray-950">{quantity}</span>
-                                                    <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest">Units of {selectedVolume}ml</span>
-                                                </div>
-                                                <button
-                                                    onClick={() => adjustQuantity(1)}
-                                                    disabled={(quantity + 1) * selectedVolume > product.stockMl}
-                                                    className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
-                                                >
-                                                    +
-                                                </button>
+                                <div className="flex flex-wrap items-center gap-8">
+                                    <div className="space-y-3">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Configure Quantity</p>
+                                        <div className="flex items-center bg-white border border-gray-100 rounded-2xl p-1.5 shadow-sm">
+                                            <button
+                                                onClick={() => adjustQuantity(-1)}
+                                                disabled={quantity <= 1}
+                                                className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
+                                            >
+                                                −
+                                            </button>
+                                            <div className="px-8 text-center min-w-[120px]">
+                                                <span className="block text-2xl font-bold text-gray-950">{quantity}</span>
+                                                <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest">Units of {selectedVolume}ml</span>
                                             </div>
+                                            <button
+                                                onClick={() => adjustQuantity(1)}
+                                                disabled={(quantity + 1) * selectedVolume > product.stockMl}
+                                                className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
+                                            >
+                                                +
+                                            </button>
                                         </div>
                                     </div>
+                                </div>
 
                                 <div className="flex flex-col gap-4">
                                     <button
