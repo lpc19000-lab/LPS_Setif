@@ -76,9 +76,7 @@ export const addToCart = async (
 
     // Ensure cart exists
     let cart = await prisma.cart.findUnique({ where: { customerId } });
-    if (!cart) {
-        cart = await prisma.cart.create({ data: { customerId } });
-    }
+    cart ??= await prisma.cart.create({ data: { customerId } });
 
     // UNIQUE CONSTRAINT: Identify item by (cart, product, volumeId)
     const existingItem = await prisma.cartItem.findFirst({
