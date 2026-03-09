@@ -213,7 +213,7 @@ export const updateOrderStatus = async (
         // Stock automation: restore stock if cancelling a non-cancelled order
         if (status === OrderStatus.CANCELLED && oldStatus !== OrderStatus.CANCELLED) {
             for (const item of order.items) {
-                const totalWeight = item.quantity * (item.volume.weight || 0);
+                const totalWeight = item.quantity * (item.volume?.weight || 0);
                 await tx.product.update({
                     where: { id: item.productId },
                     data: { stockWeight: { increment: totalWeight } },

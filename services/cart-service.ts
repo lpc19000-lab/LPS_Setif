@@ -124,7 +124,7 @@ export const updateCartItem = async (cartItemId: string, quantity: number) => {
     }
 
     // Stock validation for update
-    const requiredWeight = quantity * (cartItem.volume.weight || 0);
+    const requiredWeight = quantity * (cartItem.volume?.weight || 0);
     if (cartItem.product.stockWeight < requiredWeight) {
         throw new Error(
             `Insufficient stock. Available: ${cartItem.product.stockWeight}g`
