@@ -21,10 +21,28 @@ export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
     const customer = await requireCustomerSession();
-    const [orders, cart] = await Promise.all([
+    const [rawOrders, cart] = await Promise.all([
         getOrdersByCustomer(customer.id),
         getCart(customer.id)
     ]);
+
+    // Serialize Decimal values for Client Components
+    const orders = rawOrders.map(order => ({
+        ...order,
+        totalPrice: Number(order.totalPrice),
+        items: order.items.map(item => ({
+            ...item,
+            price: Number(item.price),
+            weight: (item as any).volume?.weight || 0
+        }))
+    }));
+
+    const enrichedCartItems = cart.items.map(item => ({
+        ...item,
+        unitPrice: Number(item.unitPrice),
+        lineTotal: Number(item.lineTotal),
+        weight: Number(item.weight)
+    }));
 
     const totalSpent = orders
         .filter(o => o.status !== "CANCELLED")
@@ -85,7 +103,7 @@ export default async function AccountPage() {
                     </div>
 
                     {/* Saved Cart Preview */}
-                    {cart.items.length > 0 && (
+                    {enrichedCartItems.length > 0 && (
                         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="font-bold text-gray-900 flex items-center gap-2">
@@ -93,11 +111,11 @@ export default async function AccountPage() {
                                     Saved Cart
                                 </h3>
                                 <span className="text-[10px] font-black bg-gray-100 px-2 py-0.5 rounded-full uppercase text-gray-400">
-                                    {cart.items.length} Items
+                                    {enrichedCartItems.length} Items
                                 </span>
                             </div>
                             <div className="space-y-4 mb-6">
-                                {cart.items.slice(0, 3).map((item) => (
+                                {enrichedCartItems.slice(0, 3).map((item) => (
                                     <div key={item.id} className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-gray-50 rounded-lg border border-gray-100 p-1 flex-shrink-0 relative overflow-hidden">
                                             <SafeImage src={item.product.imageUrl} alt={item.product.name} fill className="object-contain" />
@@ -113,15 +131,15 @@ export default async function AccountPage() {
                                                 </span>
                                                 <div className="w-1 h-1 rounded-full bg-gray-200" />
                                                 <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
-                                                    Qty: {item.quantity} · {(item as any).weight}g
+                                                    Qty: {item.quantity} · {item.weight}g
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
-                                {cart.items.length > 3 && (
+                                {enrichedCartItems.length > 3 && (
                                     <p className="text-[10px] text-center text-gray-400 font-medium">
-                                        + {cart.items.length - 3} more items
+                                        + {enrichedCartItems.length - 3} more items
                                     </p>
                                 )}
                             </div>
