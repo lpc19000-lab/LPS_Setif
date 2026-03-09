@@ -45,7 +45,7 @@ export default function CheckoutPage() {
             const orderItems = items.map((item) => ({
                 productId: item.product.id,
                 quantity: item.quantity,
-                selectedWeight: item.product.selectedWeight,
+                volumeId: item.product.volumeId,
             }));
             const res = await fetch("/api/orders", {
                 method: "POST",
@@ -211,7 +211,7 @@ export default function CheckoutPage() {
                                                     {t("qty")}: {item.quantity} × {Number(item.product.basePrice).toLocaleString()} DA
                                                 </p>
                                                 <p className="text-[10px] text-primary font-bold">
-                                                    {item.product.selectedWeight >= 1000 ? `${item.product.selectedWeight / 1000}kg` : `${item.product.selectedWeight}g`}
+                                                    {item.product.weight >= 1000 ? `${item.product.weight / 1000}kg` : `${item.product.weight}g`}
                                                 </p>
                                             </div>
                                             <p className="font-bold text-gray-700">

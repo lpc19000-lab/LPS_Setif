@@ -9,7 +9,7 @@ export const getRestockSuggestions = async () => {
             name: true,
             brand: true,
             imageUrl: true,
-            stockMl: true,
+            stockWeight: true,
             lowStockThreshold: true,
         }
     });
@@ -17,43 +17,45 @@ export const getRestockSuggestions = async () => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const recentItems = await prisma.orderItem.groupBy({
-        by: ['productId', 'selectedVolume'],
-        _sum: { quantity: true },
+    const recentItems = await prisma.orderItem.findMany({
         where: {
             order: {
                 createdAt: { gte: thirtyDaysAgo },
                 status: { not: OrderStatus.CANCELLED }
             }
+        },
+        include: {
+            volume: { select: { weight: true } }
         }
     });
 
     const recentDemandMap = new Map<string, number>();
     recentItems.forEach(item => {
-        const totalMl = (item._sum.quantity || 0) * item.selectedVolume;
-        recentDemandMap.set(item.productId, (recentDemandMap.get(item.productId) || 0) + totalMl);
+        const weight = item.volume?.weight || 0;
+        const totalWeight = (item.quantity || 0) * weight;
+        recentDemandMap.set(item.productId, (recentDemandMap.get(item.productId) || 0) + totalWeight);
     });
 
     return products.map(product => {
-        const mlSold30d = recentDemandMap.get(product.id) || 0;
-        const avgDailyMlSales = mlSold30d / 30;
+        const weightSold30d = recentDemandMap.get(product.id) || 0;
+        const avgDailyWeightSales = weightSold30d / 30;
 
-        // Handle infinity if avgDailyMlSales is 0
-        const estimatedDaysLeft = avgDailyMlSales > 0 ? Math.floor(product.stockMl / avgDailyMlSales) : 999;
+        // Handle infinity if avgDailyWeightSales is 0
+        const estimatedDaysLeft = avgDailyWeightSales > 0 ? Math.floor(product.stockWeight / avgDailyWeightSales) : 999;
 
         let recommendation = "Healthy";
         let status = "NORMAL";
-        if (product.stockMl <= product.lowStockThreshold || estimatedDaysLeft < 7) {
+        if (product.stockWeight <= product.lowStockThreshold || estimatedDaysLeft < 7) {
             recommendation = "Restock Soon";
             status = "WARNING";
-            if (product.stockMl === 0) {
+            if (product.stockWeight === 0) {
                 recommendation = "Restock Immediately (OOS)";
                 status = "CRITICAL";
             }
-        } else if (estimatedDaysLeft > 60 && product.stockMl > 5000) { // 5L overstock
+        } else if (estimatedDaysLeft > 60 && product.stockWeight > 5000) { // 5kg overstock
             recommendation = "Overstock";
             status = "INFO";
-        } else if (avgDailyMlSales === 0 && product.stockMl > 0) {
+        } else if (avgDailyWeightSales === 0 && product.stockWeight > 0) {
             recommendation = "No Recent Sales";
             status = "INFO";
         }
@@ -63,9 +65,9 @@ export const getRestockSuggestions = async () => {
             name: product.name,
             brand: product.brand,
             imageUrl: product.imageUrl,
-            currentStockMl: product.stockMl,
-            mlSold30d,
-            avgDailyMlSales: Number(avgDailyMlSales.toFixed(2)),
+            currentStockWeight: product.stockWeight,
+            weightSold30d,
+            avgDailyWeightSales: Number(avgDailyWeightSales.toFixed(2)),
             estimatedDaysLeft,
             recommendation,
             status
@@ -95,21 +97,21 @@ export const getDeadStock = async () => {
     const deadProducts = await prisma.product.findMany({
         where: {
             id: { notIn: Array.from(activeProductIds) },
-            stockMl: { gt: 0 } // Only care if we actually have it in stock
+            stockWeight: { gt: 0 } // Only care if we actually have it in stock
         },
         select: {
             id: true,
             name: true,
             brand: true,
             imageUrl: true,
-            stockMl: true,
+            stockWeight: true,
             basePrice: true,
             createdAt: true
         }
     });
 
     return deadProducts.map(p => {
-        const valueTieUp = Number(p.basePrice) * (p.stockMl / 100); // Rough estimate based on base price per 100ml
+        const valueTieUp = Number(p.basePrice) * (p.stockWeight / 100); // Rough estimate based on base price per 100g
         return {
             ...p,
             valueTieUp,
@@ -152,7 +154,7 @@ export const getProfitAnalytics = async () => {
         const dStr = order.createdAt.toISOString().split('T')[0];
 
         let orderRevenue = Number(order.totalPrice);
-        let orderCost = 0; 
+        let orderCost = 0;
 
         order.items.forEach(item => {
             // Placeholder: Estimate cost as 70% of price if costPrice is missing from schema
@@ -222,10 +224,10 @@ export const getInventoryHealthScore = async () => {
 
     // Low stock penalty
     const products = await prisma.product.findMany({
-        select: { stockMl: true, lowStockThreshold: true }
+        select: { stockWeight: true, lowStockThreshold: true }
     });
-    
-    const lowStockCount = products.filter(p => p.stockMl <= p.lowStockThreshold).length;
+
+    const lowStockCount = products.filter(p => p.stockWeight <= p.lowStockThreshold).length;
     score -= (lowStockCount * 2); // 2 points per low stock item
 
     // Dead stock penalty
@@ -233,7 +235,7 @@ export const getInventoryHealthScore = async () => {
     score -= (deadStock.length * 5); // 5 points per dead stock item
 
     // OOS penalty
-    const oosCount = products.filter(p => p.stockMl === 0).length;
+    const oosCount = products.filter(p => p.stockWeight === 0).length;
     score -= (oosCount * 5); // 5 points per OOS item
 
     return Math.max(0, score); // clamp to 0
@@ -254,7 +256,7 @@ export const getSmartAlerts = async () => {
         alerts.push({ type: "WARNING", message: `${urgentRestock.length} products are out of stock and need immediate restocking.` });
     }
 
-    const warningRestock = restock.filter(r => r.status === "WARNING" && r.currentStockMl > 0);
+    const warningRestock = restock.filter(r => r.status === "WARNING" && r.currentStockWeight > 0);
     if (warningRestock.length > 0) {
         alerts.push({ type: "INFO", message: `${warningRestock.length} products are running low and will stock out within 7 days.` });
     }

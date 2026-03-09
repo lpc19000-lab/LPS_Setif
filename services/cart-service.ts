@@ -8,11 +8,12 @@ export const getCart = async (customerId: string) => {
             items: {
                 include: {
                     product: {
-                        include: { 
-                            category: true, 
-                            volumes: true 
+                        include: {
+                            category: true,
+                            volumes: true
                         },
                     },
+                    volume: true
                 },
             },
         },
@@ -23,21 +24,21 @@ export const getCart = async (customerId: string) => {
     // Calculate total using volume-based pricing
     let totalPrice = 0;
     const enrichedItems = cart.items.map((item) => {
-        // Find matching volume price in database
-        const volumeData = item.product.volumes.find((v) => v.ml === item.selectedVolume);
-        
+        const volumeData = item.volume;
+
         // Calculate unit price: fixed volume price OR calculated from basePrice
-        const unitPrice = volumeData 
-            ? Number(volumeData.price) 
-            : (Number(item.product.basePrice) / 100) * item.selectedVolume;
+        const unitPrice = volumeData
+            ? Number(volumeData.price)
+            : (Number(item.product.basePrice) / 100) * (volumeData?.weight || 0);
 
         const lineTotal = unitPrice * item.quantity;
         totalPrice += lineTotal;
-        
-        return { 
-            ...item, 
-            unitPrice, 
-            lineTotal 
+
+        return {
+            ...item,
+            unitPrice,
+            lineTotal,
+            weight: volumeData?.weight || 0
         };
     });
 
@@ -49,21 +50,27 @@ export const addToCart = async (
     customerId: string,
     productId: string,
     quantity: number,
-    selectedVolume: number = 100
+    volumeId: string
 ) => {
-    // Validate product existence and fetch necessary fields
-    const product = await prisma.product.findUnique({ 
-        where: { id: productId },
-        select: { id: true, name: true, stockMl: true }
-    });
-    
-    if (!product) throw new Error("Product not found");
+    // Validate product and volume existence
+    const [product, volume] = await Promise.all([
+        prisma.product.findUnique({
+            where: { id: productId },
+            select: { id: true, name: true, stockWeight: true }
+        }),
+        prisma.productVolume.findUnique({
+            where: { id: volumeId }
+        })
+    ]);
 
-    // Validate stock availability (ml-based)
-    const requiredMl = quantity * selectedVolume;
-    if (product.stockMl < requiredMl) {
+    if (!product) throw new Error("Product not found");
+    if (!volume) throw new Error("Volume not found");
+
+    // Validate stock availability (weight-based)
+    const requiredWeight = quantity * (volume.weight || 0);
+    if (product.stockWeight < requiredWeight) {
         throw new Error(
-            `Insufficient stock for "${product.name}". Available: ${product.stockMl}ml`
+            `Insufficient stock for "${product.name}". Available: ${product.stockWeight}g`
         );
     }
 
@@ -73,12 +80,12 @@ export const addToCart = async (
         cart = await prisma.cart.create({ data: { customerId } });
     }
 
-    // UNIQUE CONSTRAINT: Identify item by (cart, product, volume)
+    // UNIQUE CONSTRAINT: Identify item by (cart, product, volumeId)
     const existingItem = await prisma.cartItem.findFirst({
-        where: { 
-            cartId: cart.id, 
-            productId, 
-            selectedVolume 
+        where: {
+            cartId: cart.id,
+            productId,
+            volumeId
         },
     });
 
@@ -87,19 +94,19 @@ export const addToCart = async (
         return await prisma.cartItem.update({
             where: { id: existingItem.id },
             data: { quantity: existingItem.quantity + quantity },
-            include: { product: true },
+            include: { product: true, volume: true },
         });
     }
 
     // Create new line item
     return await prisma.cartItem.create({
-        data: { 
-            cartId: cart.id, 
-            productId, 
-            quantity, 
-            selectedVolume 
+        data: {
+            cartId: cart.id,
+            productId,
+            quantity,
+            volumeId
         },
-        include: { product: true },
+        include: { product: true, volume: true },
     });
 };
 
@@ -107,7 +114,7 @@ export const addToCart = async (
 export const updateCartItem = async (cartItemId: string, quantity: number) => {
     const cartItem = await prisma.cartItem.findUnique({
         where: { id: cartItemId },
-        include: { product: true },
+        include: { product: true, volume: true },
     });
 
     if (!cartItem) throw new Error("Cart item not found");
@@ -117,17 +124,17 @@ export const updateCartItem = async (cartItemId: string, quantity: number) => {
     }
 
     // Stock validation for update
-    const requiredMl = quantity * cartItem.selectedVolume;
-    if (cartItem.product.stockMl < requiredMl) {
+    const requiredWeight = quantity * (cartItem.volume.weight || 0);
+    if (cartItem.product.stockWeight < requiredWeight) {
         throw new Error(
-            `Insufficient stock. Available: ${cartItem.product.stockMl}ml`
+            `Insufficient stock. Available: ${cartItem.product.stockWeight}g`
         );
     }
 
     return await prisma.cartItem.update({
         where: { id: cartItemId },
         data: { quantity },
-        include: { product: true },
+        include: { product: true, volume: true },
     });
 };
 

@@ -102,9 +102,20 @@ export default async function AccountPage() {
                                         <div className="w-10 h-10 bg-gray-50 rounded-lg border border-gray-100 p-1 flex-shrink-0 relative overflow-hidden">
                                             <SafeImage src={item.product.imageUrl} alt={item.product.name} fill className="object-contain" />
                                         </div>
+                                        {/* Item Info */}
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-bold text-gray-900 truncate">{item.product.name}</p>
-                                            <p className="text-[10px] text-gray-400">Qty: {item.quantity} · {item.selectedVolume}ml</p>
+                                            <h4 className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors truncate">
+                                                {item.product.name}
+                                            </h4>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider truncate">
+                                                    {item.product.brand}
+                                                </span>
+                                                <div className="w-1 h-1 rounded-full bg-gray-200" />
+                                                <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
+                                                    Qty: {item.quantity} · {item.product.volumes.find((v: any) => v.id === item.volumeId)?.weight}g
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

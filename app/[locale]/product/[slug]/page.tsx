@@ -20,7 +20,7 @@ interface Product {
     basePrice: number;
     stockWeight: number;
     category: { id: string; name: string } | null;
-    volumes: { weight: number; price: number }[];
+    volumes: { id: string; weight: number; price: number }[];
 }
 
 export default function ProductPage() {
@@ -33,7 +33,7 @@ export default function ProductPage() {
 
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
-    const [selectedWeight, setSelectedWeight] = useState(100);
+    const [selectedVolumeId, setSelectedVolumeId] = useState("");
     const [quantity, setQuantity] = useState(1);
     const [message, setMessage] = useState("");
     const [adding, setAdding] = useState(false);
@@ -47,6 +47,9 @@ export default function ProductPage() {
             .then((json) => {
                 if (json.success) {
                     setProduct(json.data);
+                    if (json.data.volumes?.length > 0) {
+                        setSelectedVolumeId(json.data.volumes[0].id);
+                    }
                     setQuantity(1);
                 }
                 setLoading(false);
@@ -61,30 +64,30 @@ export default function ProductPage() {
         }
     });
 
+    const selectedVolume = product?.volumes?.find(v => v.id === selectedVolumeId);
+
     const adjustQuantity = (delta: number) => {
-        if (!product) return;
+        if (!product || !selectedVolume) return;
         const next = quantity + delta;
-        const requiredWeight = next * selectedWeight;
+        const requiredWeight = next * selectedVolume.weight;
         if (next >= 1 && requiredWeight <= product.stockWeight) {
             setQuantity(next);
         }
     };
 
     const handleAddToCart = () => {
-        if (!product) return;
+        if (!product || !selectedVolume) return;
         setAdding(true);
         setMessage("");
-
-        const currentWeightPrice = product.volumes?.find(v => v.weight === selectedWeight)?.price
-            || (product.basePrice / 100) * selectedWeight;
 
         const result = addItem({
             id: product.id,
             name: product.name,
             brand: product.brand,
             imageUrl: product.imageUrl,
-            basePrice: Number(currentWeightPrice),
-            selectedWeight: selectedWeight,
+            basePrice: Number(selectedVolume.price),
+            volumeId: selectedVolume.id,
+            weight: selectedVolume.weight,
             stockWeight: product.stockWeight,
         }, quantity);
 
@@ -199,11 +202,11 @@ export default function ProductPage() {
                                     <p className="text-[#D4AF37] text-xs font-black uppercase tracking-[0.3em] mb-3">{t("professional_grade")}</p>
                                     <div className="flex items-baseline gap-3 mb-8">
                                         <span className="text-5xl font-bold">
-                                            {((product.volumes?.find(v => v.weight === selectedWeight)?.price || (product.basePrice / 100) * selectedWeight)).toLocaleString()}
+                                            {(selectedVolume?.price || 0).toLocaleString()}
                                         </span>
                                         <span className="text-xl text-gray-500 font-serif">DA</span>
                                         <span className="ml-4 text-gray-400 text-sm font-light tracking-wide italic">
-                                            {t("per_unit")} {selectedWeight >= 1000 ? `${selectedWeight / 1000}kg` : `${selectedWeight}g`}
+                                            {t("per_unit")} {selectedVolume ? (selectedVolume.weight >= 1000 ? `${selectedVolume.weight / 1000}kg` : `${selectedVolume.weight}g`) : ""}
                                         </span>
                                     </div>
 
@@ -212,13 +215,13 @@ export default function ProductPage() {
                                             <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">{t("selected_size")}</p>
                                             <p className="text-lg font-bold flex items-center gap-2">
                                                 <Box className="w-4 h-4 text-[#D4AF37]" />
-                                                {selectedWeight >= 1000 ? `${selectedWeight / 1000}kg` : `${selectedWeight}g`}
+                                                {selectedVolume ? (selectedVolume.weight >= 1000 ? `${selectedVolume.weight / 1000}kg` : `${selectedVolume.weight}g`) : ""}
                                             </p>
                                         </div>
                                         <div className="space-y-1">
                                             <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">{t("order_total")}</p>
                                             <p className="text-lg font-bold text-[#D4AF37]">
-                                                {((product.volumes?.find(v => v.weight === selectedWeight)?.price || (product.basePrice / 100) * selectedWeight) * quantity).toLocaleString()} DA
+                                                {((selectedVolume?.price || 0) * quantity).toLocaleString()} DA
                                             </p>
                                         </div>
                                     </div>
@@ -231,21 +234,18 @@ export default function ProductPage() {
                                 <div className="space-y-4">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t("select_size")}</p>
                                     <div className="flex flex-wrap gap-3">
-                                        {(product.volumes || [200, 250, 500, 1000]).map((v: any) => {
-                                            const weight = typeof v === 'number' ? v : v.weight;
-                                            return (
-                                                <button
-                                                    key={weight}
-                                                    onClick={() => setSelectedWeight(weight)}
-                                                    className={`px-6 py-4 rounded-2xl border transition-all font-bold text-sm ${selectedWeight === weight
-                                                        ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105"
-                                                        : "bg-white border-gray-100 text-gray-600 hover:border-primary/30"
-                                                        }`}
-                                                >
-                                                    {weight >= 1000 ? `${weight / 1000}kg` : `${weight}g`}
-                                                </button>
-                                            );
-                                        })}
+                                        {product.volumes?.map((v) => (
+                                            <button
+                                                key={v.id}
+                                                onClick={() => setSelectedVolumeId(v.id)}
+                                                className={`px-6 py-4 rounded-2xl border transition-all font-bold text-sm ${selectedVolumeId === v.id
+                                                    ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105"
+                                                    : "bg-white border-gray-100 text-gray-600 hover:border-primary/30"
+                                                    }`}
+                                            >
+                                                {v.weight >= 1000 ? `${v.weight / 1000}kg` : `${v.weight}g`}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
 
@@ -263,12 +263,12 @@ export default function ProductPage() {
                                             <div className="px-8 text-center min-w-[120px]">
                                                 <span className="block text-2xl font-bold text-gray-950">{quantity}</span>
                                                 <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest">
-                                                    {t("units_of")} {selectedWeight >= 1000 ? `${selectedWeight / 1000}kg` : `${selectedWeight}g`}
+                                                    {t("units_of")} {selectedVolume ? (selectedVolume.weight >= 1000 ? `${selectedVolume.weight / 1000}kg` : `${selectedVolume.weight}g`) : ""}
                                                 </span>
                                             </div>
                                             <button
                                                 onClick={() => adjustQuantity(1)}
-                                                disabled={(quantity + 1) * selectedWeight > product.stockWeight}
+                                                disabled={(quantity + 1) * (selectedVolume?.weight || 0) > product.stockWeight}
                                                 className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
                                             >
                                                 +

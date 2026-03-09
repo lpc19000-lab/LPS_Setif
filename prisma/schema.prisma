@@ -94,6 +94,8 @@ model ProductVolume {
   weight    Int?
   price     Decimal @db.Decimal(10, 2)
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItems CartItem[]
+  orderItems OrderItem[]
 
   @@unique([productId, weight])
   @@map("product_volumes")
@@ -180,10 +182,11 @@ model OrderItem {
   orderId        String  @map("order_id")
   productId      String  @map("product_id")
   quantity       Int
-  selectedWeight Int     @default(100) @map("selected_weight")
+  volumeId       String  @map("volume_id")
   price          Decimal @db.Decimal(10, 2)
   order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id])
+  product        Product @relation(fields: [productId], references: [id])
+  volume         ProductVolume @relation(fields: [volumeId], references: [id])
 
   @@index([orderId])
   @@index([productId])
@@ -205,9 +208,10 @@ model CartItem {
   cartId         String  @map("cart_id")
   productId      String  @map("product_id")
   quantity       Int
-  selectedWeight Int     @default(100) @map("selected_weight")
+  volumeId       String  @map("volume_id")
   cart           Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id])
+  product        Product @relation(fields: [productId], references: [id])
+  volume         ProductVolume @relation(fields: [volumeId], references: [id])
 
   @@index([cartId])
   @@index([productId])

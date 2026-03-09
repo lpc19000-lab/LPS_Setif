@@ -102,7 +102,7 @@ export default function MiniCart() {
                                                 <p className="text-[10px] text-gray-400 font-serif italic truncate">{item.product.brand}</p>
                                                 <span className="w-1 h-1 rounded-full bg-gray-200"></span>
                                                 <p className="text-[10px] font-black uppercase tracking-widest text-primary">
-                                                    {item.product.selectedWeight >= 1000 ? `${item.product.selectedWeight / 1000}kg` : `${item.product.selectedWeight}g`}
+                                                    {item.product.weight >= 1000 ? `${item.product.weight / 1000}kg` : `${item.product.weight}g`}
                                                 </p>
                                             </div>
                                             <div className="flex items-center justify-between mt-3">

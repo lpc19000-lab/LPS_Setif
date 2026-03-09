@@ -90,7 +90,7 @@ export default function CartPage() {
                                                     <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">{item.product.brand}</p>
                                                     <span className="w-1 h-3 border-l border-gray-200"></span>
                                                     <p className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest">
-                                                        {item.product.selectedVolume}ml Edition
+                                                        {item.product.weight >= 1000 ? `${item.product.weight / 1000}kg` : `${item.product.weight}g`} Edition
                                                     </p>
                                                 </div>
                                             </div>
@@ -114,7 +114,7 @@ export default function CartPage() {
                                                 </button>
                                                 <div className="px-4 py-2 text-center min-w-[80px]">
                                                     <span className="block text-sm font-black text-gray-900">{item.quantity}</span>
-                                                    <span className="text-[7px] text-gray-400 uppercase font-black">Units of {item.product.selectedVolume}ml</span>
+                                                    <span className="text-[7px] text-gray-400 uppercase font-black">Units of {item.product.weight >= 1000 ? `${item.product.weight / 1000}kg` : `${item.product.weight}g`}</span>
                                                 </div>
                                                 <button
                                                     onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}

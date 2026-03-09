@@ -11,7 +11,7 @@ type ProductWithStock = {
     name: string;
     brand: string;
     imageUrl: string;
-    stockMl: number;
+    stockWeight: number;
     lowStockThreshold: number;
     basePrice: any;
 };
@@ -47,7 +47,7 @@ export default function InventoryManagerClient({
 
     const filteredProducts = initialProducts.filter(p => {
         const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.brand.toLowerCase().includes(searchTerm.toLowerCase());
-        const status = getStatus(p.stockMl, p.lowStockThreshold);
+        const status = getStatus(p.stockWeight, p.lowStockThreshold);
         const matchesStatus = statusFilter === "ALL" || status === statusFilter;
         return matchesSearch && matchesStatus;
     });
@@ -100,8 +100,8 @@ export default function InventoryManagerClient({
                             key={status}
                             onClick={() => setStatusFilter(status)}
                             className={`px-4 py-2 rounded-xl text-xs font-bold tracking-widest uppercase transition-all flex-1 sm:flex-none ${statusFilter === status
-                                    ? "bg-primary-dark text-white shadow-md shadow-primary-dark/20"
-                                    : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+                                ? "bg-primary-dark text-white shadow-md shadow-primary-dark/20"
+                                : "bg-gray-50 text-gray-500 hover:bg-gray-100"
                                 }`}
                         >
                             {status.replace(/_/g, " ")}
@@ -137,18 +137,18 @@ export default function InventoryManagerClient({
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        {getStatusDisplay(getStatus(product.stockMl, product.lowStockThreshold))}
+                                        {getStatusDisplay(getStatus(product.stockWeight, product.lowStockThreshold))}
                                     </td>
                                     <td className="px-6 py-4 text-center">
-                                        <span className={`font-serif text-xl font-bold ${product.stockMl === 0 ? "text-red-500" :
-                                                product.stockMl <= product.lowStockThreshold ? "text-amber-500" :
-                                                    "text-primary-dark"
+                                        <span className={`font-serif text-xl font-bold ${product.stockWeight === 0 ? "text-red-500" :
+                                            product.stockWeight <= product.lowStockThreshold ? "text-amber-500" :
+                                                "text-primary-dark"
                                             }`}>
-                                            {product.stockMl}
+                                            {product.stockWeight}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-center text-gray-400 font-bold">
-                                        {product.lowStockThreshold}ml
+                                        {product.lowStockThreshold}g
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center justify-end gap-2">
@@ -195,12 +195,12 @@ export default function InventoryManagerClient({
                                         </div>
                                         <div>
                                             <div className="font-bold text-gray-900 text-sm">{p.name}</div>
-                                            <div className="text-xs text-gray-500 font-medium tracking-wide">Current Stock: <span className="font-bold text-primary-dark">{p.stockMl}ml</span></div>
+                                            <div className="text-xs text-gray-500 font-medium tracking-wide">Current Stock: <span className="font-bold text-primary-dark">{p.stockWeight}g</span></div>
                                         </div>
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Adjustment Quantity</label>
+                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Adjustment Quantity (g)</label>
                                         <div className="relative">
                                             <input
                                                 type="number"
@@ -212,7 +212,7 @@ export default function InventoryManagerClient({
                                                 {adjustQuantity > 0 ? `+${adjustQuantity} (Add)` : adjustQuantity < 0 ? `${adjustQuantity} (Remove)` : "(No Change)"}
                                             </div>
                                         </div>
-                                        <p className="text-[10px] text-primary font-bold uppercase">Resulting Stock: {p.stockMl + adjustQuantity}</p>
+                                        <p className="text-[10px] text-primary font-bold uppercase">Resulting Stock: {p.stockWeight + adjustQuantity}g</p>
                                     </div>
 
                                     <div className="space-y-1.5">

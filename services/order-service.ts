@@ -8,7 +8,7 @@ import { unstable_cache, revalidateTag } from "next/cache";
 interface OrderItemInput {
     productId: string;
     quantity: number;
-    selectedWeight: number;
+    volumeId: string;
 }
 
 interface CreateOrderInput {
@@ -31,11 +31,11 @@ export const createOrder = async (input: CreateOrderInput) => {
         }
 
         // Step 1: Validate products exist and fetch prices
-        // Step 1: Validate products exist and fetch prices
         const productIds = input.items.map((i) => i.productId);
         const uniqueProductIds = Array.from(new Set(productIds));
         const products = await tx.product.findMany({
             where: { id: { in: uniqueProductIds } },
+            include: { volumes: true }
         });
 
         if (products.length !== uniqueProductIds.length) {
@@ -44,20 +44,26 @@ export const createOrder = async (input: CreateOrderInput) => {
             throw Errors.invalidInput(`Products not found: ${missingIds.join(", ")}`);
         }
 
-        // Legacy validations removed
+        // Step 1.5: Validate volumes
+        const volumeIds = input.items.map(i => i.volumeId);
+        const volumes = await tx.productVolume.findMany({
+            where: { id: { in: volumeIds } }
+        });
 
         // Step 4: Validate and update stock (weight-based)
         for (const item of input.items) {
             const product = products.find((p) => p.id === item.productId)!;
-            const requiredWeight = item.quantity * item.selectedWeight;
+            const volume = volumes.find(v => v.id === item.volumeId)!;
+            const itemWeight = volume.weight || 0;
+            const requiredWeight = item.quantity * itemWeight;
 
-            if ((product as any).stockWeight < requiredWeight) {
-                throw Errors.outOfStock(product.name, (product as any).stockWeight, requiredWeight);
+            if (product.stockWeight < requiredWeight) {
+                throw Errors.outOfStock(product.name, product.stockWeight, requiredWeight);
             }
 
             await tx.product.update({
                 where: { id: item.productId },
-                data: { stockWeight: { decrement: requiredWeight } } as any,
+                data: { stockWeight: { decrement: requiredWeight } },
             });
         }
 
@@ -65,23 +71,24 @@ export const createOrder = async (input: CreateOrderInput) => {
         let totalPrice = 0;
         const orderItemsData = input.items.map((item) => {
             const product = products.find((p) => p.id === item.productId)!;
+            const volume = volumes.find(v => v.id === item.volumeId)!;
 
-            // Calculate unit price from basePrice (per 100g)
-            const unitPrice = (Number((product as any).basePrice) / 100) * item.selectedWeight;
+            // Use volume price OR calculate from basePrice (per 100g)
+            const unitPrice = volume.price
+                ? Number(volume.price)
+                : (Number(product.basePrice) / 100) * (volume.weight || 0);
 
             const lineTotal = unitPrice * item.quantity;
             totalPrice += lineTotal;
             return {
                 productId: item.productId,
                 quantity: item.quantity,
-                selectedWeight: item.selectedWeight,
+                volumeId: item.volumeId,
                 price: unitPrice,
             };
         });
 
-        // Step 5.5: Validate Total Bill Minimum (Removed as per Phase 4)
-
-        // Step 6: Create order with items (Status: PENDING by default for System 7)
+        // Step 6: Create order with items
         const order = await tx.order.create({
             data: {
                 customerId: input.customerId,
@@ -100,7 +107,7 @@ export const createOrder = async (input: CreateOrderInput) => {
                     },
                 },
             } as any,
-            include: { items: { include: { product: true } }, customer: true },
+            include: { items: { include: { product: true, volume: true } }, customer: true },
         });
 
         // Step 7: Clear customer cart
@@ -112,7 +119,6 @@ export const createOrder = async (input: CreateOrderInput) => {
         }
 
         // Step 8: Create invoice
-        // Added Date.now() suffix to ensure uniqueness even if count is inaccurate due to concurrency
         const invoiceCount = await tx.invoice.count();
         const invoiceNumber = `INV-${new Date().getFullYear()}-${(invoiceCount + 1).toString().padStart(4, "0")}-${Math.floor(Math.random() * 1000)}`;
 
@@ -124,8 +130,11 @@ export const createOrder = async (input: CreateOrderInput) => {
             },
         });
 
-        // Step 9: Update ProductSales aggregation
+        // Step 9: Update ProductSales and InventoryLog
         for (const item of orderItemsData) {
+            const volume = volumes.find(v => v.id === item.volumeId)!;
+            const itemWeight = (volume.weight || 0);
+
             await tx.productSales.upsert({
                 where: { productId: item.productId },
                 update: {
@@ -138,14 +147,12 @@ export const createOrder = async (input: CreateOrderInput) => {
                     revenue: Number(item.price) * item.quantity,
                 },
             });
-        }
 
-        for (const item of orderItemsData) {
             await tx.inventoryLog.create({
                 data: {
                     productId: item.productId,
                     changeType: "SALE",
-                    quantity: -(item.quantity * item.selectedWeight), // Log in weight
+                    quantity: -(item.quantity * itemWeight),
                     source: "ORDER",
                     reason: `Sale from order ${order.id}`,
                 },
@@ -172,9 +179,8 @@ export const createOrder = async (input: CreateOrderInput) => {
         if (fullOrder) {
             await notifyNewOrder(fullOrder.id, fullOrder.customer.shopName, Number(fullOrder.totalPrice));
 
-            // Check for low stock alerts
             for (const item of fullOrder.items) {
-                const product = item.product as any;
+                const product = item.product;
                 if (product && product.stockWeight <= product.lowStockThreshold) {
                     await notifyLowStock(product.id, product.name, product.stockWeight);
                 }
@@ -197,7 +203,7 @@ export const updateOrderStatus = async (
     return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const order = await tx.order.findUnique({
             where: { id: orderId },
-            include: { items: true },
+            include: { items: { include: { volume: true } } },
         });
 
         if (!order) throw new Error("Order not found");
@@ -207,17 +213,17 @@ export const updateOrderStatus = async (
         // Stock automation: restore stock if cancelling a non-cancelled order
         if (status === OrderStatus.CANCELLED && oldStatus !== OrderStatus.CANCELLED) {
             for (const item of order.items) {
-                const totalWeight = item.quantity * (item as any).selectedWeight;
+                const totalWeight = item.quantity * (item.volume.weight || 0);
                 await tx.product.update({
                     where: { id: item.productId },
-                    data: { stockWeight: { increment: totalWeight } } as any,
+                    data: { stockWeight: { increment: totalWeight } },
                 });
 
                 await tx.inventoryLog.create({
                     data: {
                         productId: item.productId,
                         changeType: "CANCEL",
-                        quantity: totalWeight, // restored in weight
+                        quantity: totalWeight,
                         source: changedBy === "CUSTOMER" ? "ORDER" : "ADMIN",
                         reason: `Restock from cancelled order ${orderId}`,
                     },
@@ -255,7 +261,7 @@ export const updateOrderStatus = async (
             where: { id: orderId },
             data: { status },
             include: {
-                items: { include: { product: true } },
+                items: { include: { product: true, volume: true } },
                 customer: true,
                 logs: { orderBy: { createdAt: "desc" } }
             },
@@ -353,14 +359,14 @@ export const getBestSellers = async (limit = 10) => {
 export const getReorderItems = async (orderId: string) => {
     const order = await prisma.order.findUnique({
         where: { id: orderId },
-        include: { items: { include: { product: true } } },
+        include: { items: { include: { product: true, volume: true } } },
     });
     if (!order) throw new Error("Order not found");
     return order.items.map((item) => ({
         productId: item.productId,
-        name: (item as any).product.name,
+        name: (item.product as any).name,
         quantity: item.quantity,
-        selectedWeight: (item as any).selectedWeight,
-        currentPrice: (Number((item as any).product.basePrice) / 100) * (item as any).selectedWeight,
+        volumeId: item.volumeId,
+        currentPrice: Number(item.volume?.price || 0),
     }));
 };

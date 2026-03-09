@@ -47,7 +47,7 @@ export const customerLoginSchema = z.object({
 export const orderItemSchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
   quantity: z.number().int().positive("Quantity must be a positive integer"),
-  selectedWeight: z.number().int().positive("Weight is required"),
+  volumeId: z.string().min(1, "Volume is required"),
 });
 
 export const createOrderSchema = z.object({
@@ -70,7 +70,7 @@ export const createOrderSchema = z.object({
 export const cartItemSchema = z.object({
   productId: z.string().min(1),
   quantity: z.number().int().positive(),
-  selectedWeight: z.number().int().positive(),
+  volumeId: z.string().min(1),
 });
 
 // ── Category Validation ────────────────────────────────────────────────────

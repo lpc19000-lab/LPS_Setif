@@ -22,9 +22,9 @@ export async function GET(request: Request) {
                 orderBy: { name: "asc" }
             });
 
-            csvData = "ID,Name,Brand,Category,BasePrice,StockMl,LowStockThreshold\n";
+            csvData = "ID,Name,Brand,Category,BasePrice,StockWeight,LowStockThreshold\n";
             products.forEach(p => {
-                csvData += `${p.id},"${p.name}","${p.brand}","${p.category.name}",${p.basePrice},${p.stockMl},${p.lowStockThreshold}\n`;
+                csvData += `${p.id},"${p.name}","${p.brand}","${p.category.name}",${p.basePrice},${p.stockWeight},${p.lowStockThreshold}\n`;
             });
             filename = `inventory_report_${new Date().toISOString().split('T')[0]}.csv`;
         }

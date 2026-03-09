@@ -8,9 +8,9 @@ type Suggestion = {
     name: string;
     brand: string;
     imageUrl: string;
-    currentStockMl: number;
-    mlSold30d: number;
-    avgDailyMlSales: number;
+    currentStockWeight: number;
+    weightSold30d: number;
+    avgDailyWeightSales: number;
     estimatedDaysLeft: number;
     recommendation: string;
     status: string;
@@ -21,7 +21,7 @@ type DeadStock = {
     name: string;
     brand: string;
     imageUrl: string;
-    stockMl: number;
+    stockWeight: number;
     basePrice: any;
     valueTieUp: number;
     daysSinceAdded: number;
@@ -59,8 +59,8 @@ export default function RestockDashboardClient({ suggestions, deadStock }: { sug
                             <thead className="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-widest sticky top-0 z-10 backdrop-blur-md">
                                 <tr>
                                     <th className="px-6 py-4 font-bold">Product</th>
-                                    <th className="px-6 py-4 font-bold text-center">In Stock (ml)</th>
-                                    <th className="px-6 py-4 font-bold text-center">30d Velocity (ml)</th>
+                                    <th className="px-6 py-4 font-bold text-center">In Stock (g)</th>
+                                    <th className="px-6 py-4 font-bold text-center">30d Velocity (g)</th>
                                     <th className="px-6 py-4 font-bold text-center">Runway</th>
                                     <th className="px-6 py-4 font-bold">Recommendation</th>
                                 </tr>
@@ -80,20 +80,20 @@ export default function RestockDashboardClient({ suggestions, deadStock }: { sug
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className="font-bold text-gray-900 text-lg">{p.currentStockMl}ml</span>
+                                            <span className="font-bold text-gray-900 text-lg">{p.currentStockWeight}g</span>
                                         </td>
                                         <td className="px-6 py-4 text-center">
                                             <div className="flex flex-col items-center">
-                                                <span className="font-bold text-gray-900 text-lg">{Math.round(p.mlSold30d)}ml</span>
-                                                <span className="text-[10px] text-gray-400 font-medium">({p.avgDailyMlSales.toFixed(1)}ml/day)</span>
+                                                <span className="font-bold text-gray-900 text-lg">{Math.round(p.weightSold30d)}g</span>
+                                                <span className="text-[10px] text-gray-400 font-medium">({p.avgDailyWeightSales.toFixed(1)}g/day)</span>
                                             </div>
                                         </td>
 
                                         <td className="px-6 py-4 text-center">
                                             <span className={`font-serif text-xl font-bold ${p.estimatedDaysLeft < 7 ? "text-red-500" :
-                                                    p.estimatedDaysLeft < 14 ? "text-amber-500" :
-                                                        p.estimatedDaysLeft > 60 ? "text-blue-500" :
-                                                            "text-emerald-500"
+                                                p.estimatedDaysLeft < 14 ? "text-amber-500" :
+                                                    p.estimatedDaysLeft > 60 ? "text-blue-500" :
+                                                        "text-emerald-500"
                                                 }`}>
                                                 {p.estimatedDaysLeft === 999 ? "∞" : p.estimatedDaysLeft}
                                                 <span className="text-xs font-sans text-gray-400 font-bold uppercase tracking-widest ml-1">Days</span>
@@ -159,8 +159,8 @@ export default function RestockDashboardClient({ suggestions, deadStock }: { sug
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-center">
-                                                <span className="font-bold text-gray-900 text-lg">{p.stockMl}</span>
-                                                <span className="text-[10px] text-gray-400 font-bold ml-1">ml</span>
+                                                <span className="font-bold text-gray-900 text-lg">{p.stockWeight}</span>
+                                                <span className="text-[10px] text-gray-400 font-bold ml-1">g</span>
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <div className="flex items-center justify-center gap-1.5 text-red-500 font-bold">

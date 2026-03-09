@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { DollarSign, Save, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { updateOrderPayment } from "../actions/order-actions";
+import { updateOrderPayment } from "@/app/[locale]/admin/actions/order-actions";
 
 interface PaymentControlProps {
     orderId: string;
@@ -100,8 +100,8 @@ export default function PaymentControl({ orderId, totalAmount, currentPaid, curr
                 <div className="pt-2 mt-2 border-t border-gray-50 flex items-center justify-between">
                     <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Status</span>
                     <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${currentStatus === 'PAID' ? 'bg-emerald-100 text-emerald-700' :
-                            currentStatus === 'PARTIALLY_PAID' ? 'bg-amber-100 text-amber-700' :
-                                'bg-red-100 text-red-700'
+                        currentStatus === 'PARTIALLY_PAID' ? 'bg-amber-100 text-amber-700' :
+                            'bg-red-100 text-red-700'
                         }`}>
                         {currentStatus.replace('_', ' ')}
                     </span>
