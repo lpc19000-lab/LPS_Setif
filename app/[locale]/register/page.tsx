@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User, Phone, MapPin, Store, ArrowRight, Loader2 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
-import { WilayaSelector } from "@/components/WilayaSelector";
+import WilayaSelector from "@/components/WilayaSelector";
 
 export default function RegisterPage() {
     const t = useTranslations("registration");

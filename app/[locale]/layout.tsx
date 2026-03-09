@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import Navbar from "@/components/Navbar";
 import { getCustomerSession } from "@/lib/customer-auth";
 import { CartProvider } from "@/context/CartContext";
