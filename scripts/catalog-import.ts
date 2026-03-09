@@ -16,7 +16,7 @@ async function main() {
     try {
         await prisma.cartItem.deleteMany();
         await prisma.orderItem.deleteMany();
-        
+
         // Use raw query or check if table exists to avoid crash
         try {
             await prisma.productVolume.deleteMany();
@@ -72,7 +72,7 @@ async function main() {
 
     for (const p of products) {
         try {
-            const basePrice = Number(p.price); 
+            const basePrice = Number(p.price);
             if (isNaN(basePrice) || basePrice <= 0) continue;
 
             const cleanName = p.name.trim();
@@ -85,13 +85,13 @@ async function main() {
                     brand: p.brand || 'LPS',
                     description: p.description || 'Premium fragrance',
                     basePrice: basePrice,
-                    stockMl: 5000, 
+                    stockWeight: 5000,
                     status: 'ACTIVE',
                     imageUrl: `/images/perfumes/${slug}.jpg`,
                     categoryId: categoryMap[p.category] || categoryMap['Unisex'],
                     volumes: {
                         create: volumeSizes.map(v => ({
-                            ml: v,
+                            weight: v,
                             price: (basePrice / 100) * v
                         }))
                     }

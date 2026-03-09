@@ -84,7 +84,7 @@ export const getSystemHealth = async () => {
         }),
 
         // Inventory Health
-        prisma.$queryRaw<[{ count: bigint }]>`SELECT COUNT(*) as count FROM products WHERE stock_ml <= low_stock_threshold AND stock_ml > 0`.then(
+        prisma.$queryRaw<[{ count: bigint }]>`SELECT COUNT(*) as count FROM products WHERE stock_weight <= low_stock_threshold AND stock_weight > 0`.then(
             (r: any) => Number(r[0]?.count ?? 0)
         ).catch(() => 0),
 
@@ -95,7 +95,7 @@ export const getSystemHealth = async () => {
                     { sales: null },
                     { sales: { unitsSold: 0 } }
                 ],
-                stockMl: { gt: 0 }
+                stockWeight: { gt: 0 }
             }
         }),
 

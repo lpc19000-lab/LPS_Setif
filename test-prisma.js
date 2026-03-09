@@ -8,7 +8,7 @@ async function main() {
       id: true,
       name: true,
       basePrice: true,
-      stockMl: true,
+      stockWeight: true,
     }
   });
   console.log('Sample Products:', JSON.stringify(products, null, 2));

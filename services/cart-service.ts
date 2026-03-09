@@ -26,10 +26,10 @@ export const getCart = async (customerId: string) => {
     const enrichedItems = cart.items.map((item) => {
         const volumeData = item.volume;
 
-        // Calculate unit price: fixed volume price OR calculated from basePrice
+        const weight = volumeData?.weight || 0;
         const unitPrice = volumeData
             ? Number(volumeData.price)
-            : (Number(item.product.basePrice) / 100) * (volumeData?.weight || 0);
+            : (Number(item.product.basePrice) / 100) * weight;
 
         const lineTotal = unitPrice * item.quantity;
         totalPrice += lineTotal;
@@ -38,7 +38,7 @@ export const getCart = async (customerId: string) => {
             ...item,
             unitPrice,
             lineTotal,
-            weight: volumeData?.weight || 0
+            weight
         };
     });
 

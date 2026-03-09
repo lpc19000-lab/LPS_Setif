@@ -21,7 +21,7 @@ export default async function AdminProductsPage() {
     const serializedProducts = products.map((p: any) => ({
         ...p,
         basePrice: Number(p.basePrice),
-        stockWeight: Number(p.stockWeight || p.stockMl || 0),
+        stockWeight: Number(p.stockWeight || 0),
     }));
 
     return (

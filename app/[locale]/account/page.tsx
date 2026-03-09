@@ -113,7 +113,7 @@ export default async function AccountPage() {
                                                 </span>
                                                 <div className="w-1 h-1 rounded-full bg-gray-200" />
                                                 <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
-                                                    Qty: {item.quantity} · {item.product.volumes.find((v: any) => v.id === item.volumeId)?.weight}g
+                                                    Qty: {item.quantity} · {(item as any).weight}g
                                                 </span>
                                             </div>
                                         </div>

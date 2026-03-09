@@ -10,7 +10,7 @@ interface Product {
     brand: string;
     imageUrl: string;
     basePrice: number;
-    stockMl: number;
+    stockWeight: number;
     lowStockThreshold: number;
     status: string;
     category: { id: string; name: string } | null;
@@ -55,7 +55,7 @@ function CatalogContent() {
         } else {
             setLoadingMore(true);
         }
-        
+
         try {
             const params = new URLSearchParams();
             if (search) params.set("search", search);
@@ -67,7 +67,7 @@ function CatalogContent() {
 
             const res = await fetch(`/api/products?${params}`);
             const json = await res.json();
-            
+
             if (json.success) {
                 if (reset) {
                     setProducts(json.data);
@@ -95,7 +95,7 @@ function CatalogContent() {
     };
 
     const brands = Array.from(new Set(products.map((p) => p.brand).filter(Boolean)));
-    
+
     return (
         <main className="pt-24 pb-20 min-h-screen bg-[#FAFAF8]">
             <div className="max-w-7xl mx-auto px-6">
@@ -177,12 +177,12 @@ function CatalogContent() {
                                                 fill
                                                 className="object-cover group-hover:scale-105 transition-transform duration-700"
                                             />
-                                            {product.stockMl <= 0 && (
+                                            {product.stockWeight <= 0 && (
                                                 <span className="absolute top-3 right-3 bg-gray-900/80 text-white text-xs px-2.5 py-1 rounded-full">
                                                     Out of Stock
                                                 </span>
                                             )}
-                                            {product.stockMl > 0 && product.stockMl <= product.lowStockThreshold && (
+                                            {product.stockWeight > 0 && product.stockWeight <= product.lowStockThreshold && (
                                                 <span className="absolute top-3 right-3 bg-red-500/90 text-white text-xs px-2.5 py-1 rounded-full">
                                                     Low Stock
                                                 </span>

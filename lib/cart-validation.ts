@@ -50,24 +50,24 @@ export async function validateCartItems(
             continue;
         }
 
-        // Stock validation (ml-based)
-        const requiredMl = item.quantity * item.selectedVolume;
-        if (product.stockMl < requiredMl) {
+        // Stock validation (weight-based)
+        const requiredWeight = item.quantity * item.selectedVolume;
+        if (product.stockWeight < requiredWeight) {
             errors.push(
-                `Insufficient stock for "${product.name}". Available: ${product.stockMl}ml, Requested: ${requiredMl}ml.`
+                `Insufficient stock for "${product.name}". Available: ${product.stockWeight}g, Requested: ${requiredWeight}g.`
             );
             continue;
         }
 
         // Price calculation: find matching volume price or fallback to base price calculation
-        const volumeData = product.volumes.find((v) => v.ml === item.selectedVolume);
-        const unitPrice = volumeData 
-            ? Number(volumeData.price) 
+        const volumeData = product.volumes.find((v) => v.weight === item.selectedVolume);
+        const unitPrice = volumeData
+            ? Number(volumeData.price)
             : (Number(product.basePrice) / 100) * item.selectedVolume;
 
         const lineTotal = unitPrice * item.quantity;
         total += lineTotal;
-        
+
         validatedItems.push({
             productId: product.id,
             name: product.name,

@@ -328,7 +328,7 @@ export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0) =>
                 take: limit,
                 skip: skip,
                 include: {
-                    items: { include: { product: true } },
+                    items: { include: { product: true, volume: true } },
                     invoice: true,
                     logs: { orderBy: { createdAt: "desc" } }
                 },
