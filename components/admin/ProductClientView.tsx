@@ -124,8 +124,8 @@ export default function ProductClientView({
                             <tr>
                                 <th className="px-6 py-4 font-medium">Product</th>
                                 <th className="px-6 py-4 font-medium">Category</th>
-                                <th className="px-6 py-4 font-medium">Base Price (100ml)</th>
-                                <th className="px-6 py-4 font-medium">Total Stock (ml)</th>
+                                <th className="px-6 py-4 font-medium">Base Price (100g)</th>
+                                <th className="px-6 py-4 font-medium">Total Stock (g)</th>
                                 <th className="px-6 py-4 font-medium">Status</th>
                                 <th className="px-6 py-4 font-medium text-right">Actions</th>
                             </tr>
@@ -159,10 +159,10 @@ export default function ProductClientView({
                                     </td>
                                     <td className="px-6 py-4">
                                         <span
-                                            className={`px-2.5 py-1 rounded-lg text-xs font-medium ${product.stockMl < 500 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-600"
+                                            className={`px-2.5 py-1 rounded-lg text-xs font-medium ${product.stockWeight < 500 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-600"
                                                 }`}
                                         >
-                                            {product.stockMl}ml available
+                                            {product.stockWeight >= 1000 ? `${(product.stockWeight / 1000).toFixed(2)}kg` : `${product.stockWeight}g`} available
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
@@ -256,17 +256,17 @@ export default function ProductClientView({
 
                                 {/* Pricing & Stock */}
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Base Price (Per 100ml) (DZD)</label>
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Base Price (Per 100g) (DZD)</label>
                                     <input type="number" step="0.01" name="basePrice" defaultValue={editingProduct?.basePrice} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Total Stock (Milliliters)</label>
-                                    <input type="number" name="stockMl" defaultValue={editingProduct?.stockMl || 5000} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Total Stock (Grams)</label>
+                                    <input type="number" name="stockWeight" defaultValue={editingProduct?.stockWeight || 5000} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
                                 </div>
 
                                 {/* Info */}
                                 <div className="space-y-1.5 md:col-span-2 p-4 bg-amber-50 rounded-2xl border border-amber-100 italic text-[11px] text-amber-700">
-                                    Note: Products will automatically be available in 30ml, 50ml, 100ml, 150ml, and 200ml variants based on the base price.
+                                    Note: Products will automatically be available in 200g, 250g, 500g, and 1kg variants based on the base price.
                                 </div>
 
                                 {/* Collections */}

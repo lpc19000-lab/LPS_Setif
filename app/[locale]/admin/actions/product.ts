@@ -19,7 +19,7 @@ export async function createProduct(formData: FormData) {
         categoryId: formData.get("categoryId") as string,
         imageUrl: formData.get("imageUrl") as string,
         basePrice: Number(formData.get("basePrice")),
-        stockMl: Number(formData.get("stockMl")),
+        stockWeight: Number(formData.get("stockWeight")),
         lowStockThreshold: Number(formData.get("lowStockThreshold") || 500),
         status: (formData.get("status") as any) || "ACTIVE",
     };
@@ -30,8 +30,8 @@ export async function createProduct(formData: FormData) {
     if (!data.name || !data.brand || !data.categoryId || !data.basePrice || isNaN(data.basePrice) || data.basePrice <= 0) {
         return { success: false, error: "Missing or invalid required fields (name, brand, categoryId, basePrice)" };
     }
-    if (data.stockMl < 0 || isNaN(data.stockMl)) {
-        return { success: false, error: "Stock (ml) cannot be negative" };
+    if (data.stockWeight < 0 || isNaN(data.stockWeight)) {
+        return { success: false, error: "Stock (g) cannot be negative" };
     }
 
     try {
@@ -39,12 +39,12 @@ export async function createProduct(formData: FormData) {
             const product = await tx.product.create({ data: data as any });
 
             // Initial stock log
-            if (data.stockMl > 0) {
+            if (data.stockWeight > 0) {
                 await tx.inventoryLog.create({
                     data: {
                         productId: product.id,
                         changeType: "INITIAL_STOCK",
-                        quantity: data.stockMl,
+                        quantity: data.stockWeight,
                         source: "ADMIN",
                         reason: "Initial stock on product creation",
                     },
@@ -72,7 +72,7 @@ export async function createProduct(formData: FormData) {
             }
         });
 
-        await logEvent("PRODUCT_CREATED", "new", `Product "${data.name}" created with ${data.stockMl}ml`);
+        await logEvent("PRODUCT_CREATED", "new", `Product "${data.name}" created with ${data.stockWeight}g`);
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         revalidatePath("/");
@@ -92,7 +92,7 @@ export async function updateProduct(id: string, formData: FormData) {
         categoryId: formData.get("categoryId") as string,
         imageUrl: formData.get("imageUrl") as string,
         basePrice: Number(formData.get("basePrice")),
-        stockMl: Number(formData.get("stockMl")),
+        stockWeight: Number(formData.get("stockWeight")),
         lowStockThreshold: Number(formData.get("lowStockThreshold") || 500),
         status: (formData.get("status") as any) || "ACTIVE",
     };

@@ -1,0 +1,105 @@
+{
+    "common": {
+        "nav": {
+            "home": "Accueil",
+            "boutique": "Boutique",
+            "panier": "Panier",
+            "compte": "Compte",
+            "admin": "Admin"
+        },
+        "buttons": {
+            "save": "Enregistrer",
+            "cancel": "Annuler",
+            "delete": "Supprimer",
+            "add_to_cart": "Ajouter au panier",
+            "checkout": "Passer à la caisse",
+            "create_account": "Créer un compte",
+            "sign_in": "Se connecter"
+        }
+    },
+    "registration": {
+        "title": "Inscription B2B",
+        "subtitle": "Rejoignez notre réseau de revendeurs de parfums de luxe en Algérie.",
+        "trader_info": "Informations du Commerçant",
+        "business_details": "Détails de l'Entreprise",
+        "full_name": "Nom Complet",
+        "phone": "Numéro de Téléphone",
+        "shop_name": "Nom de la Boutique",
+        "wilaya": "Wilaya",
+        "address": "Adresse Complète",
+        "placeholder_name": "Entrez votre nom complet",
+        "placeholder_shop": "Nom légal de l'entreprise",
+        "placeholder_address": "Adresse complète, rue et localité",
+        "already_registered": "Déjà inscrit ?",
+        "sign_in_link": "Connectez-vous à votre compte"
+    },
+    "product": {
+        "base_price": "Prix de base",
+        "view_details": "Voir les détails",
+        "available": "disponible",
+        "variants_note": "Note: Les produits seront automatiquement disponibles en variantes de 200g, 250g, 500g et 1kg basées sur le prix de base.",
+        "added_success": "Ajouté au panier avec succès !",
+        "added_fail": "Échec de l'ajout au panier",
+        "not_found": "Produit non trouvé",
+        "back_to_shop": "Retour à la boutique",
+        "back_to_catalog": "Retour au catalogue",
+        "authentic": "Authentique",
+        "premium_fragrance": "Parfum Premium",
+        "low_stock": "Stock faible",
+        "in_stock": "En stock",
+        "out_of_stock": "En rupture de stock",
+        "professional_grade": "Qualité Professionnelle",
+        "per_unit": "Par unité de",
+        "selected_size": "Taille sélectionnée",
+        "order_total": "Total de la commande",
+        "select_size": "Choisir la taille",
+        "configure_quantity": "Configurer la quantité",
+        "units_of": "Unités de",
+        "wholesale_note": "Emballage de gros professionnel pour la taille sélectionnée"
+    },
+    "catalog": {
+        "search_placeholder": "Rechercher dans les collections...",
+        "products_found": "produits trouvés",
+        "sort_featured": "Mis en avant",
+        "sort_low_high": "Prix: Croissant",
+        "sort_high_low": "Prix: Décroissant",
+        "no_products": "Aucun produit trouvé pour"
+    },
+    "cart": {
+        "title": "Votre Panier",
+        "empty": "Votre panier est actuellement vide.",
+        "continue_shopping": "Continuer les achats",
+        "subtotal": "Sous-total",
+        "view_cart": "Voir le panier",
+        "checkout_now": "Passer à la caisse"
+    },
+    "checkout": {
+        "title": "Paiement",
+        "no_items": "Aucun article à régler",
+        "browse_products": "Parcourir les produits",
+        "shipping_details": "Détails de livraison",
+        "company_name": "Entreprise / Nom *",
+        "placeholder_name": "Votre nom ou nom de boutique",
+        "phone": "Téléphone *",
+        "wilaya": "Wilaya *",
+        "address": "Adresse *",
+        "placeholder_address": "Adresse de livraison détaillée",
+        "order_notes": "Notes de commande (Optionnel)",
+        "placeholder_notes": "Instructions spéciales pour la préparation ou livraison...",
+        "order_summary": "Résumé de la commande",
+        "qty": "Qté",
+        "total": "Total",
+        "min_order_met": "Montant minimum de commande atteint",
+        "min_order_error": "Le montant minimum de la commande est de 5 000 DA. Il vous manque {amount} DA.",
+        "place_order": "Passer la commande",
+        "placing_order": "Traitement...",
+        "order_success_title": "Commande Passée !",
+        "order_success_msg": "Votre commande a été confirmée et une facture a été générée. Nous la traiterons sous 24 heures.",
+        "view_history": "Voir l'historique des commandes",
+        "network_error": "Erreur réseau. Veuillez réessayer."
+    },
+    "home": {
+        "title": "LPS Perfume - Luxe Parfum Setif",
+        "hero_subtitle": "Distributeur de parfums de luxe en gros"
+    }
+}

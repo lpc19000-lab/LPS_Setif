@@ -3,22 +3,37 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { User, Phone, ShoppingBag, MapPin, Store, ArrowRight, Loader2 } from "lucide-react";
+import { User, Phone, MapPin, Store, ArrowRight, Loader2 } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import { WilayaSelector } from "@/components/WilayaSelector";
 
 export default function RegisterPage() {
+    const t = useTranslations("registration");
+    const b = useTranslations("common.buttons");
+    const locale = useLocale();
+    const router = useRouter();
+
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
         shopName: "",
-        wilaya: "",
+        wilayaNumber: "",
+        wilayaName: "",
         address: "",
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const router = useRouter();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleWilayaChange = (wilaya: { id: string; name: string }) => {
+        setFormData({
+            ...formData,
+            wilayaNumber: wilaya.id,
+            wilayaName: wilaya.name
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +51,7 @@ export default function RegisterPage() {
             const data = await response.json();
 
             if (data.success) {
-                router.push("/account");
+                router.push(`/${locale}/account`);
                 router.refresh();
             } else {
                 setError(data.error || "Registration failed");
@@ -53,8 +68,8 @@ export default function RegisterPage() {
             <div className="max-w-xl w-full">
                 {/* Header */}
                 <div className="text-center mb-10">
-                    <h1 className="text-4xl font-serif font-bold text-primary-dark mb-2">B2B Registration</h1>
-                    <p className="text-gray-500 tracking-wide text-sm font-medium">Join our network of luxury perfume retailers in Algeria.</p>
+                    <h1 className="text-4xl font-serif font-bold text-primary-dark mb-2">{t("title")}</h1>
+                    <p className="text-gray-500 tracking-wide text-sm font-medium">{t("subtitle")}</p>
                 </div>
 
                 {/* Form Card */}
@@ -63,11 +78,11 @@ export default function RegisterPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* Personal Info */}
                             <div className="space-y-6">
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary border-b border-primary/10 pb-2">Trader Information</h3>
+                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary border-b border-primary/10 pb-2">{t("trader_info")}</h3>
 
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Full Name</label>
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{t("full_name")}</label>
                                         <div className="relative">
                                             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                                             <input
@@ -76,13 +91,13 @@ export default function RegisterPage() {
                                                 required
                                                 value={formData.name}
                                                 onChange={handleChange}
-                                                placeholder="Enter full name"
+                                                placeholder={t("placeholder_name")}
                                                 className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-medium"
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Phone Number</label>
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{t("phone")}</label>
                                         <div className="relative">
                                             <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                                             <input
@@ -101,11 +116,11 @@ export default function RegisterPage() {
 
                             {/* Business Info */}
                             <div className="space-y-6">
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary border-b border-primary/10 pb-2">Business Details</h3>
+                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary border-b border-primary/10 pb-2">{t("business_details")}</h3>
 
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Shop Name</label>
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{t("shop_name")}</label>
                                         <div className="relative">
                                             <Store className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                                             <input
@@ -114,32 +129,24 @@ export default function RegisterPage() {
                                                 required
                                                 value={formData.shopName}
                                                 onChange={handleChange}
-                                                placeholder="Legal name of business"
+                                                placeholder={t("placeholder_shop")}
                                                 className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-medium"
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Wilaya</label>
-                                        <div className="relative">
-                                            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                            <input
-                                                type="text"
-                                                name="wilaya"
-                                                required
-                                                value={formData.wilaya}
-                                                onChange={handleChange}
-                                                placeholder="e.g. Setif, Algiers..."
-                                                className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-medium"
-                                            />
-                                        </div>
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{t("wilaya")}</label>
+                                        <WilayaSelector
+                                            value={formData.wilayaNumber}
+                                            onChange={handleWilayaChange}
+                                        />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Full Business Address</label>
+                            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{t("address")}</label>
                             <div className="relative">
                                 <MapPin className="absolute left-4 top-4 w-4 h-4 text-gray-300" />
                                 <input
@@ -148,7 +155,7 @@ export default function RegisterPage() {
                                     required
                                     value={formData.address}
                                     onChange={handleChange}
-                                    placeholder="Complete street address and locality"
+                                    placeholder={t("placeholder_address")}
                                     className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-medium"
                                 />
                             </div>
@@ -169,7 +176,7 @@ export default function RegisterPage() {
                                 <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
                                 <>
-                                    Create Account
+                                    {b("create_account")}
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </>
                             )}
@@ -178,9 +185,9 @@ export default function RegisterPage() {
                 </div>
 
                 <p className="mt-8 text-center text-sm text-gray-500">
-                    Already registered?{" "}
-                    <Link href="/login" className="text-primary font-bold hover:underline underline-offset-4">
-                        Sign in to account
+                    {t("already_registered")}{" "}
+                    <Link href={`/${locale}/login`} className="text-primary font-bold hover:underline underline-offset-4">
+                        {t("sign_in_link")}
                     </Link>
                 </p>
             </div>

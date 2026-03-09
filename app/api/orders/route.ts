@@ -43,15 +43,15 @@ export async function POST(request: Request) {
 
         try {
             let initialLogMessage = "Order placed successfully.";
-            if (shippingData) {
-                initialLogMessage = `Order placed. Ship to: ${shippingData.name || ''}, ${shippingData.phone || ''}, ${shippingData.address || ''}, ${shippingData.city || ''}. Notes: ${shippingData.notes || 'None'}`;
-            }
+            initialLogMessage = `Order placed. Ship to: ${shippingData.name || ''}, ${shippingData.phone || ''}, ${shippingData.address || ''}, ${shippingData.wilayaName || ''}. Notes: ${shippingData.notes || 'None'}`;
 
             const order = await createOrder({
                 customerId: customer.id,
                 items,
                 createdBy: "CUSTOMER",
                 notes: initialLogMessage,
+                wilayaNumber: shippingData?.wilayaNumber,
+                wilayaName: shippingData?.wilayaName,
             });
 
             // Log success

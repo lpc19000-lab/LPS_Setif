@@ -9,6 +9,7 @@ import { ShoppingCart, ArrowLeft, Info, Package, ShieldCheck, Box } from "lucide
 import SafeImage from "@/components/SafeImage";
 import { useRealtime } from "@/hooks/use-realtime";
 import { showToast } from "@/components/ui/Toast";
+import { useTranslations, useLocale } from "next-intl";
 
 interface Product {
     id: string;
@@ -17,17 +18,22 @@ interface Product {
     description: string;
     imageUrl: string;
     basePrice: number;
-    stockMl: number;
+    stockWeight: number;
     category: { id: string; name: string } | null;
-    volumes: { ml: number; price: number }[];
+    volumes: { weight: number; price: number }[];
 }
 
 export default function ProductPage() {
     const params = useParams();
     const router = useRouter();
+    const t = useTranslations("product");
+    const c = useTranslations("catalog");
+    const locale = useLocale();
+    const isRtl = locale === "ar";
+
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
-    const [selectedVolume, setSelectedVolume] = useState(100);
+    const [selectedWeight, setSelectedWeight] = useState(100);
     const [quantity, setQuantity] = useState(1);
     const [message, setMessage] = useState("");
     const [adding, setAdding] = useState(false);
@@ -58,8 +64,8 @@ export default function ProductPage() {
     const adjustQuantity = (delta: number) => {
         if (!product) return;
         const next = quantity + delta;
-        const requiredMl = next * selectedVolume;
-        if (next >= 1 && requiredMl <= product.stockMl) {
+        const requiredWeight = next * selectedWeight;
+        if (next >= 1 && requiredWeight <= product.stockWeight) {
             setQuantity(next);
         }
     };
@@ -69,25 +75,25 @@ export default function ProductPage() {
         setAdding(true);
         setMessage("");
 
-        const currentVolumePrice = product.volumes?.find(v => v.ml === selectedVolume)?.price
-            || (product.basePrice / 100) * selectedVolume;
+        const currentWeightPrice = product.volumes?.find(v => v.weight === selectedWeight)?.price
+            || (product.basePrice / 100) * selectedWeight;
 
         const result = addItem({
             id: product.id,
             name: product.name,
             brand: product.brand,
             imageUrl: product.imageUrl,
-            basePrice: Number(currentVolumePrice),
-            selectedVolume: selectedVolume,
-            stockMl: product.stockMl,
+            basePrice: Number(currentWeightPrice),
+            selectedWeight: selectedWeight,
+            stockWeight: product.stockWeight,
         }, quantity);
 
         if (result.success) {
-            setMessage("Added to cart successfully!");
-            showToast(`${product.name} added to cart!`, "success");
+            setMessage(t("added_success"));
+            showToast(`${product.name} ${t("added_success")}`, "success");
         } else {
-            setMessage(result.error || "Failed to add to cart");
-            showToast(result.error || "Failed to add to cart", "error");
+            setMessage(result.error || t("added_fail"));
+            showToast(result.error || t("added_fail"), "error");
         }
 
         setAdding(false);
@@ -104,9 +110,9 @@ export default function ProductPage() {
     if (!product) {
         return (
             <main className="pt-24 min-h-screen flex flex-col items-center justify-center gap-4">
-                <h1 className="text-2xl font-serif text-gray-400">Product not found</h1>
-                <Link href="/catalog" className="btn-primary">
-                    Back to Shop
+                <h1 className="text-2xl font-serif text-gray-400">{t("not_found")}</h1>
+                <Link href={`/${locale}/catalog`} className="btn-primary">
+                    {t("back_to_shop")}
                 </Link>
             </main>
         );
@@ -117,9 +123,9 @@ export default function ProductPage() {
             <div className="max-w-7xl mx-auto px-6">
                 {/* Header Actions */}
                 <div className="flex items-center justify-between mb-12">
-                    <Link href="/catalog" className="flex items-center gap-2 text-gray-400 hover:text-primary transition-all font-bold group text-sm uppercase tracking-widest">
-                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                        Back to Catalog
+                    <Link href={`/${locale}/catalog`} className="flex items-center gap-2 text-gray-400 hover:text-primary transition-all font-bold group text-sm uppercase tracking-widest">
+                        <ArrowLeft className={`w-4 h-4 group-hover:${isRtl ? "translate-x-1" : "-translate-x-1"} transition-transform`} />
+                        {t("back_to_catalog")}
                     </Link>
                 </div>
 
@@ -143,7 +149,7 @@ export default function ProductPage() {
                             {/* Overlay Badge */}
                             <div className="absolute top-8 right-8 bg-black/5 backdrop-blur-md px-4 py-2 rounded-full border border-black/5 flex items-center gap-2">
                                 <ShieldCheck className="w-4 h-4 text-primary" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">Authentic</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest">{t("authentic")}</span>
                             </div>
                         </div>
                     </motion.div>
@@ -156,7 +162,7 @@ export default function ProductPage() {
                             transition={{ duration: 0.6, delay: 0.2 }}
                         >
                             <span className="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-6">
-                                {product.category?.name || "Premium Fragrance"}
+                                {product.category?.name || t("premium_fragrance")}
                             </span>
 
                             <h1 className="text-5xl md:text-6xl font-serif text-gray-950 mb-4 leading-tight">
@@ -166,17 +172,19 @@ export default function ProductPage() {
                             <div className="flex items-center gap-4 mb-10">
                                 <p className="text-xl text-gray-400 font-light font-serif italic">{product.brand}</p>
                                 <div className="h-4 w-px bg-gray-200"></div>
-                                {product.stockMl > 0 ? (
-                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${product.stockMl <= 500 ? "bg-amber-50 text-amber-600" : "bg-green-50 text-green-600"
+                                {product.stockWeight > 0 ? (
+                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${product.stockWeight <= 500 ? "bg-amber-50 text-amber-600" : "bg-green-50 text-green-600"
                                         }`}>
-                                        <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${product.stockMl <= 500 ? "bg-amber-500" : "bg-green-500"
+                                        <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${product.stockWeight <= 500 ? "bg-amber-500" : "bg-green-500"
                                             }`}></div>
-                                        {product.stockMl <= 500 ? `Low Stock (${product.stockMl}ml left)` : "In Stock"}
+                                        {product.stockWeight <= 500
+                                            ? `${t("low_stock")} (${product.stockWeight >= 1000 ? (product.stockWeight / 1000).toFixed(1) + "kg" : product.stockWeight + "g"})`
+                                            : t("in_stock")}
                                     </div>
                                 ) : (
                                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest">
                                         <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
-                                        Out of Stock
+                                        {t("out_of_stock")}
                                     </div>
                                 )}
                             </div>
@@ -188,29 +196,29 @@ export default function ProductPage() {
                             {/* Price Card */}
                             <div className="bg-[#1A1A1A] rounded-[2.5rem] p-10 mb-12 text-white relative overflow-hidden group">
                                 <div className="relative z-10">
-                                    <p className="text-[#D4AF37] text-xs font-black uppercase tracking-[0.3em] mb-3">Professional Grade</p>
+                                    <p className="text-[#D4AF37] text-xs font-black uppercase tracking-[0.3em] mb-3">{t("professional_grade")}</p>
                                     <div className="flex items-baseline gap-3 mb-8">
                                         <span className="text-5xl font-bold">
-                                            {((product.volumes?.find(v => v.ml === selectedVolume)?.price || (product.basePrice / 100) * selectedVolume)).toLocaleString()}
+                                            {((product.volumes?.find(v => v.weight === selectedWeight)?.price || (product.basePrice / 100) * selectedWeight)).toLocaleString()}
                                         </span>
                                         <span className="text-xl text-gray-500 font-serif">DA</span>
                                         <span className="ml-4 text-gray-400 text-sm font-light tracking-wide italic">
-                                            Per {selectedVolume}ml Unit
+                                            {t("per_unit")} {selectedWeight >= 1000 ? `${selectedWeight / 1000}kg` : `${selectedWeight}g`}
                                         </span>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-1">
-                                            <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Selected Size</p>
+                                            <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">{t("selected_size")}</p>
                                             <p className="text-lg font-bold flex items-center gap-2">
                                                 <Box className="w-4 h-4 text-[#D4AF37]" />
-                                                {selectedVolume}ml
+                                                {selectedWeight >= 1000 ? `${selectedWeight / 1000}kg` : `${selectedWeight}g`}
                                             </p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Order Total</p>
+                                            <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">{t("order_total")}</p>
                                             <p className="text-lg font-bold text-[#D4AF37]">
-                                                {((product.volumes?.find(v => v.ml === selectedVolume)?.price || (product.basePrice / 100) * selectedVolume) * quantity).toLocaleString()} DA
+                                                {((product.volumes?.find(v => v.weight === selectedWeight)?.price || (product.basePrice / 100) * selectedWeight) * quantity).toLocaleString()} DA
                                             </p>
                                         </div>
                                     </div>
@@ -221,20 +229,20 @@ export default function ProductPage() {
                             {/* Controls */}
                             <div className="space-y-8">
                                 <div className="space-y-4">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Select Bottle Size</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t("select_size")}</p>
                                     <div className="flex flex-wrap gap-3">
-                                        {(product.volumes || [30, 50, 100, 150, 200]).map((v: any) => {
-                                            const ml = typeof v === 'number' ? v : v.ml;
+                                        {(product.volumes || [200, 250, 500, 1000]).map((v: any) => {
+                                            const weight = typeof v === 'number' ? v : v.weight;
                                             return (
                                                 <button
-                                                    key={ml}
-                                                    onClick={() => setSelectedVolume(ml)}
-                                                    className={`px-6 py-4 rounded-2xl border transition-all font-bold text-sm ${selectedVolume === ml
-                                                            ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105"
-                                                            : "bg-white border-gray-100 text-gray-600 hover:border-primary/30"
+                                                    key={weight}
+                                                    onClick={() => setSelectedWeight(weight)}
+                                                    className={`px-6 py-4 rounded-2xl border transition-all font-bold text-sm ${selectedWeight === weight
+                                                        ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105"
+                                                        : "bg-white border-gray-100 text-gray-600 hover:border-primary/30"
                                                         }`}
                                                 >
-                                                    {ml}ml
+                                                    {weight >= 1000 ? `${weight / 1000}kg` : `${weight}g`}
                                                 </button>
                                             );
                                         })}
@@ -243,7 +251,7 @@ export default function ProductPage() {
 
                                 <div className="flex flex-wrap items-center gap-8">
                                     <div className="space-y-3">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Configure Quantity</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t("configure_quantity")}</p>
                                         <div className="flex items-center bg-white border border-gray-100 rounded-2xl p-1.5 shadow-sm">
                                             <button
                                                 onClick={() => adjustQuantity(-1)}
@@ -254,11 +262,13 @@ export default function ProductPage() {
                                             </button>
                                             <div className="px-8 text-center min-w-[120px]">
                                                 <span className="block text-2xl font-bold text-gray-950">{quantity}</span>
-                                                <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest">Units of {selectedVolume}ml</span>
+                                                <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest">
+                                                    {t("units_of")} {selectedWeight >= 1000 ? `${selectedWeight / 1000}kg` : `${selectedWeight}g`}
+                                                </span>
                                             </div>
                                             <button
                                                 onClick={() => adjustQuantity(1)}
-                                                disabled={(quantity + 1) * selectedVolume > product.stockMl}
+                                                disabled={(quantity + 1) * selectedWeight > product.stockWeight}
                                                 className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
                                             >
                                                 +
@@ -270,7 +280,7 @@ export default function ProductPage() {
                                 <div className="flex flex-col gap-4">
                                     <button
                                         onClick={handleAddToCart}
-                                        disabled={adding || product.stockMl === 0}
+                                        disabled={adding || product.stockWeight === 0}
                                         className="w-full bg-primary text-white py-6 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-primary-dark transition-all transform active:scale-[0.99] shadow-xl shadow-primary/20 disabled:opacity-50"
                                     >
                                         {adding ? (
@@ -278,7 +288,7 @@ export default function ProductPage() {
                                         ) : (
                                             <>
                                                 <ShoppingCart className="w-5 h-5" />
-                                                Add to Wholesale Cart
+                                                {t("add_to_cart")}
                                             </>
                                         )}
                                     </button>
@@ -286,7 +296,7 @@ export default function ProductPage() {
 
                                     <div className="flex items-center gap-2 justify-center text-gray-400 text-[10px] font-medium uppercase tracking-[0.2em]">
                                         <Info className="w-3 h-3 text-primary" />
-                                        Professional wholesale packaging for selected size
+                                        {t("wholesale_note")}
                                     </div>
                                 </div>
                             </div>

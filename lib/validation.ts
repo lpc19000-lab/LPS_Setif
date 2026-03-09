@@ -3,7 +3,7 @@ import { z } from "zod";
 // ── Product Validation ─────────────────────────────────────────────────────
 
 export const volumeSchema = z.object({
-  ml: z.number().int().positive(),
+  weight: z.number().int().positive(),
   price: z.number().positive(),
 });
 
@@ -15,7 +15,7 @@ export const createProductSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   imageUrl: z.string().url("Invalid image URL"),
   basePrice: z.number().positive("Base price must be positive"),
-  stockMl: z.number().int().min(0).optional(),
+  stockWeight: z.number().int().min(0).optional(),
   lowStockThreshold: z.number().int().min(0).optional(),
   status: z.enum(["ACTIVE", "INACTIVE", "DRAFT"]).optional(),
   volumes: z.array(volumeSchema).optional(),
@@ -33,7 +33,8 @@ export const customerRegistrationSchema = z.object({
     .max(15)
     .regex(/^[0-9+\-\s]+$/, "Invalid phone number format"),
   shopName: z.string().min(2, "Shop name is required").max(150),
-  wilaya: z.string().min(2, "Wilaya is required").max(100),
+  wilayaNumber: z.string().min(1, "Wilaya number is required"),
+  wilayaName: z.string().min(1, "Wilaya name is required"),
   address: z.string().min(5, "Address must be at least 5 characters").max(500),
 });
 
@@ -46,7 +47,7 @@ export const customerLoginSchema = z.object({
 export const orderItemSchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
   quantity: z.number().int().positive("Quantity must be a positive integer"),
-  selectedVolume: z.number().int().positive("Volume is required"),
+  selectedWeight: z.number().int().positive("Weight is required"),
 });
 
 export const createOrderSchema = z.object({
@@ -55,7 +56,9 @@ export const createOrderSchema = z.object({
     .object({
       name: z.string().optional(),
       phone: z.string().optional(),
-      city: z.string().optional(),
+      wilayaNumber: z.string().optional(),
+      wilayaName: z.string().optional(),
+      wilaya: z.string().optional(), // Combined string for backward compat
       address: z.string().optional(),
       notes: z.string().optional(),
     })
@@ -67,7 +70,7 @@ export const createOrderSchema = z.object({
 export const cartItemSchema = z.object({
   productId: z.string().min(1),
   quantity: z.number().int().positive(),
-  selectedVolume: z.number().int().positive(),
+  selectedWeight: z.number().int().positive(),
 });
 
 // ── Category Validation ────────────────────────────────────────────────────
@@ -80,7 +83,7 @@ export const createCategorySchema = z.object({
 // ── Admin Data Validation ──────────────────────────────────────────────────
 
 export const stockUpdateSchema = z.object({
-  stockMl: z.number().int().min(0, "Stock cannot be negative"),
+  stockWeight: z.number().int().min(0, "Stock cannot be negative"),
 });
 
 export const priceUpdateSchema = z.object({

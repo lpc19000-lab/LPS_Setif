@@ -65,7 +65,7 @@ model Product {
   categoryId           String              @map("category_id")
   imageUrl             String              @map("image_url")
   basePrice            Decimal             @map("base_price") @db.Decimal(10, 2)
-  stockMl              Int                 @default(0) @map("stock_ml")
+  stockWeight          Int                 @default(0) @map("stock_weight")
   lowStockThreshold    Int                 @default(500) @map("low_stock_threshold")
   status               ProductStatus       @default(ACTIVE)
   createdAt            DateTime            @default(now()) @map("created_at")
@@ -91,11 +91,11 @@ model Product {
 model ProductVolume {
   id        String  @id @default(cuid())
   productId String  @map("product_id")
-  ml        Int
+  weight    Int?
   price     Decimal @db.Decimal(10, 2)
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@unique([productId, ml])
+  @@unique([productId, weight])
   @@map("product_volumes")
 }
 
@@ -138,7 +138,9 @@ model Customer {
   id        String   @id @default(cuid())
   name      String
   phone     String   @unique
-  wilaya    String
+  wilayaNumber String?   @map("wilaya_number")
+  wilayaName   String?   @map("wilaya_name")
+  wilaya       String?
   address   String
   shopName  String   @map("shop_name")
   createdAt DateTime @default(now()) @map("created_at")
@@ -157,6 +159,10 @@ model Order {
   shippingCompany String?     @map("shipping_company")
   trackingNumber  String?     @map("tracking_number")
   shippingDate    DateTime?   @map("shipping_date")
+  wilayaNumber    String?     @map("wilaya_number")
+  wilayaName      String?     @map("wilaya_name")
+  amountPaid      Decimal     @default(0) @map("amount_paid") @db.Decimal(10, 2)
+  paymentStatus   PaymentStatus @default(UNPAID) @map("payment_status")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
   items           OrderItem[]
@@ -174,7 +180,7 @@ model OrderItem {
   orderId        String  @map("order_id")
   productId      String  @map("product_id")
   quantity       Int
-  selectedVolume Int     @default(100) @map("selected_volume")
+  selectedWeight Int     @default(100) @map("selected_weight")
   price          Decimal @db.Decimal(10, 2)
   order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
@@ -199,7 +205,7 @@ model CartItem {
   cartId         String  @map("cart_id")
   productId      String  @map("product_id")
   quantity       Int
-  selectedVolume Int     @default(100) @map("selected_volume")
+  selectedWeight Int     @default(100) @map("selected_weight")
   cart           Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
 
@@ -242,6 +248,12 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+enum PaymentStatus {
+  PAID
+  PARTIALLY_PAID
+  UNPAID
 }
 
 model ProductSales {

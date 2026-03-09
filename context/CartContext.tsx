@@ -8,8 +8,8 @@ export interface CartProduct {
     brand: string;
     imageUrl: string;
     basePrice: number;
-    selectedVolume: number; // For volume-based selling
-    stockMl: number; // For ml-based validation
+    selectedWeight: number; // For weight-based selling
+    stockWeight: number; // For gram-based validation
 }
 
 export interface CartItem {
@@ -64,29 +64,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         let error = "";
 
         setItems(prev => {
-            // Check for existing item WITH SAME VOLUME
-            const existing = prev.find(i => 
-                i.product.id === product.id && 
-                i.product.selectedVolume === product.selectedVolume
+            // Check for existing item WITH SAME WEIGHT
+            const existing = prev.find(i =>
+                i.product.id === product.id &&
+                i.product.selectedWeight === product.selectedWeight
             );
-            
+
             const currentQty = existing ? existing.quantity : 0;
             const newQty = currentQty + quantityToAdd;
 
-            const totalMlRequired = newQty * product.selectedVolume;
-            if (totalMlRequired > product.stockMl) {
-                error = `Insufficient stock. Only ${product.stockMl}ml available.`;
+            const totalWeightRequired = newQty * product.selectedWeight;
+            if (totalWeightRequired > product.stockWeight) {
+                const available = product.stockWeight >= 1000 ? `${(product.stockWeight / 1000).toFixed(2)}kg` : `${product.stockWeight}g`;
+                error = `Insufficient stock. Only ${available} available.`;
                 return prev;
             }
 
             if (existing) {
-                return prev.map(i => 
-                    (i.product.id === product.id && i.product.selectedVolume === product.selectedVolume)
-                    ? { ...i, quantity: newQty } 
-                    : i
+                return prev.map(i =>
+                    (i.product.id === product.id && i.product.selectedWeight === product.selectedWeight)
+                        ? { ...i, quantity: newQty }
+                        : i
                 );
             } else {
-                return [...prev, { id: `${product.id}-${product.selectedVolume}`, product, quantity: newQty }];
+                return [...prev, { id: `${product.id}-${product.selectedWeight}`, product, quantity: newQty }];
             }
         });
 
@@ -107,9 +108,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             const existing = prev.find(i => i.id === cartItemId);
             if (!existing) return prev;
 
-            const totalMlRequired = newQuantity * existing.product.selectedVolume;
-            if (totalMlRequired > existing.product.stockMl) {
-                error = `Insufficient stock. Only ${existing.product.stockMl}ml available.`;
+            const totalWeightRequired = newQuantity * existing.product.selectedWeight;
+            if (totalWeightRequired > existing.product.stockWeight) {
+                const available = existing.product.stockWeight >= 1000 ? `${(existing.product.stockWeight / 1000).toFixed(2)}kg` : `${existing.product.stockWeight}g`;
+                error = `Insufficient stock. Only ${available} available.`;
                 return prev;
             }
 

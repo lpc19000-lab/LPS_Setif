@@ -1,0 +1,105 @@
+{
+    "common": {
+        "nav": {
+            "home": "الرئيسية",
+            "boutique": "المتجر",
+            "panier": "سلة التسوق",
+            "compte": "الحساب",
+            "admin": "لوحة التحكم"
+        },
+        "buttons": {
+            "save": "حفظ",
+            "cancel": "إلغاء",
+            "delete": "حذف",
+            "add_to_cart": "أضف إلى السلة",
+            "checkout": "إتمام الطلب",
+            "create_account": "إنشاء حساب",
+            "sign_in": "تسجيل الدخول"
+        }
+    },
+    "registration": {
+        "title": "التسجيل كتاجر",
+        "subtitle": "انضم إلى شبكتنا من تجار العطور الفاخرة في الجزائر.",
+        "trader_info": "معلومات التاجر",
+        "business_details": "تفاصيل النشاط التجاري",
+        "full_name": "الاسم الكامل",
+        "phone": "رقم الهاتف",
+        "shop_name": "اسم المحل",
+        "wilaya": "الولاية",
+        "address": "العنوان الكامل",
+        "placeholder_name": "أدخل الاسم الكامل",
+        "placeholder_shop": "الاسم التجاري للنشاط",
+        "placeholder_address": "العنوان الكامل، الشارع والحي",
+        "already_registered": "مسجل بالفعل؟",
+        "sign_in_link": "سجل الدخول إلى حسابك"
+    },
+    "product": {
+        "base_price": "السعر الأساسي",
+        "view_details": "عرض التفاصيل",
+        "available": "متوفر",
+        "variants_note": "ملاحظة: ستتوفر المنتجات تلقائيًا بأوزان 200جم، 250جم، 500جم، و1كجم بناءً على السعر الأساسي.",
+        "added_success": "تمت الإضافة إلى السلة بنجاح!",
+        "added_fail": "فشل في الإضافة إلى السلة",
+        "not_found": "المنتج غير موجود",
+        "back_to_shop": "العودة إلى المتجر",
+        "back_to_catalog": "العودة إلى الكتالوج",
+        "authentic": "أصلي",
+        "premium_fragrance": "عطر فاخر",
+        "low_stock": "مخزون منخفض",
+        "in_stock": "متوفر في المخزون",
+        "out_of_stock": "غير متوفر",
+        "professional_grade": "جودة احترافية",
+        "per_unit": "لكل وحدة من",
+        "selected_size": "الحجم المختار",
+        "order_total": "إجمالي الطلب",
+        "select_size": "اختر الحجم",
+        "configure_quantity": "تحديد الكمية",
+        "units_of": "وحدات من",
+        "wholesale_note": "تغليف بالجملة احترافي للحجم المختار"
+    },
+    "catalog": {
+        "search_placeholder": "البحث في المجموعات...",
+        "products_found": "منتجات موجودة",
+        "sort_featured": "المميزة",
+        "sort_low_high": "السعر: من الأقل إلى الأعلى",
+        "sort_high_low": "السعر: من الأعلى إلى الأقل",
+        "no_products": "لم يتم العثور على منتجات لـ"
+    },
+    "cart": {
+        "title": "سلة التسوق",
+        "empty": "سلة التسوق فارغة حاليًا.",
+        "continue_shopping": "مواصلة التسوق",
+        "subtotal": "المجموع الفرعي",
+        "view_cart": "عرض السلة",
+        "checkout_now": "إتمام الطلب الآن"
+    },
+    "checkout": {
+        "title": "إتمام الطلب",
+        "no_items": "لا توجد عناصر لإتمام الطلب",
+        "browse_products": "تصفح المنتجات",
+        "shipping_details": "تفاصيل الشحن",
+        "company_name": "اسم الشركة / الاسم *",
+        "placeholder_name": "اسمك أو اسم المحل",
+        "phone": "الهاتف *",
+        "wilaya": "الولاية *",
+        "address": "العنوان *",
+        "placeholder_address": "عنوان الشحن بالتفصيل",
+        "order_notes": "ملاحظات الطلب (اختياري)",
+        "placeholder_notes": "أي تعليمات خاصة للتجهيز أو التوصيل...",
+        "order_summary": "ملخص الطلب",
+        "qty": "الكمية",
+        "total": "الإجمالي",
+        "min_order_met": "تم استيفاء الحد الأدنى لمبلغ الطلب",
+        "min_order_error": "الحد الأدنى لمبلغ الطلب هو 5,000 دج. ينقصك {amount} دج.",
+        "place_order": "إرسال الطلب",
+        "placing_order": "جاري المعالجة...",
+        "order_success_title": "تم إرسال الطلب بنجاح!",
+        "order_success_msg": "تم تأكيد طلبك وإصدار الفاتورة. سنقوم بمعالجته خلال 24 ساعة.",
+        "view_history": "عرض سجل الطلبات",
+        "network_error": "خطأ في الشبكة. يرجى المحاولة مرة أخرى."
+    },
+    "home": {
+        "title": "LPS Perfume - Luxe Parfum Setif",
+        "hero_subtitle": "موزع عطور فاخرة بالجملة"
+    }
+}

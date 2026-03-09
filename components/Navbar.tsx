@@ -6,6 +6,8 @@ import { useState } from "react";
 import { Shield, User, ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import dynamic from "next/dynamic";
+import { useTranslations, useLocale } from 'next-intl';
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const MiniCart = dynamic(() => import("./shop/MiniCart"), {
     ssr: false,
@@ -17,17 +19,20 @@ interface NavbarProps {
 
 export default function Navbar({ customerName }: NavbarProps) {
     const pathname = usePathname();
+    const locale = useLocale();
+    const t = useTranslations('common.nav');
+    const b = useTranslations('common.buttons');
     const [mobileOpen, setMobileOpen] = useState(false);
     const { totalQuantity, setIsCartOpen } = useCart();
 
-    const isHeroPage = pathname === "/";
+    const isHeroPage = pathname === `/${locale}` || pathname === `/${locale}/`;
 
     const navLinks = [
-        { href: "/", label: "Home" },
-        { href: "/catalog", label: "Catalog" },
+        { href: `/${locale}`, label: t('home') },
+        { href: `/${locale}/catalog`, label: t('boutique') },
         ...(customerName
-            ? [{ href: "/account", label: "Account" }]
-            : [{ href: "/login", label: "Login" }]
+            ? [{ href: `/${locale}/account`, label: t('compte') }]
+            : [{ href: `/${locale}/login`, label: b('checkout').split(' ')[0] }] // fallback if no specific login label
         ),
     ];
 
@@ -40,7 +45,7 @@ export default function Navbar({ customerName }: NavbarProps) {
         >
             <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2" prefetch={true}>
+                <Link href={`/${locale}`} className="flex items-center gap-2" prefetch={true}>
                     <span
                         className={`font-serif text-2xl font-bold tracking-wider ${isHeroPage ? "text-[#D4AF37]" : "text-primary-dark"
                             }`}
@@ -75,9 +80,11 @@ export default function Navbar({ customerName }: NavbarProps) {
                         </Link>
                     ))}
 
+                    <LanguageSwitcher isHeroPage={isHeroPage} />
+
                     {!customerName && (
                         <Link
-                            href="/register"
+                            href={`/${locale}/register`}
                             prefetch={true}
                             className={`text-sm px-5 py-2 rounded-full font-medium transition-all duration-300 ${isHeroPage
                                 ? "border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10"
@@ -90,7 +97,7 @@ export default function Navbar({ customerName }: NavbarProps) {
 
                     {customerName && (
                         <Link
-                            href="/account"
+                            href={`/${locale}/account`}
                             prefetch={true}
                             className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300 ${isHeroPage
                                 ? "border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10"
@@ -112,7 +119,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                     >
                         <ShoppingCart className="w-5 h-5" />
                         {totalQuantity > 0 && (
-                            <span className="absolute 0 top-0 right-0 bg-primary text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-white">
+                            <span className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-white">
                                 {totalQuantity}
                             </span>
                         )}
@@ -120,7 +127,7 @@ export default function Navbar({ customerName }: NavbarProps) {
 
                     {/* Admin Portal Icon */}
                     <Link
-                        href="/admin/login"
+                        href={`/${locale}/admin/login`}
                         title="Admin Portal"
                         prefetch={true}
                         className={`p-2 rounded-full transition-all duration-300 ${isHeroPage
@@ -134,6 +141,7 @@ export default function Navbar({ customerName }: NavbarProps) {
 
                 {/* Mobile Icons + Toggle */}
                 <div className="md:hidden flex items-center gap-2">
+                    <LanguageSwitcher isHeroPage={isHeroPage} />
                     {/* Mobile Cart Trigger */}
                     <button
                         onClick={() => setIsCartOpen(true)}
@@ -147,7 +155,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                         )}
                     </button>
                     <Link
-                        href="/admin/login"
+                        href={`/${locale}/admin/login`}
                         prefetch={true}
                         className={`p-1.5 rounded-full ${isHeroPage ? "text-white/70" : "text-gray-500"}`}
                     >
@@ -185,7 +193,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                         ))}
                         {!customerName && (
                             <Link
-                                href="/register"
+                                href={`/${locale}/register`}
                                 prefetch={true}
                                 onClick={() => setMobileOpen(false)}
                                 className="block mt-4 text-center text-sm px-5 py-2.5 rounded-full bg-primary text-white"
@@ -195,7 +203,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                         )}
                         {customerName && (
                             <Link
-                                href="/account"
+                                href={`/${locale}/account`}
                                 prefetch={true}
                                 onClick={() => setMobileOpen(false)}
                                 className="block mt-4 text-center text-sm px-5 py-2.5 rounded-full bg-primary text-white"

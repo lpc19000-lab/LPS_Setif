@@ -3,16 +3,27 @@ import { DollarSign, Package, Users, ShoppingCart, Clock, Trophy, AlertTriangle,
 import { getInventoryHealthScore } from "@/services/intelligence-service";
 import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
+import RealtimeReloader from "@/components/admin/RealtimeReloader";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // ... (rest of the code)
+
     const [
         totalProducts,
         totalCustomers,
         totalOrders,
         pendingOrders,
         revenueResult,
+        unpaidBalanceResult,
+        partiallyPaidOrders,
+        dailyRevenueResult,
+        monthlyRevenueResult,
         lowStockProducts,
         unreadNotifications,
         bestSellers,
@@ -26,7 +37,20 @@ export default async function AdminDashboard() {
             _sum: { totalPrice: true },
             where: { status: { not: "CANCELLED" } }
         }),
-        prisma.$queryRaw<[{ count: bigint }]>`SELECT COUNT(*) as count FROM products WHERE stock_quantity <= low_stock_threshold AND stock_quantity > 0`.then(
+        prisma.order.aggregate({
+            _sum: { totalPrice: true, amountPaid: true },
+            where: { paymentStatus: { in: ["UNPAID", "PARTIALLY_PAID"] }, status: { not: "CANCELLED" } }
+        }),
+        prisma.order.count({ where: { paymentStatus: "PARTIALLY_PAID" } }),
+        prisma.order.aggregate({
+            _sum: { totalPrice: true },
+            where: { createdAt: { gte: startOfDay }, status: { not: "CANCELLED" } }
+        }),
+        prisma.order.aggregate({
+            _sum: { totalPrice: true },
+            where: { createdAt: { gte: startOfMonth }, status: { not: "CANCELLED" } }
+        }),
+        prisma.$queryRaw<[{ count: bigint }]>`SELECT COUNT(*) as count FROM products WHERE stock_weight <= low_stock_threshold AND stock_weight > 0`.then(
             (r) => Number(r[0]?.count ?? 0)
         ).catch(() => 0),
         prisma.notification.count({ where: { isRead: false } }),
@@ -39,6 +63,10 @@ export default async function AdminDashboard() {
     ]);
 
     const revenue = revenueResult._sum.totalPrice ? Number(revenueResult._sum.totalPrice) : 0;
+    const unpaidBalance = (unpaidBalanceResult._sum.totalPrice ? Number(unpaidBalanceResult._sum.totalPrice) : 0) -
+        (unpaidBalanceResult._sum.amountPaid ? Number(unpaidBalanceResult._sum.amountPaid) : 0);
+    const dailyRevenue = dailyRevenueResult._sum.totalPrice ? Number(dailyRevenueResult._sum.totalPrice) : 0;
+    const monthlyRevenue = monthlyRevenueResult._sum.totalPrice ? Number(monthlyRevenueResult._sum.totalPrice) : 0;
 
     const recentOrders = await prisma.order.findMany({
         take: 5,
@@ -47,7 +75,7 @@ export default async function AdminDashboard() {
     });
 
     const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat("en-US", { style: "currency", currency: "DZD" }).format(amount);
+        return new Intl.NumberFormat("en-US", { style: "currency", currency: "DZD" }).format(amount).replace("DZD", "DA");
     };
 
     const formatDate = (date: Date) => {
@@ -66,6 +94,15 @@ export default async function AdminDashboard() {
         }
     };
 
+    const getPaymentStatusColor = (status: string) => {
+        switch (status) {
+            case "PAID": return "bg-emerald-100 text-emerald-700 border-emerald-200";
+            case "PARTIALLY_PAID": return "bg-amber-100 text-amber-700 border-amber-200";
+            case "UNPAID": return "bg-red-100 text-red-700 border-red-200";
+            default: return "bg-gray-100 text-gray-700 border-gray-200";
+        }
+    };
+
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div>
@@ -73,27 +110,9 @@ export default async function AdminDashboard() {
                 <p className="text-gray-500 mt-1 tracking-wide">Welcome back. Here is what is happening with your store today.</p>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-                {/* Inventory Health Score */}
-                <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group flex flex-col justify-between">
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className={`p-3 rounded-xl ${inventoryHealthScore >= 90 ? "bg-emerald-50 text-emerald-600" :
-                                inventoryHealthScore >= 70 ? "bg-amber-50 text-amber-600" :
-                                    "bg-red-50 text-red-600"
-                            }`}>
-                            <Activity className="w-5 h-5" />
-                        </div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Health Score</h3>
-                    </div>
-                    <p className={`text-2xl font-bold font-serif relative z-10 ${inventoryHealthScore >= 90 ? "text-emerald-600" :
-                            inventoryHealthScore >= 70 ? "text-amber-600" :
-                                "text-red-600"
-                        }`}>
-                        {inventoryHealthScore}%
-                    </p>
-                </div>
-                {/* Revenue */}
+            {/* Financial Overview Grid (Phase 6) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Total Revenue */}
                 <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-300">
                         <DollarSign className="w-16 h-16 text-[#D4AF37]" strokeWidth={1} />
@@ -105,6 +124,65 @@ export default async function AdminDashboard() {
                         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Total Revenue</h3>
                     </div>
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{formatCurrency(revenue)}</p>
+                </div>
+
+                {/* Unpaid Balance */}
+                <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-300">
+                        <AlertTriangle className="w-16 h-16 text-red-500" strokeWidth={1} />
+                    </div>
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-red-50 text-red-600 rounded-xl">
+                            <AlertTriangle className="w-5 h-5" />
+                        </div>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Unpaid Balance</h3>
+                    </div>
+                    <p className="text-2xl font-bold text-red-600 relative z-10">{formatCurrency(unpaidBalance)}</p>
+                    <p className="text-xs text-gray-400 mt-2 font-medium">Includes {partiallyPaidOrders} partially paid orders</p>
+                </div>
+
+                {/* Daily Revenue */}
+                <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                            <Activity className="w-5 h-5" />
+                        </div>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Daily Revenue</h3>
+                    </div>
+                    <p className="text-2xl font-bold text-primary-dark relative z-10">{formatCurrency(dailyRevenue)}</p>
+                </div>
+
+                {/* Monthly Revenue */}
+                <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                            <Activity className="w-5 h-5" />
+                        </div>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Monthly Revenue</h3>
+                    </div>
+                    <p className="text-2xl font-bold text-primary-dark relative z-10">{formatCurrency(monthlyRevenue)}</p>
+                </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                {/* Inventory Health Score */}
+                <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group flex flex-col justify-between">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className={`p-3 rounded-xl ${inventoryHealthScore >= 90 ? "bg-emerald-50 text-emerald-600" :
+                            inventoryHealthScore >= 70 ? "bg-amber-50 text-amber-600" :
+                                "bg-red-50 text-red-600"
+                            }`}>
+                            <Activity className="w-5 h-5" />
+                        </div>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Health Score</h3>
+                    </div>
+                    <p className={`text-2xl font-bold font-serif relative z-10 ${inventoryHealthScore >= 90 ? "text-emerald-600" :
+                        inventoryHealthScore >= 70 ? "text-amber-600" :
+                            "text-red-600"
+                        }`}>
+                        {inventoryHealthScore}%
+                    </p>
                 </div>
 
                 {/* Orders */}
@@ -177,13 +255,14 @@ export default async function AdminDashboard() {
                                 <th className="px-6 py-4 font-medium">Customer</th>
                                 <th className="px-6 py-4 font-medium">Date</th>
                                 <th className="px-6 py-4 font-medium">Total</th>
+                                <th className="px-6 py-4 font-medium">Payment</th>
                                 <th className="px-6 py-4 font-medium">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {recentOrders.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                                         No orders found yet.
                                     </td>
                                 </tr>
@@ -204,7 +283,12 @@ export default async function AdminDashboard() {
                                             {formatCurrency(Number(order.totalPrice))}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(order.status)}`}>
+                                            <span className={`px-3 py-1 text-[10px] font-bold rounded-full border ${getPaymentStatusColor(order.paymentStatus)}`}>
+                                                {order.paymentStatus.replace('_', ' ')}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 text-[10px] font-bold rounded-full border ${getStatusColor(order.status)}`}>
                                                 {order.status}
                                             </span>
                                         </td>

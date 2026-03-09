@@ -8,7 +8,7 @@ import { unstable_cache, revalidateTag } from "next/cache";
 interface OrderItemInput {
     productId: string;
     quantity: number;
-    selectedVolume: number;
+    selectedWeight: number;
 }
 
 interface CreateOrderInput {
@@ -16,6 +16,8 @@ interface CreateOrderInput {
     items: OrderItemInput[];
     createdBy?: "CUSTOMER" | "ADMIN" | "SYSTEM";
     notes?: string;
+    wilayaNumber?: string;
+    wilayaName?: string;
 }
 
 // ── CONSTANTS ─────────────────────────────────────────────────────────────
@@ -44,35 +46,35 @@ export const createOrder = async (input: CreateOrderInput) => {
 
         // Legacy validations removed
 
-        // Step 4: Validate and update stock (ml-based)
+        // Step 4: Validate and update stock (weight-based)
         for (const item of input.items) {
             const product = products.find((p) => p.id === item.productId)!;
-            const requiredMl = item.quantity * item.selectedVolume;
+            const requiredWeight = item.quantity * item.selectedWeight;
 
-            if ((product as any).stockMl < requiredMl) {
-                throw Errors.outOfStock(product.name, (product as any).stockMl, requiredMl);
+            if ((product as any).stockWeight < requiredWeight) {
+                throw Errors.outOfStock(product.name, (product as any).stockWeight, requiredWeight);
             }
 
             await tx.product.update({
                 where: { id: item.productId },
-                data: { stockMl: { decrement: requiredMl } } as any,
+                data: { stockWeight: { decrement: requiredWeight } } as any,
             });
         }
 
-        // Step 5: Calculate total with volume prices
+        // Step 5: Calculate total with weight prices
         let totalPrice = 0;
         const orderItemsData = input.items.map((item) => {
             const product = products.find((p) => p.id === item.productId)!;
 
-            // Calculate unit price from basePrice (per 100ml)
-            const unitPrice = (Number((product as any).basePrice) / 100) * item.selectedVolume;
+            // Calculate unit price from basePrice (per 100g)
+            const unitPrice = (Number((product as any).basePrice) / 100) * item.selectedWeight;
 
             const lineTotal = unitPrice * item.quantity;
             totalPrice += lineTotal;
             return {
                 productId: item.productId,
                 quantity: item.quantity,
-                selectedVolume: item.selectedVolume,
+                selectedWeight: item.selectedWeight,
                 price: unitPrice,
             };
         });
@@ -85,6 +87,8 @@ export const createOrder = async (input: CreateOrderInput) => {
                 customerId: input.customerId,
                 totalPrice,
                 status: OrderStatus.PENDING,
+                wilayaNumber: input.wilayaNumber,
+                wilayaName: input.wilayaName,
                 items: {
                     create: orderItemsData,
                 },
@@ -95,7 +99,7 @@ export const createOrder = async (input: CreateOrderInput) => {
                         message: input.notes || "Order placed successfully.",
                     },
                 },
-            },
+            } as any,
             include: { items: { include: { product: true } }, customer: true },
         });
 
@@ -141,7 +145,7 @@ export const createOrder = async (input: CreateOrderInput) => {
                 data: {
                     productId: item.productId,
                     changeType: "SALE",
-                    quantity: -(item.quantity * item.selectedVolume), // Log in ml
+                    quantity: -(item.quantity * item.selectedWeight), // Log in weight
                     source: "ORDER",
                     reason: `Sale from order ${order.id}`,
                 },
@@ -157,13 +161,23 @@ export const createOrder = async (input: CreateOrderInput) => {
 
     // Post-transaction: Trigger notifications
     try {
-        await notifyNewOrder(order.id, order.customer.shopName, Number(order.totalPrice));
+        const fullOrder = await prisma.order.findUnique({
+            where: { id: order.id },
+            include: {
+                customer: true,
+                items: { include: { product: true } }
+            }
+        });
 
-        // Check for low stock alerts
-        for (const item of order.items) {
-            const product = await prisma.product.findUnique({ where: { id: item.productId } });
-            if (product && (product as any).stockMl <= product.lowStockThreshold) {
-                await notifyLowStock(product.id, product.name, (product as any).stockMl);
+        if (fullOrder) {
+            await notifyNewOrder(fullOrder.id, fullOrder.customer.shopName, Number(fullOrder.totalPrice));
+
+            // Check for low stock alerts
+            for (const item of fullOrder.items) {
+                const product = item.product as any;
+                if (product && product.stockWeight <= product.lowStockThreshold) {
+                    await notifyLowStock(product.id, product.name, product.stockWeight);
+                }
             }
         }
     } catch (e) {
@@ -193,17 +207,17 @@ export const updateOrderStatus = async (
         // Stock automation: restore stock if cancelling a non-cancelled order
         if (status === OrderStatus.CANCELLED && oldStatus !== OrderStatus.CANCELLED) {
             for (const item of order.items) {
-                const totalMl = item.quantity * (item as any).selectedVolume;
+                const totalWeight = item.quantity * (item as any).selectedWeight;
                 await tx.product.update({
                     where: { id: item.productId },
-                    data: { stockMl: { increment: totalMl } } as any,
+                    data: { stockWeight: { increment: totalWeight } } as any,
                 });
 
                 await tx.inventoryLog.create({
                     data: {
                         productId: item.productId,
                         changeType: "CANCEL",
-                        quantity: totalMl, // restored in ml
+                        quantity: totalWeight, // restored in weight
                         source: changedBy === "CUSTOMER" ? "ORDER" : "ADMIN",
                         reason: `Restock from cancelled order ${orderId}`,
                     },
@@ -346,7 +360,7 @@ export const getReorderItems = async (orderId: string) => {
         productId: item.productId,
         name: (item as any).product.name,
         quantity: item.quantity,
-        selectedVolume: (item as any).selectedVolume,
-        currentPrice: (Number((item as any).product.basePrice) / 100) * (item as any).selectedVolume,
+        selectedWeight: (item as any).selectedWeight,
+        currentPrice: (Number((item as any).product.basePrice) / 100) * (item as any).selectedWeight,
     }));
 };

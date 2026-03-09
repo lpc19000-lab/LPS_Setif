@@ -4,7 +4,8 @@ import prisma from "@/lib/db";
 export const registerCustomer = async (data: {
     name: string;
     phone: string;
-    wilaya: string;
+    wilayaNumber: string;
+    wilayaName: string;
     address: string;
     shopName: string;
 }) => {
@@ -16,7 +17,12 @@ export const registerCustomer = async (data: {
         throw new Error("A customer with this phone number already exists");
     }
 
-    return await prisma.customer.create({ data });
+    return await prisma.customer.create({ 
+        data: {
+            ...data,
+            wilaya: `${data.wilayaNumber} - ${data.wilayaName}`
+        }
+    });
 };
 
 // ── READ ──────────────────────────────────────────────────────────────────
@@ -46,7 +52,8 @@ export const updateCustomer = async (
     data: Partial<{
         name: string;
         phone: string;
-        wilaya: string;
+        wilayaNumber: string;
+        wilayaName: string;
         address: string;
         shopName: string;
     }>

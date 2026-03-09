@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-
 import { useCart } from "@/context/CartContext";
+import { useTranslations, useLocale } from "next-intl";
+import WilayaSelector from "@/components/WilayaSelector";
 
 export default function CheckoutPage() {
     const router = useRouter();
+    const t = useTranslations("checkout");
+    const locale = useLocale();
     const { items, totalPrice, clearCart } = useCart();
     const [mounted, setMounted] = useState(false);
     const [placing, setPlacing] = useState(false);
@@ -17,7 +20,8 @@ export default function CheckoutPage() {
     const [form, setForm] = useState({
         name: "",
         phone: "",
-        city: "",
+        wilayaNumber: "",
+        wilayaName: "",
         address: "",
         notes: "",
     });
@@ -29,6 +33,10 @@ export default function CheckoutPage() {
     const MIN_ORDER_AMOUNT = 5000;
     const isValidOrder = totalPrice >= MIN_ORDER_AMOUNT;
 
+    const handleWilayaChange = (number: string, name: string) => {
+        setForm(prev => ({ ...prev, wilayaNumber: number, wilayaName: name }));
+    };
+
     const placeOrder = async () => {
         setPlacing(true);
         setStatus("idle");
@@ -37,24 +45,31 @@ export default function CheckoutPage() {
             const orderItems = items.map((item) => ({
                 productId: item.product.id,
                 quantity: item.quantity,
-                selectedVolume: item.product.selectedVolume,
+                selectedWeight: item.product.selectedWeight,
             }));
             const res = await fetch("/api/orders", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ items: orderItems, shippingData: form }),
+                body: JSON.stringify({
+                    items: orderItems,
+                    shippingData: {
+                        ...form,
+                        wilaya: `${form.wilayaNumber} - ${form.wilayaName}` // For backward compatibility if needed, or update API
+                    }
+                }),
             });
             const json = await res.json();
             if (json.success) {
                 clearCart();
-                router.push("/order-confirmation");
+                setStatus("success");
+                // router.push(`/${locale}/order-confirmation`); // Optional: stay on page or redirect
             } else {
                 setStatus("error");
-                setErrorMsg(json.message || json.error || "Order failed");
+                setErrorMsg(json.message || json.error || t("network_error"));
             }
         } catch {
             setStatus("error");
-            setErrorMsg("Network error. Please try again.");
+            setErrorMsg(t("network_error"));
         }
         setPlacing(false);
     };
@@ -77,24 +92,23 @@ export default function CheckoutPage() {
                 >
                     <span className="text-5xl block mb-4">✓</span>
                     <h1 className="text-2xl font-serif text-primary-dark mb-3">
-                        Order Placed!
+                        {t("order_success_title")}
                     </h1>
                     <p className="text-gray-500 mb-8">
-                        Your order has been confirmed and an invoice has been generated.
-                        We&apos;ll process it within 24 hours.
+                        {t("order_success_msg")}
                     </p>
                     <div className="flex flex-col gap-3">
                         <button
-                            onClick={() => router.push("/account/orders")}
+                            onClick={() => router.push(`/${locale}/account/orders`)}
                             className="btn-primary"
                         >
-                            View Order History
+                            {t("view_history")}
                         </button>
                         <button
-                            onClick={() => router.push("/catalog")}
+                            onClick={() => router.push(`/${locale}/catalog`)}
                             className="text-gray-400 text-sm hover:text-primary transition-colors"
                         >
-                            Continue Shopping
+                            {useTranslations("cart")("continue_shopping")}
                         </button>
                     </div>
                 </motion.div>
@@ -104,16 +118,16 @@ export default function CheckoutPage() {
 
     return (
         <main className="pt-24 pb-20 min-h-screen bg-[#FAFAF8]">
-            <div className="max-w-3xl mx-auto px-6">
+            <div className="max-w-7xl mx-auto px-6">
                 <h1 className="text-3xl md:text-4xl font-serif text-primary-dark mb-8">
-                    Checkout
+                    {t("title")}
                 </h1>
 
                 {items.length === 0 ? (
                     <div className="text-center py-20">
-                        <p className="text-gray-400 text-lg mb-4">No items to checkout</p>
-                        <button onClick={() => router.push("/catalog")} className="btn-primary">
-                            Browse Products
+                        <p className="text-gray-400 text-lg mb-4">{t("no_items")}</p>
+                        <button onClick={() => router.push(`/${locale}/catalog`)} className="btn-primary">
+                            {t("browse_products")}
                         </button>
                     </div>
                 ) : (
@@ -121,22 +135,22 @@ export default function CheckoutPage() {
                         {/* Order Details Column */}
                         <div className="space-y-6">
                             <div className="bg-white rounded-xl p-6 border border-gray-100">
-                                <h2 className="font-serif text-lg text-gray-800 mb-4">Shipping Details</h2>
+                                <h2 className="font-serif text-lg text-gray-800 mb-4">{t("shipping_details")}</h2>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm text-gray-500 mb-1">Company / Name *</label>
+                                        <label className="block text-sm text-gray-500 mb-1">{t("company_name")}</label>
                                         <input
                                             type="text"
                                             required
                                             value={form.name}
                                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                                             className="input-luxury w-full"
-                                            placeholder="Your name or shop name"
+                                            placeholder={t("placeholder_name")}
                                         />
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm text-gray-500 mb-1">Phone *</label>
+                                            <label className="block text-sm text-gray-500 mb-1">{t("phone")}</label>
                                             <input
                                                 type="text"
                                                 required
@@ -147,35 +161,31 @@ export default function CheckoutPage() {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm text-gray-500 mb-1">City (Wilaya) *</label>
-                                            <input
-                                                type="text"
-                                                required
-                                                value={form.city}
-                                                onChange={(e) => setForm({ ...form, city: e.target.value })}
-                                                className="input-luxury w-full"
-                                                placeholder="City"
+                                            <label className="block text-sm text-gray-500 mb-1">{t("wilaya")}</label>
+                                            <WilayaSelector
+                                                value={form.wilayaNumber}
+                                                onChange={(wilaya) => handleWilayaChange(wilaya.id, wilaya.name)}
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm text-gray-500 mb-1">Address *</label>
+                                        <label className="block text-sm text-gray-500 mb-1">{t("address")}</label>
                                         <input
                                             type="text"
                                             required
                                             value={form.address}
                                             onChange={(e) => setForm({ ...form, address: e.target.value })}
                                             className="input-luxury w-full"
-                                            placeholder="Detailed shipping address"
+                                            placeholder={t("placeholder_address")}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm text-gray-500 mb-1">Order Notes (Optional)</label>
+                                        <label className="block text-sm text-gray-500 mb-1">{t("order_notes")}</label>
                                         <textarea
                                             value={form.notes}
                                             onChange={(e) => setForm({ ...form, notes: e.target.value })}
                                             className="input-luxury w-full min-h-[100px]"
-                                            placeholder="Any special instructions for picking, packing or delivery..."
+                                            placeholder={t("placeholder_notes")}
                                         />
                                     </div>
                                 </div>
@@ -186,7 +196,7 @@ export default function CheckoutPage() {
                         <div className="space-y-6">
                             {/* Order Items */}
                             <div className="bg-white rounded-xl p-6 border border-gray-100">
-                                <h2 className="font-serif text-lg text-gray-800 mb-4">Order Summary</h2>
+                                <h2 className="font-serif text-lg text-gray-800 mb-4">{t("order_summary")}</h2>
                                 <div className="divide-y divide-gray-50 max-h-60 overflow-y-auto pr-2">
                                     {items.map((item) => (
                                         <div
@@ -198,7 +208,10 @@ export default function CheckoutPage() {
                                                     {item.product.name}
                                                 </p>
                                                 <p className="text-gray-400 text-sm">
-                                                    Qty: {item.quantity} × {Number(item.product.basePrice).toLocaleString()} DA
+                                                    {t("qty")}: {item.quantity} × {Number(item.product.basePrice).toLocaleString()} DA
+                                                </p>
+                                                <p className="text-[10px] text-primary font-bold">
+                                                    {item.product.selectedWeight >= 1000 ? `${item.product.selectedWeight / 1000}kg` : `${item.product.selectedWeight}g`}
                                                 </p>
                                             </div>
                                             <p className="font-bold text-gray-700">
@@ -214,17 +227,17 @@ export default function CheckoutPage() {
 
                             <div className="bg-white rounded-xl p-6 border border-gray-100">
                                 <div className="flex justify-between items-center text-lg mb-4">
-                                    <span className="font-serif text-gray-800">Total</span>
+                                    <span className="font-serif text-gray-800">{t("total")}</span>
                                     <span className="font-bold text-primary-dark text-2xl">
                                         {totalPrice.toLocaleString()} DA
                                     </span>
                                 </div>
                                 <div className="text-sm">
                                     {isValidOrder ? (
-                                        <p className="text-green-600 font-medium">✓ Minimum order amount met</p>
+                                        <p className="text-green-600 font-medium">✓ {t("min_order_met")}</p>
                                     ) : (
                                         <p className="text-red-500 font-medium">
-                                            Minimum order amount is 5,000 DA. You need {(MIN_ORDER_AMOUNT - totalPrice).toLocaleString()} DA more.
+                                            {t("min_order_error", { amount: (MIN_ORDER_AMOUNT - totalPrice).toLocaleString() })}
                                         </p>
                                     )}
                                 </div>
@@ -240,16 +253,16 @@ export default function CheckoutPage() {
                             {/* Place Order */}
                             <button
                                 onClick={placeOrder}
-                                disabled={placing || !isValidOrder || !form.name || !form.phone || !form.city || !form.address}
+                                disabled={placing || !isValidOrder || !form.name || !form.phone || !form.wilayaNumber || !form.address}
                                 className="btn-primary w-full text-center text-lg py-4 disabled:opacity-50"
                             >
                                 {placing ? (
                                     <span className="flex items-center justify-center gap-2">
                                         <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        Processing...
+                                        {t("placing_order")}
                                     </span>
                                 ) : (
-                                    "Place Order"
+                                    t("place_order")
                                 )}
                             </button>
                         </div>

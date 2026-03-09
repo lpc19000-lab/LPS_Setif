@@ -36,7 +36,7 @@ export const getActiveProducts = (filters?: {
             where.tags = { some: { tag: { slug: filters.tagSlug } } };
         }
         if (filters?.inStock) {
-            where.stockMl = { gt: 0 };
+            where.stockWeight = { gt: 0 };
         }
 
         const [products, total] = await Promise.all([
@@ -51,7 +51,7 @@ export const getActiveProducts = (filters?: {
                     brand: true,
                     imageUrl: true,
                     basePrice: true,
-                    stockMl: true,
+                    stockWeight: true,
                     category: {
                         select: {
                             id: true,
@@ -69,7 +69,7 @@ export const getActiveProducts = (filters?: {
                     },
                     volumes: {
                         select: {
-                            ml: true,
+                            weight: true,
                             price: true
                         }
                     }
@@ -133,7 +133,7 @@ export const getProducts = (filters?: {
                 brand: true,
                 imageUrl: true,
                 basePrice: true,
-                stockMl: true,
+                stockWeight: true,
                 status: true,
                 category: {
                     select: {
@@ -288,13 +288,13 @@ export const createProduct = async (data: {
     categoryId: string;
     imageUrl: string;
     basePrice: number;
-    stockMl: number;
+    stockWeight: number;
     lowStockThreshold?: number;
     status?: string;
     collectionIds?: string[];
     tagIds?: string[];
     additionalImages?: string[];
-    volumes?: { ml: number; price: number }[];
+    volumes?: { weight: number; price: number }[];
 }) => {
     const slug = generateSlug(data.name) + "-" + Date.now().toString(36);
     const { collectionIds, tagIds, additionalImages, volumes, ...productData } = data;
@@ -307,7 +307,7 @@ export const createProduct = async (data: {
                 status: (data.status as ProductStatus) || "ACTIVE",
                 volumes: volumes ? {
                     create: volumes.map(v => ({
-                        ml: v.ml,
+                        weight: v.weight,
                         price: v.price
                     }))
                 } : undefined
@@ -315,12 +315,12 @@ export const createProduct = async (data: {
         });
 
         // Create initial stock log
-        if (data.stockMl > 0) {
+        if (data.stockWeight > 0) {
             await tx.inventoryLog.create({
                 data: {
                     productId: product.id,
                     changeType: "INITIAL_STOCK",
-                    quantity: data.stockMl,
+                    quantity: data.stockWeight,
                     source: "ADMIN",
                     reason: "Initial stock on product creation",
                 },
@@ -373,12 +373,12 @@ export const updateProduct = async (
         categoryId: string;
         imageUrl: string;
         basePrice: number;
-        stockMl: number;
+        stockWeight: number;
         lowStockThreshold: number;
         status: string;
         collectionIds: string[];
         tagIds: string[];
-        volumes: { ml: number; price: number }[];
+        volumes: { weight: number; price: number }[];
     }>
 ) => {
     const { collectionIds, tagIds, volumes, ...productData } = data;
@@ -399,7 +399,7 @@ export const updateProduct = async (
                 await tx.productVolume.createMany({
                     data: volumes.map(v => ({
                         productId: id,
-                        ml: v.ml,
+                        weight: v.weight,
                         price: v.price
                     }))
                 });
@@ -445,17 +445,17 @@ export const deleteProduct = async (id: string) => {
 
 // ── LOW STOCK ─────────────────────────────────────────────────────────────
 export const getLowStockProducts = async () => {
-    // Current approach: products where stockMl is less than their individual lowStockThreshold
+    // Current approach: products where stockWeight is less than their individual lowStockThreshold
     return await prisma.product.findMany({
         where: {
             OR: [
-                { stockMl: { lte: 500 } }, // default if not specified
+                { stockWeight: { lte: 500 } }, // default if not specified
                 // Prisma doesn't support comparing two columns directly in findMany easily without raw query
                 // but we can use a reasonable default or fetch and filter
             ]
         },
         include: { category: true },
-        orderBy: { stockMl: "asc" },
+        orderBy: { stockWeight: "asc" },
     });
 };
 

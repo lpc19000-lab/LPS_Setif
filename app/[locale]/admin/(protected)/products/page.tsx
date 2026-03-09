@@ -18,10 +18,10 @@ export default async function AdminProductsPage() {
         prisma.tag.findMany({ orderBy: { name: "asc" } }),
     ]);
 
-    const serializedProducts = products.map((p) => ({
+    const serializedProducts = products.map((p: any) => ({
         ...p,
         basePrice: Number(p.basePrice),
-        stockMl: Number(p.stockMl),
+        stockWeight: Number(p.stockWeight || p.stockMl || 0),
     }));
 
     return (

@@ -6,9 +6,13 @@ import { X, ShoppingBag, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import SafeImage from "@/components/SafeImage";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function MiniCart() {
     const { isCartOpen, setIsCartOpen, items, totalQuantity, totalPrice, removeItem, updateQuantity } = useCart();
+    const t = useTranslations("cart");
+    const locale = useLocale();
+    const isRtl = locale === "ar";
 
     // Prevent body scroll when open
     useEffect(() => {
@@ -37,17 +41,17 @@ export default function MiniCart() {
 
                     {/* Drawer */}
                     <motion.div
-                        initial={{ x: "100%" }}
+                        initial={{ x: isRtl ? "-100%" : "100%" }}
                         animate={{ x: 0 }}
-                        exit={{ x: "100%" }}
+                        exit={{ x: isRtl ? "-100%" : "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col"
+                        className={`fixed top-0 ${isRtl ? "left-0" : "right-0"} h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col`}
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between p-6 border-b border-gray-100">
                             <h2 className="text-xl font-serif font-bold text-primary-dark flex items-center gap-2">
                                 <ShoppingBag className="w-5 h-5" />
-                                Your Cart
+                                {t("title")}
                                 <span className="text-sm font-sans font-normal text-gray-400">({totalQuantity})</span>
                             </h2>
                             <button
@@ -63,12 +67,12 @@ export default function MiniCart() {
                             {items.length === 0 ? (
                                 <div className="text-center py-20">
                                     <ShoppingBag className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                                    <p className="text-gray-500 mb-6">Your cart is currently empty.</p>
+                                    <p className="text-gray-500 mb-6">{t("empty")}</p>
                                     <button
                                         onClick={() => setIsCartOpen(false)}
                                         className="text-primary font-bold hover:text-primary-dark transition-colors"
                                     >
-                                        Continue Shopping
+                                        {t("continue_shopping")}
                                     </button>
                                 </div>
                             ) : (
@@ -87,7 +91,7 @@ export default function MiniCart() {
                                                 <h3 className="font-bold text-gray-900 text-sm truncate group-hover:text-primary transition-colors">
                                                     {item.product.name}
                                                 </h3>
-                                                <button 
+                                                <button
                                                     onClick={() => removeItem(item.id)}
                                                     className="p-1 hover:bg-red-50 text-gray-300 hover:text-red-500 rounded-lg transition-all flex-shrink-0"
                                                 >
@@ -98,7 +102,7 @@ export default function MiniCart() {
                                                 <p className="text-[10px] text-gray-400 font-serif italic truncate">{item.product.brand}</p>
                                                 <span className="w-1 h-1 rounded-full bg-gray-200"></span>
                                                 <p className="text-[10px] font-black uppercase tracking-widest text-primary">
-                                                    {item.product.selectedVolume}ml
+                                                    {item.product.selectedWeight >= 1000 ? `${item.product.selectedWeight / 1000}kg` : `${item.product.selectedWeight}g`}
                                                 </p>
                                             </div>
                                             <div className="flex items-center justify-between mt-3">
@@ -133,26 +137,26 @@ export default function MiniCart() {
                         {items.length > 0 && (
                             <div className="p-6 border-t border-gray-100 bg-gray-50">
                                 <div className="flex justify-between items-end mb-6">
-                                    <p className="text-gray-500 text-sm font-medium">Subtotal</p>
+                                    <p className="text-gray-500 text-sm font-medium">{t("subtotal")}</p>
                                     <p className="text-2xl font-serif font-bold text-primary-dark">
                                         {totalPrice.toLocaleString()} <span className="text-sm text-gray-400 font-sans">DA</span>
                                     </p>
                                 </div>
                                 <div className="space-y-3">
                                     <Link
-                                        href="/cart"
+                                        href={`/${locale}/cart`}
                                         onClick={() => setIsCartOpen(false)}
                                         className="flex items-center justify-center w-full py-3.5 bg-white border border-gray-200 text-gray-900 font-bold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all"
                                     >
-                                        View Cart
+                                        {t("view_cart")}
                                     </Link>
                                     <Link
-                                        href="/checkout"
+                                        href={`/${locale}/checkout`}
                                         onClick={() => setIsCartOpen(false)}
                                         className="flex items-center justify-center gap-2 w-full py-3.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 group"
                                     >
-                                        Checkout Now
-                                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                        {t("checkout_now")}
+                                        <ArrowRight className={`w-4 h-4 group-hover:${isRtl ? "-translate-x-1" : "translate-x-1"} transition-transform`} />
                                     </Link>
                                 </div>
                             </div>

@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/Button";
 import { ShoppingCart } from "lucide-react";
 import SafeImage from "@/components/SafeImage";
+import { useTranslations, useLocale } from "next-intl";
+import Link from "next/link";
 
 interface ProductProps {
     product: {
@@ -16,6 +18,10 @@ interface ProductProps {
 }
 
 export default function ProductCard({ product }: ProductProps) {
+    const t = useTranslations("product");
+    const b = useTranslations("common.buttons");
+    const locale = useLocale();
+
     return (
         <div className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-xl flex flex-col h-full">
             {/* Image Container */}
@@ -44,15 +50,19 @@ export default function ProductCard({ product }: ProductProps) {
                 <div className="flex flex-col gap-4 mt-auto">
                     <div className="flex items-center justify-between">
                         <div className="flex flex-col">
-                            <span className="text-xs text-gray-400 uppercase tracking-widest">Base Price (100ml)</span>
+                            <span className="text-xs text-gray-400 uppercase tracking-widest">
+                                {t("base_price")} (100g)
+                            </span>
                             <span className="text-2xl font-semibold text-primary">{product.basePrice} DZD</span>
                         </div>
                     </div>
 
-                    <Button className="w-full gap-2 py-6">
-                        <ShoppingCart size={18} />
-                        View Details
-                    </Button>
+                    <Link href={`/${locale}/product/${product.id}`} className="w-full">
+                        <Button className="w-full gap-2 py-6">
+                            <ShoppingCart size={18} />
+                            {t("view_details")}
+                        </Button>
+                    </Link>
                 </div>
             </div>
         </div>

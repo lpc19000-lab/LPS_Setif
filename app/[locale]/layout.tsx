@@ -5,6 +5,9 @@ import Navbar from "@/components/Navbar";
 import { getCustomerSession } from "@/lib/customer-auth";
 import { CartProvider } from "@/context/CartContext";
 import ToastContainer from "@/components/ui/Toast";
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 
 const playfair = Playfair_Display({
     subsets: ["latin"],
@@ -24,21 +27,34 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
     children,
-}: Readonly<{
+    params: { locale }
+}: {
     children: React.ReactNode;
-}>) {
+    params: { locale: string };
+}) {
+    // Validate that the incoming `locale` is supported
+    if (!['fr', 'ar'].includes(locale)) {
+        notFound();
+    }
+
+    const messages = await getMessages();
     const customer = await getCustomerSession();
+    const direction = locale === 'ar' ? 'rtl' : 'ltr';
 
     return (
-        <html lang="en">
+        <html lang={locale} dir={direction}>
             <body
                 className={`${playfair.variable} ${inter.variable} font-sans antialiased`}
             >
-                <CartProvider>
-                    <Navbar customerName={customer?.name} />
-                    {children}
-                    <ToastContainer />
-                </CartProvider>
+                <NextIntlClientProvider messages={messages}>
+                    <CartProvider>
+                        <Navbar customerName={customer?.name} />
+                        <main className="min-h-screen">
+                            {children}
+                        </main>
+                        <ToastContainer />
+                    </CartProvider>
+                </NextIntlClientProvider>
             </body>
         </html>
     );
