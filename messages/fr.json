@@ -14,7 +14,21 @@
             "add_to_cart": "Ajouter au panier",
             "checkout": "Passer à la caisse",
             "create_account": "Créer un compte",
-            "sign_in": "Se connecter"
+            "sign_in": "Se connecter",
+            "register": "S'inscrire",
+            "logout": "Déconnexion",
+            "my_account": "Mon Compte",
+            "loading": "Chargement...",
+            "discover_more": "Découvrir plus",
+            "view": "Voir"
+        },
+        "labels": {
+            "all_categories": "Toutes les catégories",
+            "all_brands": "Toutes les marques",
+            "in_stock_only": "En stock uniquement",
+            "out_of_stock": "Rupture de stock",
+            "low_stock": "Stock faible",
+            "per_100ml": "Par 100ml référence"
         }
     },
     "registration": {
@@ -32,6 +46,19 @@
         "placeholder_address": "Adresse complète, rue et localité",
         "already_registered": "Déjà inscrit ?",
         "sign_in_link": "Connectez-vous à votre compte"
+    },
+    "login": {
+        "title": "Accès Commerçant",
+        "subtitle": "Entrez votre numéro de téléphone enregistré pour accéder à votre espace grossiste.",
+        "phone_label": "Numéro de Téléphone",
+        "phone_placeholder": "05 / 06 / 07 ...",
+        "submit": "Connexion Sécurisée",
+        "no_account": "Pas encore de compte commerçant ?",
+        "register_link": "Inscrivez-vous maintenant",
+        "store_home": "Accueil Boutique",
+        "catalog_link": "Catalogue",
+        "error_generic": "Une erreur s'est produite. Veuillez réessayer.",
+        "error_login_failed": "Échec de la connexion"
     },
     "product": {
         "base_price": "Prix de base",
@@ -58,12 +85,16 @@
         "wholesale_note": "Emballage de gros professionnel pour la taille sélectionnée"
     },
     "catalog": {
-        "search_placeholder": "Rechercher dans les collections...",
+        "title": "Notre Collection",
+        "subtitle": "Parfums haut de gamme avec options de volume flexibles",
+        "search_placeholder": "Rechercher des parfums...",
         "products_found": "produits trouvés",
         "sort_featured": "Mis en avant",
         "sort_low_high": "Prix: Croissant",
         "sort_high_low": "Prix: Décroissant",
-        "no_products": "Aucun produit trouvé pour"
+        "no_products": "Aucun produit trouvé",
+        "no_products_hint": "Essayez d'ajuster votre recherche ou vos filtres",
+        "discover_more": "Découvrir plus"
     },
     "cart": {
         "title": "Votre Panier",
@@ -100,6 +131,26 @@
     },
     "home": {
         "title": "LPS Perfume - Luxe Parfum Setif",
-        "hero_subtitle": "Distributeur de parfums de luxe en gros"
+        "hero_subtitle": "Distributeur de parfums de luxe en gros",
+        "new_arrivals": "Nouveautés",
+        "new_arrivals_subtitle": "Les derniers ajouts à notre collection premium",
+        "best_sellers": "Meilleures Ventes",
+        "best_sellers_subtitle": "Les parfums les plus populaires chez nos partenaires",
+        "featured": "Parfums en Vedette",
+        "featured_subtitle": "Des sélections choisies à la main pour votre boutique",
+        "features_title": "Pourquoi Nous Choisir",
+        "cta_title": "Rejoignez Notre Réseau",
+        "cta_subtitle": "Commencez à vendre des parfums de luxe dès aujourd'hui",
+        "footer_rights": "Tous droits réservés"
+    },
+    "account": {
+        "title": "Mon Compte",
+        "orders": "Mes Commandes",
+        "saved_cart": "Panier Sauvegardé",
+        "no_orders": "Aucune commande pour le moment",
+        "order_id": "Commande",
+        "order_date": "Date",
+        "order_status": "Statut",
+        "order_total": "Total"
     }
 }

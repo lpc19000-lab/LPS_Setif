@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { getNewArrivals, getBestSellers, getFeaturedProducts } from "@/services/product-service";
 import { ProductSection, FeaturesSection, CTASection } from "@/components/HomeClient";
+import { getTranslations } from "next-intl/server";
 
 const FragranceScroll = dynamic(() => import("@/components/FragranceScroll"), {
     loading: () => <div className="h-screen bg-[#121212] animate-pulse" />,
@@ -10,6 +11,7 @@ const FragranceScroll = dynamic(() => import("@/components/FragranceScroll"), {
 
 // Server-side data fetching — runs on the server with caching
 async function ProductSections() {
+    const t = await getTranslations("home");
     const [newArrivals, bestSellers, featured] = await Promise.all([
         getNewArrivals(8),
         getBestSellers(4),
@@ -19,18 +21,18 @@ async function ProductSections() {
     return (
         <>
             <ProductSection
-                title="New Arrivals"
-                subtitle="The latest additions to our premium collection"
+                title={t("new_arrivals")}
+                subtitle={t("new_arrivals_subtitle")}
                 products={JSON.parse(JSON.stringify(newArrivals))}
             />
             <ProductSection
-                title="Best Sellers"
-                subtitle="Most popular fragrances among our partners"
+                title={t("best_sellers")}
+                subtitle={t("best_sellers_subtitle")}
                 products={JSON.parse(JSON.stringify(bestSellers))}
             />
             <ProductSection
-                title="Featured Perfumes"
-                subtitle="Hand-picked selections for your store"
+                title={t("featured")}
+                subtitle={t("featured_subtitle")}
                 products={JSON.parse(JSON.stringify(featured))}
             />
         </>
@@ -38,7 +40,9 @@ async function ProductSections() {
 }
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
-    await params;
+    const { locale } = await params;
+    const t = await getTranslations("home");
+
     return (
         <main>
             {/* ── Cinematic Hero ──── */}
@@ -86,12 +90,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                         <span className="text-white/30 text-xs tracking-[0.3em] uppercase">Perfume</span>
                     </div>
                     <div className="flex gap-8 text-white/40 text-sm">
-                        <Link href="/catalog" prefetch={true} className="hover:text-[#D4AF37] transition-colors">Catalog</Link>
-                        <Link href="/register" prefetch={true} className="hover:text-[#D4AF37] transition-colors">Register</Link>
-                        <Link href="/login" prefetch={true} className="hover:text-[#D4AF37] transition-colors">Login</Link>
+                        <Link href={`/${locale}/catalog`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">Catalog</Link>
+                        <Link href={`/${locale}/register`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">Register</Link>
+                        <Link href={`/${locale}/login`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">Login</Link>
                     </div>
                     <p className="text-white/20 text-xs">
-                        © {new Date().getFullYear()} LPS Perfume. All rights reserved.
+                        © {new Date().getFullYear()} LPS Perfume. {t("footer_rights")}.
                     </p>
                 </div>
             </footer>

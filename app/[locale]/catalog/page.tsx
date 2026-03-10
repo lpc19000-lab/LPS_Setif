@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import SafeImage from "@/components/SafeImage";
+import { useTranslations, useLocale } from "next-intl";
 
 interface Product {
     id: string;
@@ -21,13 +25,13 @@ interface Category {
     name: string;
 }
 
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
-import SafeImage from "@/components/SafeImage";
-
 function CatalogContent() {
     const searchParams = useSearchParams();
     const initialCategory = searchParams.get("category") || "";
+    const t = useTranslations("catalog");
+    const tCommon = useTranslations("common.labels");
+    const tBtn = useTranslations("common.buttons");
+    const locale = useLocale();
 
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -102,10 +106,10 @@ function CatalogContent() {
                 {/* Header */}
                 <div className="text-center mb-12">
                     <h1 className="text-3xl md:text-5xl font-serif text-primary-dark mb-3">
-                        Our Collection
+                        {t("title")}
                     </h1>
                     <p className="text-gray-500 max-w-md mx-auto">
-                        Premium fragrances with flexible volume options
+                        {t("subtitle")}
                     </p>
                 </div>
 
@@ -113,7 +117,7 @@ function CatalogContent() {
                 <div className="flex flex-col md:flex-row gap-4 mb-10">
                     <input
                         type="text"
-                        placeholder="Search fragrances..."
+                        placeholder={t("search_placeholder")}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="input-luxury flex-1"
@@ -123,7 +127,7 @@ function CatalogContent() {
                         onChange={(e) => setCategoryFilter(e.target.value)}
                         className="input-luxury md:w-48"
                     >
-                        <option value="">All Categories</option>
+                        <option value="">{tCommon("all_categories")}</option>
                         {categories.map((c) => (
                             <option key={c.id} value={c.id}>{c.name}</option>
                         ))}
@@ -133,7 +137,7 @@ function CatalogContent() {
                         onChange={(e) => setBrandFilter(e.target.value)}
                         className="input-luxury md:w-48"
                     >
-                        <option value="">All Brands</option>
+                        <option value="">{tCommon("all_brands")}</option>
                         {brands.map((b) => (
                             <option key={b} value={b}>{b}</option>
                         ))}
@@ -145,7 +149,7 @@ function CatalogContent() {
                             onChange={(e) => setInStockOnly(e.target.checked)}
                             className="accent-[#D4AF37]"
                         />
-                        In Stock Only
+                        {tCommon("in_stock_only")}
                     </label>
                 </div>
 
@@ -156,8 +160,8 @@ function CatalogContent() {
                     </div>
                 ) : products.length === 0 ? (
                     <div className="text-center py-20">
-                        <p className="text-gray-400 text-lg">No products found</p>
-                        <p className="text-gray-300 text-sm mt-2">Try adjusting your search or filters</p>
+                        <p className="text-gray-400 text-lg">{t("no_products")}</p>
+                        <p className="text-gray-300 text-sm mt-2">{t("no_products_hint")}</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -168,7 +172,7 @@ function CatalogContent() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.05, duration: 0.5 }}
                             >
-                                <Link href={`/product/${product.id}`}>
+                                <Link href={`/${locale}/product/${product.id}`}>
                                     <div className="product-card group cursor-pointer">
                                         <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
                                             <SafeImage
@@ -179,12 +183,12 @@ function CatalogContent() {
                                             />
                                             {product.stockWeight <= 0 && (
                                                 <span className="absolute top-3 right-3 bg-gray-900/80 text-white text-xs px-2.5 py-1 rounded-full">
-                                                    Out of Stock
+                                                    {tCommon("out_of_stock")}
                                                 </span>
                                             )}
                                             {product.stockWeight > 0 && product.stockWeight <= product.lowStockThreshold && (
                                                 <span className="absolute top-3 right-3 bg-red-500/90 text-white text-xs px-2.5 py-1 rounded-full">
-                                                    Low Stock
+                                                    {tCommon("low_stock")}
                                                 </span>
                                             )}
                                         </div>
@@ -204,11 +208,11 @@ function CatalogContent() {
                                                         {Number(product.basePrice).toLocaleString()} DA
                                                     </p>
                                                     <p className="text-gray-400 text-xs mt-0.5">
-                                                        Per 100ml reference
+                                                        {tCommon("per_100ml")}
                                                     </p>
                                                 </div>
                                                 <span className="text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    View →
+                                                    {tBtn("view")} →
                                                 </span>
                                             </div>
                                         </div>
@@ -230,7 +234,7 @@ function CatalogContent() {
                             {loadingMore ? (
                                 <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                             ) : null}
-                            {loadingMore ? "Loading..." : "Discover More"}
+                            {loadingMore ? tBtn("loading") : t("discover_more")}
                         </button>
                     </div>
                 )}

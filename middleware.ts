@@ -3,12 +3,9 @@ import type { NextRequest } from "next/server";
 import { verifyJwtToken } from "./lib/auth";
 import { isRateLimited } from "./lib/rate-limit";
 import createMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
 
-const intlMiddleware = createMiddleware({
-    locales: ['fr', 'ar'],
-    defaultLocale: 'fr',
-    localePrefix: 'always'
-});
+const intlMiddleware = createMiddleware(routing);
 
 export const config = {
     matcher: ["/((?!api|_next|.*\\..*).*)", "/admin/:path*", "/account/:path*", "/api/:path*"],

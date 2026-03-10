@@ -91,7 +91,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                                 : "bg-primary text-white hover:bg-primary-dark"
                                 }`}
                         >
-                            Register
+                            {b('register')}
                         </Link>
                     )}
 
@@ -198,7 +198,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                                 onClick={() => setMobileOpen(false)}
                                 className="block mt-4 text-center text-sm px-5 py-2.5 rounded-full bg-primary text-white"
                             >
-                                Register
+                                {b('register')}
                             </Link>
                         )}
                         {customerName && (
@@ -208,7 +208,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                                 onClick={() => setMobileOpen(false)}
                                 className="block mt-4 text-center text-sm px-5 py-2.5 rounded-full bg-primary text-white"
                             >
-                                My Account ({customerName.split(' ')[0]})
+                                {b('my_account')} ({customerName.split(' ')[0]})
                             </Link>
                         )}
                     </div>

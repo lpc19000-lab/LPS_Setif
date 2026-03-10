@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import SafeImage from "@/components/SafeImage";
+import { useTranslations, useLocale } from "next-intl";
 
 interface Product {
     id: string;
@@ -15,6 +16,7 @@ interface Product {
 }
 
 function ProductCard({ product, i }: { product: Product; i: number }) {
+    const locale = useLocale();
     return (
         <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -22,7 +24,7 @@ function ProductCard({ product, i }: { product: Product; i: number }) {
             viewport={{ once: true }}
             transition={{ delay: i * 0.08, duration: 0.5 }}
         >
-            <Link href={`/product/${product.slug || product.id}`} prefetch={true}>
+            <Link href={`/${locale}/product/${product.slug || product.id}`} prefetch={true}>
                 <div className="product-card group cursor-pointer">
                     <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
                         <SafeImage
@@ -52,6 +54,8 @@ function ProductCard({ product, i }: { product: Product; i: number }) {
 }
 
 export function ProductSection({ title, subtitle, products }: { title: string; subtitle: string; products: Product[] }) {
+    const locale = useLocale();
+    const t = useTranslations("catalog");
     if (products.length === 0) return null;
     return (
         <section className="py-20 bg-[#FAFAF8]">
@@ -73,11 +77,11 @@ export function ProductSection({ title, subtitle, products }: { title: string; s
                 </div>
                 <div className="text-center mt-10">
                     <Link
-                        href="/catalog"
+                        href={`/${locale}/catalog`}
                         prefetch={true}
                         className="inline-block px-8 py-3 border border-primary/30 text-primary rounded-full text-sm uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-300"
                     >
-                        View All
+                        {t("discover_more")}
                     </Link>
                 </div>
             </div>
@@ -85,25 +89,27 @@ export function ProductSection({ title, subtitle, products }: { title: string; s
     );
 }
 
-const features = [
-    {
-        icon: "✦",
-        title: "Bulk Fragrances",
-        desc: "High-quality bulk perfumes for wholesalers across Algeria.",
-    },
-    {
-        icon: "◆",
-        title: "Flexible Volume",
-        desc: "Order precisely the amount you need with our ml-based system.",
-    },
-    {
-        icon: "❖",
-        title: "Fast Delivery",
-        desc: "Nationwide delivery across all 58 wilayas within 48 hours.",
-    },
-];
-
 export function FeaturesSection() {
+    const t = useTranslations("home");
+
+    const features = [
+        {
+            icon: "✦",
+            titleKey: "Parfums en Gros",
+            descKey: "Parfums de haute qualité en gros pour les revendeurs à travers l'Algérie.",
+        },
+        {
+            icon: "◆",
+            titleKey: "Volume Flexible",
+            descKey: "Commandez exactement la quantité dont vous avez besoin avec notre système au ml.",
+        },
+        {
+            icon: "❖",
+            titleKey: "Livraison Rapide",
+            descKey: "Livraison nationale dans les 58 wilayas sous 48 heures.",
+        },
+    ];
+
     return (
         <section className="py-24 bg-white">
             <div className="max-w-6xl mx-auto px-6">
@@ -114,7 +120,7 @@ export function FeaturesSection() {
                     transition={{ duration: 0.7 }}
                     className="text-center text-3xl md:text-4xl font-serif text-primary-dark mb-4"
                 >
-                    Why LPS Perfume?
+                    {t("features_title")}
                 </motion.h2>
                 <motion.p
                     initial={{ opacity: 0 }}
@@ -123,7 +129,7 @@ export function FeaturesSection() {
                     transition={{ delay: 0.2, duration: 0.7 }}
                     className="text-center text-gray-500 mb-16 max-w-lg mx-auto"
                 >
-                    Algeria&apos;s premier B2B perfume distribution platform
+                    {t("hero_subtitle")}
                 </motion.p>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -137,8 +143,8 @@ export function FeaturesSection() {
                             className="text-center p-8 rounded-2xl bg-[#FAFAF8] border border-gray-100 hover:border-primary/20 transition-all duration-500 hover:shadow-lg"
                         >
                             <span className="text-primary text-3xl mb-4 block">{f.icon}</span>
-                            <h3 className="text-lg font-serif font-semibold text-gray-800 mb-2">{f.title}</h3>
-                            <p className="text-gray-500 text-sm leading-relaxed">{f.desc}</p>
+                            <h3 className="text-lg font-serif font-semibold text-gray-800 mb-2">{f.titleKey}</h3>
+                            <p className="text-gray-500 text-sm leading-relaxed">{f.descKey}</p>
                         </motion.div>
                     ))}
                 </div>
@@ -148,6 +154,10 @@ export function FeaturesSection() {
 }
 
 export function CTASection() {
+    const locale = useLocale();
+    const t = useTranslations("home");
+    const b = useTranslations("common.buttons");
+
     return (
         <section className="py-24 bg-[#121212] text-center">
             <motion.div
@@ -158,26 +168,25 @@ export function CTASection() {
                 className="max-w-2xl mx-auto px-6"
             >
                 <h2 className="text-[#D4AF37] text-3xl md:text-5xl font-serif font-bold mb-6">
-                    Ready to Partner?
+                    {t("cta_title")}
                 </h2>
                 <p className="text-white/60 text-lg mb-10 leading-relaxed">
-                    Join hundreds of retailers across Algeria. Register today and access
-                    exclusive wholesale pricing on premium fragrances.
+                    {t("cta_subtitle")}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link
-                        href="/register"
+                        href={`/${locale}/register`}
                         prefetch={true}
                         className="px-8 py-3.5 bg-[#D4AF37] text-white rounded-full font-medium hover:bg-[#B8860B] transition-all duration-300 text-sm uppercase tracking-widest"
                     >
-                        Register Now
+                        {b("register")}
                     </Link>
                     <Link
-                        href="/catalog"
+                        href={`/${locale}/catalog`}
                         prefetch={true}
                         className="px-8 py-3.5 border border-white/20 text-white/80 rounded-full font-medium hover:border-[#D4AF37]/50 hover:text-[#D4AF37] transition-all duration-300 text-sm uppercase tracking-widest"
                     >
-                        Browse Catalog
+                        {t("cta_subtitle").includes("الجملة") ? "تصفح الكتالوج" : "Parcourir le Catalogue"}
                     </Link>
                 </div>
             </motion.div>

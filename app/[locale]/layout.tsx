@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Playfair_Display, Inter, Noto_Sans_Arabic } from "next/font/google";
 import "../globals.css";
 import Navbar from "@/components/Navbar";
 import { getCustomerSession } from "@/lib/customer-auth";
@@ -8,6 +8,7 @@ import ToastContainer from "@/components/ui/Toast";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { routing } from '@/i18n/routing';
 
 const playfair = Playfair_Display({
     subsets: ["latin"],
@@ -17,6 +18,12 @@ const playfair = Playfair_Display({
 const inter = Inter({
     subsets: ["latin"],
     variable: "--font-sans",
+});
+
+const notoArabic = Noto_Sans_Arabic({
+    subsets: ["arabic"],
+    variable: "--font-arabic",
+    weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -35,7 +42,7 @@ export default async function RootLayout({
     const { locale } = await params;
 
     // Validate that the incoming `locale` is supported
-    if (!['fr', 'ar'].includes(locale)) {
+    if (!routing.locales.includes(locale as any)) {
         notFound();
     }
 
@@ -46,7 +53,7 @@ export default async function RootLayout({
     return (
         <html lang={locale} dir={direction}>
             <body
-                className={`${playfair.variable} ${inter.variable} font-sans antialiased`}
+                className={`${playfair.variable} ${inter.variable} ${notoArabic.variable} ${locale === 'ar' ? 'font-arabic' : 'font-sans'} antialiased`}
             >
                 <NextIntlClientProvider messages={messages}>
                     <CartProvider>
