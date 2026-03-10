@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, ChevronRight, Trash2, ArrowRight, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
 import { useCart } from "@/context/CartContext";
 import SafeImage from "@/components/SafeImage";
 
-
-
 export default function CartPage() {
+    const { items, totalPrice, updateQuantity, removeItem } = useCart();
+    const [mounted, setMounted] = useState(false);
     const t = useTranslations("cart");
     const locale = useLocale();
     const isRtl = locale === 'ar';
@@ -91,14 +91,12 @@ export default function CartPage() {
                                         transition={{ duration: 0.4, delay: i * 0.05 }}
                                         className="bg-white rounded-3xl p-6 flex flex-col sm:flex-row items-center gap-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative group"
                                     >
-                                        <div className="w-32 h-32 rounded-2xl bg-gray-50 overflow-hidden flex-shrink-0 border border-gray-100 p-3 self-start sm:self-center">
-                                            <SafeImage
-                                                src={item.product.image_url || item.product.imageUrl || ""}
-                                                alt={item.product.name}
-                                                fill
-                                                className="object-contain group-hover:scale-110 transition-transform duration-700"
-                                            />
-                                        </div>
+                                        <SafeImage
+                                            src={item.product.imageUrl || ""}
+                                            alt={item.product.name}
+                                            fill
+                                            className="object-contain group-hover:scale-110 transition-transform duration-700"
+                                        />
 
                                         <div className="flex-1 min-w-0 w-full">
                                             <div className="flex items-start justify-between mb-4">

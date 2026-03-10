@@ -2,7 +2,7 @@
 
 import { useCart } from "@/context/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingBag, ArrowRight } from "lucide-react";
+import { X, ShoppingBag, ArrowRight, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import SafeImage from "@/components/SafeImage";
@@ -89,7 +89,7 @@ export default function MiniCart() {
                                     >
                                         <div className="w-20 h-20 bg-gray-50 rounded-xl p-2 border border-gray-100 flex-shrink-0 relative overflow-hidden">
                                             <SafeImage
-                                                src={item.product.image_url || item.product.imageUrl}
+                                                src={item.product.imageUrl}
                                                 alt={item.product.name}
                                                 fill
                                                 className="object-contain group-hover:scale-110 transition-transform duration-500"
