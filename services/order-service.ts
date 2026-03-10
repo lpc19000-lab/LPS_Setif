@@ -163,8 +163,8 @@ export const createOrder = async (input: CreateOrderInput) => {
     });
 
     // Post-transaction: Clear cache
-    revalidateTag(`orders:${input.customerId}`);
-    revalidateTag("orders");
+    revalidateTag(`orders:${input.customerId}`, "max");
+    revalidateTag("orders", "max");
 
     // Post-transaction: Trigger notifications
     try {
@@ -254,8 +254,8 @@ export const updateOrderStatus = async (
         });
 
         // After status update
-        revalidateTag(`orders:${order.customerId}`);
-        revalidateTag("orders");
+        revalidateTag(`orders:${order.customerId}`, "max");
+        revalidateTag("orders", "max");
 
         return await tx.order.update({
             where: { id: orderId },

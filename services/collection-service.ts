@@ -42,7 +42,7 @@ export const getCollectionBySlug = async (slug: string) => {
 export const createCollection = async (data: { name: string }) => {
     const slug = generateSlug(data.name);
     const result = await prisma.collection.create({ data: { name: data.name, slug } });
-    revalidateTag('collections');
+    revalidateTag('collections', "max");
     return result;
 };
 
@@ -50,13 +50,13 @@ export const createCollection = async (data: { name: string }) => {
 export const updateCollection = async (id: string, data: { name: string }) => {
     const slug = generateSlug(data.name);
     const result = await prisma.collection.update({ where: { id }, data: { name: data.name, slug } });
-    revalidateTag('collections');
+    revalidateTag('collections', "max");
     return result;
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteCollection = async (id: string) => {
     const result = await prisma.collection.delete({ where: { id } });
-    revalidateTag('collections');
+    revalidateTag('collections', "max");
     return result;
 };

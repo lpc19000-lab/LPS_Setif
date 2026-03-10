@@ -35,7 +35,7 @@ export async function cancelOrderAction(orderId: string) {
 
         revalidatePath(`/account/orders/${orderId}`);
         revalidatePath("/account/orders");
-        revalidateTag("products");
+        revalidateTag("products", "max");
 
         return { success: true };
     } catch (error) {
@@ -51,7 +51,7 @@ export async function adminUpdateOrderStatus(orderId: string, status: OrderStatu
         revalidatePath("/admin/orders");
         revalidatePath(`/account/orders/${orderId}`);
         revalidatePath("/account/orders");
-        revalidateTag("products");
+        revalidateTag("products", "max");
 
         return { success: true };
     } catch (error) {

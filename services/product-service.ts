@@ -439,7 +439,7 @@ export const updateProduct = async (
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteProduct = async (id: string) => {
     const result = await prisma.product.delete({ where: { id } });
-    revalidateTag('products');
+    revalidateTag('products', "max");
     return result;
 };
 

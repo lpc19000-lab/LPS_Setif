@@ -52,7 +52,7 @@ export const createCategory = async (data: {
 }) => {
     const slug = generateSlug(data.name);
     const result = await prisma.category.create({ data: { ...data, slug } });
-    revalidateTag('categories');
+    revalidateTag('categories', "max");
     return result;
 };
 
@@ -66,13 +66,13 @@ export const updateCategory = async (
         updateData.slug = generateSlug(data.name);
     }
     const result = await prisma.category.update({ where: { id }, data: updateData });
-    revalidateTag('categories');
+    revalidateTag('categories', "max");
     return result;
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteCategory = async (id: string) => {
     const result = await prisma.category.delete({ where: { id } });
-    revalidateTag('categories');
+    revalidateTag('categories', "max");
     return result;
 };
