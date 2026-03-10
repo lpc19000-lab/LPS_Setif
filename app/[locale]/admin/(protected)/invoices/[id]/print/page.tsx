@@ -4,8 +4,8 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-export default async function InvoicePrintPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
+export default async function InvoicePrintPage({ params }: { params: { id: string, locale: string } }) {
+    const { id } = params;
     const invoice = await prisma.invoice.findUnique({
         where: { id },
         include: {

@@ -26,8 +26,8 @@ export const dynamic = "force-dynamic";
 
 const STATUS_STEPS = ["PENDING", "CONFIRMED", "PACKED", "SHIPPED", "DELIVERED"];
 
-export default async function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id, locale } = await params;
+export default async function OrderDetailsPage({ params }: { params: { id: string, locale: string } }) {
+    const { id, locale } = params;
     const t = await getTranslations({ locale, namespace: "account" });
     const com = await getTranslations({ locale, namespace: "common" });
     const ch = await getTranslations({ locale, namespace: "checkout" });
