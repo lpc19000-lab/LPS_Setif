@@ -10,7 +10,11 @@ import {
     CheckCircle2,
     Truck,
     XCircle,
-import { Package, ArrowLeft, ArrowRight, ChevronLeft } from "lucide-react";
+    Package,
+    ArrowLeft,
+    ArrowRight,
+    ChevronLeft
+} from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 

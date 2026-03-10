@@ -73,7 +73,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                     <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
                         <div className="flex items-center gap-4 mb-8">
                             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl font-serif font-bold">
-                                {customer.name.charAt(0)}
+                                {(customer.name || "?").charAt(0)}
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold text-gray-900">{customer.shopName}</h2>

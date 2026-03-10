@@ -1,7 +1,13 @@
 import { SignJWT, jwtVerify } from "jose";
 
 export const getJwtSecretKey = () => {
-    const secret = process.env.JWT_SECRET || "fallback_super_secret_for_development_must_change";
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        if (process.env.NODE_ENV === "production") {
+            throw new Error("JWT_SECRET environment variable is not set");
+        }
+        return new TextEncoder().encode("development_only_secret_12345678");
+    }
     return new TextEncoder().encode(secret);
 };
 
