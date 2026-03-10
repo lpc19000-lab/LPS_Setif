@@ -10,6 +10,7 @@ import WilayaSelector from "@/components/WilayaSelector";
 export default function CheckoutPage() {
     const router = useRouter();
     const t = useTranslations("checkout");
+    const tCommon = useTranslations("common.labels");
     const locale = useLocale();
     const { items, totalPrice, clearCart } = useCart();
     const [mounted, setMounted] = useState(false);
@@ -208,7 +209,7 @@ export default function CheckoutPage() {
                                                     {item.product.name}
                                                 </p>
                                                 <p className="text-gray-400 text-sm">
-                                                    {t("qty")}: {item.quantity} × {Number(item.product.basePrice).toLocaleString()} DA
+                                                    {t("qty")}: {item.quantity} × {Number(item.product.basePrice).toLocaleString()} {tCommon("currency")}
                                                 </p>
                                                 <p className="text-[10px] text-primary font-bold">
                                                     {item.product.weight >= 1000 ? `${item.product.weight / 1000}kg` : `${item.product.weight}g`}
@@ -218,7 +219,7 @@ export default function CheckoutPage() {
                                                 {(
                                                     Number(item.product.basePrice) * item.quantity
                                                 ).toLocaleString()}{" "}
-                                                DA
+                                                {tCommon("currency")}
                                             </p>
                                         </div>
                                     ))}
@@ -229,7 +230,7 @@ export default function CheckoutPage() {
                                 <div className="flex justify-between items-center text-lg mb-4">
                                     <span className="font-serif text-gray-800">{t("total")}</span>
                                     <span className="font-bold text-primary-dark text-2xl">
-                                        {totalPrice.toLocaleString()} DA
+                                        {totalPrice.toLocaleString()} {tCommon("currency")}
                                     </span>
                                 </div>
                                 <div className="text-sm">

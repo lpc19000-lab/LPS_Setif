@@ -208,7 +208,7 @@ function CatalogContent() {
                                             <div className="flex items-end justify-between">
                                                 <div>
                                                     <p className="text-primary-dark font-bold text-xl">
-                                                        {Number(product.basePrice).toLocaleString()} DA
+                                                        {Number(product.basePrice).toLocaleString()} {tCommon("currency")}
                                                     </p>
                                                     <p className="text-gray-400 text-xs mt-0.5">
                                                         {tCommon("per_100ml")}

@@ -11,6 +11,7 @@ import { useTranslations, useLocale } from "next-intl";
 export default function MiniCart() {
     const { isCartOpen, setIsCartOpen, items, totalQuantity, totalPrice, removeItem, updateQuantity } = useCart();
     const t = useTranslations("cart");
+    const com = useTranslations("common");
     const locale = useLocale();
     const isRtl = locale === "ar";
 
@@ -134,7 +135,7 @@ export default function MiniCart() {
                                                     </button>
                                                 </div>
                                                 <p className="text-sm font-bold text-gray-950">
-                                                    {(Number(item.product.basePrice) * item.quantity).toLocaleString()} <span className="text-[10px] text-gray-400 font-normal">DA</span>
+                                                    {(Number(item.product.basePrice) * item.quantity).toLocaleString()} <span className="text-[10px] text-gray-400 font-normal">{com('currency')}</span>
                                                 </p>
                                             </div>
                                         </div>
@@ -149,7 +150,7 @@ export default function MiniCart() {
                                 <div className="space-y-3 mb-6">
                                     <div className="flex justify-between items-center text-sm">
                                         <p className="text-gray-400 font-medium">{t("subtotal_products")}</p>
-                                        <p className="font-bold text-gray-900">{totalPrice.toLocaleString()} DA</p>
+                                        <p className="font-bold text-gray-900">{totalPrice.toLocaleString()} {com('currency')}</p>
                                     </div>
                                     <div className="flex justify-between items-center text-sm">
                                         <p className="text-gray-400 font-medium">{t("shipping_fees")}</p>
@@ -158,7 +159,7 @@ export default function MiniCart() {
                                     <div className="pt-3 border-t border-gray-100 flex justify-between items-end">
                                         <p className="text-gray-900 font-bold">{t("grand_total")}</p>
                                         <p className="text-2xl font-serif font-bold text-primary-dark">
-                                            {totalPrice.toLocaleString()} <span className="text-xs text-gray-400 font-sans">DA</span>
+                                            {totalPrice.toLocaleString()} <span className="text-xs text-gray-400 font-sans">{com('currency')}</span>
                                         </p>
                                     </div>
                                 </div>

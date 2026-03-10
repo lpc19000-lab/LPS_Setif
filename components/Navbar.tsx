@@ -57,13 +57,13 @@ export default function Navbar({ customerName }: Readonly<NavbarProps>) {
                         className={`font-serif text-2xl font-bold tracking-wider ${isHeroPage ? "text-[#D4AF37]" : "text-primary-dark"
                             }`}
                     >
-                        LPS
+                        {t('lps')}
                     </span>
                     <span
                         className={`text-xs uppercase tracking-[0.3em] ${isHeroPage ? "text-white/60" : "text-gray-400"
                             }`}
                     >
-                        Perfume
+                        {t('perfume')}
                     </span>
                 </Link>
 
@@ -128,7 +128,7 @@ export default function Navbar({ customerName }: Readonly<NavbarProps>) {
                     {/* Admin Portal Icon */}
                     <Link
                         href={`/${locale}/admin/login`}
-                        title="Admin Portal"
+                        title={t('admin_portal')}
                         prefetch={true}
                         className={`p-2 rounded-full transition-all duration-300 ${isHeroPage
                             ? "text-white/50 hover:text-[#D4AF37] hover:bg-white/5"

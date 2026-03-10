@@ -95,18 +95,18 @@ export function FeaturesSection() {
     const features = [
         {
             icon: "✦",
-            titleKey: "Parfums en Gros",
-            descKey: "Parfums de haute qualité en gros pour les revendeurs à travers l'Algérie.",
+            titleKey: "features.wholesale_title",
+            descKey: "features.wholesale_desc",
         },
         {
             icon: "◆",
-            titleKey: "Volume Flexible",
-            descKey: "Commandez exactement la quantité dont vous avez besoin avec notre système au ml.",
+            titleKey: "features.flexible_title",
+            descKey: "features.flexible_desc",
         },
         {
             icon: "❖",
-            titleKey: "Livraison Rapide",
-            descKey: "Livraison nationale dans les 58 wilayas sous 48 heures.",
+            titleKey: "features.fast_delivery_title",
+            descKey: "features.fast_delivery_desc",
         },
     ];
 
@@ -143,8 +143,8 @@ export function FeaturesSection() {
                             className="text-center p-8 rounded-2xl bg-[#FAFAF8] border border-gray-100 hover:border-primary/20 transition-all duration-500 hover:shadow-lg"
                         >
                             <span className="text-primary text-3xl mb-4 block">{f.icon}</span>
-                            <h3 className="text-lg font-serif font-semibold text-gray-800 mb-2">{f.titleKey}</h3>
-                            <p className="text-gray-500 text-sm leading-relaxed">{f.descKey}</p>
+                            <h3 className="text-lg font-serif font-semibold text-gray-800 mb-2">{t(f.titleKey)}</h3>
+                            <p className="text-gray-500 text-sm leading-relaxed">{t(f.descKey)}</p>
                         </motion.div>
                     ))}
                 </div>
@@ -186,7 +186,7 @@ export function CTASection() {
                         prefetch={true}
                         className="px-8 py-3.5 border border-white/20 text-white/80 rounded-full font-medium hover:border-[#D4AF37]/50 hover:text-[#D4AF37] transition-all duration-300 text-sm uppercase tracking-widest"
                     >
-                        {t("cta_subtitle").includes("الجملة") ? "تصفح الكتالوج" : "Parcourir le Catalogue"}
+                        {t("cta_browse_catalog")}
                     </Link>
                 </div>
             </motion.div>

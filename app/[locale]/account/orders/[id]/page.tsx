@@ -20,18 +20,22 @@ import { notFound, redirect } from "next/navigation";
 import ReorderButton from "@/components/shop/ReorderButton";
 import CancelOrderButton from "@/components/shop/CancelOrderButton";
 import SafeImage from "@/components/SafeImage";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 const STATUS_STEPS = ["PENDING", "CONFIRMED", "PACKED", "SHIPPED", "DELIVERED"];
 
 export default async function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
+    const { id, locale } = await params;
+    const t = await getTranslations({ locale, namespace: "account" });
+    const com = await getTranslations({ locale, namespace: "common" });
+    const ch = await getTranslations({ locale, namespace: "checkout" });
     const customer = await requireCustomerSession();
     const order = await getOrderById(id);
 
     if (!order) notFound();
-    if (order.customerId !== customer.id) redirect("/account/orders");
+    if (order.customerId !== customer.id) redirect(`/${locale}/account/orders`);
 
     const currentStepIndex = STATUS_STEPS.indexOf(order.status);
     const isCancelled = order.status === "CANCELLED";
@@ -43,18 +47,18 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                 <div className="flex items-center gap-4">
                     <Link
-                        href="/account/orders"
+                        href={`/${locale}/account/orders`}
                         className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary/20 transition-all"
                     >
-                        <ArrowLeft className="w-5 h-5" />
+                        <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
                     </Link>
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Order Information</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{t("order_info")}</span>
                             <span className="w-1 h-1 rounded-full bg-gray-300"></span>
                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">#{order.id.slice(-8).toUpperCase()}</span>
                         </div>
-                        <h1 className="text-3xl font-serif font-bold text-primary-dark">Shipment Tracking</h1>
+                        <h1 className="text-3xl font-serif font-bold text-primary-dark">{t("shipment_tracking")}</h1>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -63,7 +67,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                         className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all"
                     >
                         <FileText className="w-4 h-4" />
-                        Download Invoice
+                        {t("download_invoice")}
                     </Link>
                     {canCancel && <CancelOrderButton orderId={order.id} />}
                     <ReorderButton orderId={order.id} />
@@ -77,8 +81,8 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                         <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center text-red-600 mb-4 animate-pulse">
                             <Truck className="w-10 h-10 opacity-20" />
                         </div>
-                        <h3 className="text-2xl font-serif font-bold text-red-600">Order Cancelled</h3>
-                        <p className="text-gray-500 mt-2 max-w-md">This order has been cancelled and inventory has been restored. If you believe this is an error, please contact support.</p>
+                        <h3 className="text-2xl font-serif font-bold text-red-600">{t("order_cancelled")}</h3>
+                        <p className="text-gray-500 mt-2 max-w-md">{t("order_cancelled_desc")}</p>
                     </div>
                 ) : (
                     <div className="relative">
@@ -104,10 +108,10 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                                         </div>
                                         <div className="text-left md:text-center">
                                             <p className={`text-[10px] font-black uppercase tracking-widest ${isCompleted ? "text-primary" : "text-gray-400"}`}>
-                                                {step}
+                                                {t(`status.${step}`)}
                                             </p>
                                             {isActive && (
-                                                <p className="text-[9px] font-medium text-gray-400 mt-0.5 hidden md:block">Current Status</p>
+                                                <p className="text-[9px] font-medium text-gray-400 mt-0.5 hidden md:block">{t("current_status")}</p>
                                             )}
                                         </div>
                                     </div>
@@ -125,9 +129,9 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                         <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
                             <h3 className="font-bold text-gray-900 flex items-center gap-2">
                                 <Boxes className="w-5 h-5 text-primary" />
-                                Products Ordered
+                                {t("products_ordered")}
                             </h3>
-                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{order.items.length} Items</span>
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t("items_count", { count: order.items.length })}</span>
                         </div>
                         <div className="divide-y divide-gray-50">
                             {order.items.map((item) => (
@@ -145,14 +149,14 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                                         <p className="text-xs text-gray-500 mt-1">{item.product.brand}</p>
                                         <div className="flex items-center gap-4 mt-3">
                                             <div className="bg-gray-100 px-3 py-1 rounded-full">
-                                                <p className="text-[10px] font-bold text-gray-500">Qty: {item.quantity}</p>
+                                                <p className="text-[10px] font-bold text-gray-500">{ch("qty")}: {item.quantity}</p>
                                             </div>
-                                            <p className="text-sm font-bold text-gray-900">{Number(item.price).toLocaleString()} DA <span className="text-[10px] font-normal text-gray-400">/ unit</span></p>
+                                            <p className="text-sm font-bold text-gray-900">{Number(item.price).toLocaleString()} {com("labels.currency")} <span className="text-[10px] font-normal text-gray-400">{t("per_unit_label")}</span></p>
                                         </div>
                                     </div>
                                     <div className="text-right hidden sm:block">
-                                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Subtotal</p>
-                                        <p className="text-lg font-bold text-primary">{(Number(item.price) * item.quantity).toLocaleString()} DA</p>
+                                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">{t("subtotal")}</p>
+                                        <p className="text-lg font-bold text-primary">{(Number(item.price) * item.quantity).toLocaleString()} {com("labels.currency")}</p>
                                     </div>
                                 </div>
                             ))}
@@ -165,25 +169,25 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                     <div className="bg-[#1A1A1A] text-white p-8 rounded-3xl relative overflow-hidden group">
                         <h3 className="text-xl font-serif font-bold mb-8 italic flex items-center gap-2 relative z-10">
                             <ShoppingCart className="w-6 h-6 text-[#D4AF37]" />
-                            Order Summary
+                            {t("order_summary")}
                         </h3>
 
                         <div className="space-y-4 relative z-10">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-400">Subtotal</span>
-                                <span className="font-bold">{Number(order.totalPrice).toLocaleString()} DA</span>
+                                <span className="text-gray-400">{t("subtotal")}</span>
+                                <span className="font-bold">{Number(order.totalPrice).toLocaleString()} {com("labels.currency")}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-400">Shipping</span>
-                                <span className="font-bold text-[#D4AF37]">Free B2B</span>
+                                <span className="text-gray-400">{t("shipping")}</span>
+                                <span className="font-bold text-[#D4AF37]">{t("free_b2b")}</span>
                             </div>
                             <div className="h-px bg-white/10 my-6"></div>
                             <div className="flex justify-between items-end">
                                 <div>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#D4AF37] mb-1">Total Amount</p>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#D4AF37] mb-1">{t("total_amount_label")}</p>
                                     <p className="text-4xl font-serif font-bold">{Number(order.totalPrice).toLocaleString()}</p>
                                 </div>
-                                <span className="text-xs text-gray-400 mb-1">DA</span>
+                                <span className="text-xs text-gray-400 mb-1">{com("labels.currency")}</span>
                             </div>
                         </div>
 
@@ -194,7 +198,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                     </div>
 
                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                        <h4 className="font-bold text-gray-900 mb-4 text-sm">Delivery Information</h4>
+                        <h4 className="font-bold text-gray-900 mb-4 text-sm">{t("delivery_info")}</h4>
                         <div className="space-y-4 text-xs">
                             <div className="flex gap-3">
                                 <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
@@ -205,9 +209,9 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                             </div>
                             {order.trackingNumber && (
                                 <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
-                                    <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Tracking Number</p>
+                                    <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">{t("tracking_number_label")}</p>
                                     <p className="text-sm font-bold text-blue-900">{order.trackingNumber}</p>
-                                    <p className="text-[10px] text-blue-400 mt-1">Status: Ship with {order.shippingCompany}</p>
+                                    <p className="text-[10px] text-blue-400 mt-1">{t("ship_with_label", { company: order.shippingCompany })}</p>
                                 </div>
                             )}
                         </div>

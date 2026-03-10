@@ -1,5 +1,5 @@
-import prisma from './lib/db.ts';
-import { getActiveProducts } from './services/product-service.ts';
+import prisma from '../lib/db';
+import { getActiveProducts } from '../services/product-service';
 
 async function test() {
     try {

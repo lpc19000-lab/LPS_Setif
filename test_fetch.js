@@ -1,4 +1,4 @@
-import prisma from './lib/db.ts';
+import prisma from './lib/db';
 
 async function test() {
     try {

@@ -5,7 +5,10 @@
             "boutique": "المتجر",
             "panier": "سلة التسوق",
             "compte": "الحساب",
-            "admin": "لوحة التحكم"
+            "admin": "لوحة التحكم",
+            "admin_portal": "بوابة الإدارة",
+            "perfume": "عطور",
+            "lps": "LPS"
         },
         "buttons": {
             "save": "حفظ",
@@ -20,7 +23,11 @@
             "my_account": "حسابي",
             "loading": "جارٍ التحميل...",
             "discover_more": "اكتشف المزيد",
-            "view": "عرض"
+            "view": "عرض",
+            "reorder": "إعادة الطلب",
+            "confirm_cancellation": "تأكيد الإلغاء",
+            "back": "رجوع",
+            "cancel_order": "إلغاء الطلب"
         },
         "labels": {
             "all_categories": "جميع الفئات",
@@ -28,7 +35,17 @@
             "in_stock_only": "المتوفر فقط",
             "out_of_stock": "غير متوفر",
             "low_stock": "مخزون منخفض",
-            "per_100ml": "لكل 100 مل مرجعي"
+            "per_100ml": "لكل 100 مل مرجعي",
+            "currency": "دج",
+            "select_wilaya": "أختر الولاية",
+            "search_wilaya": "البحث عن ولاية...",
+            "no_results": "لم يتم العثور على نتائج",
+            "are_you_sure": "هل أنت متأكد؟"
+        },
+        "alerts": {
+            "reorder_failed": "فشل في إضافة العناصر إلى السلة",
+            "cancel_failed": "فشل إلغاء الطلب",
+            "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
         }
     },
     "registration": {
@@ -45,7 +62,10 @@
         "placeholder_shop": "الاسم التجاري للنشاط",
         "placeholder_address": "العنوان الكامل، الشارع والحي",
         "already_registered": "مسجل بالفعل؟",
-        "sign_in_link": "سجل الدخول إلى حسابك"
+        "sign_in_link": "سجل الدخول إلى حسابك",
+        "placeholder_phone": "05 / 06 / 07 ...",
+        "error_registration_failed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
+        "error_generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
     },
     "login": {
         "title": "دخول التاجر",
@@ -150,16 +170,80 @@
         "features_title": "لماذا تختارنا",
         "cta_title": "انضم إلى شبكتنا",
         "cta_subtitle": "ابدأ ببيع العطور الفاخرة اليوم",
+        "cta_browse_catalog": "تصفح الكتالوج",
+        "hero": {
+            "title_part1": "جوهر",
+            "title_part2": "الفخامة العالمية",
+            "subtitle": "الوجهة الأولى لتجارة الجملة للعطور الفاخرة في الجزائر. الحصرية والأناقة والتميز في كل زجاجة.",
+            "browse_collections": "تصفح المجموعات",
+            "become_partner": "كن شريكاً معنا"
+        },
+        "features": {
+            "wholesale_title": "عطور بالجملة",
+            "wholesale_desc": "عطور عالية الجودة بالجملة للموزعين في جميع أنحاء الجزائر.",
+            "flexible_title": "حجم مرن",
+            "flexible_desc": "اطلب بالضبط الكمية التي تحتاجها من خلال نظامنا بالملل.",
+            "fast_delivery_title": "توصيل سريع",
+            "fast_delivery_desc": "توصيل وطني في 58 ولاية خلال 48 ساعة."
+        },
         "footer_rights": "جميع الحقوق محفوظة"
     },
     "account": {
         "title": "حسابي",
+        "trader_account": "حساب التاجر",
         "orders": "طلباتي",
         "saved_cart": "السلة المحفوظة",
         "no_orders": "لا توجد طلبات حتى الآن",
+        "no_orders_placed": "لم يتم تقديم أي طلبات بعد.",
         "order_id": "الطلب",
         "order_date": "التاريخ",
         "order_status": "الحالة",
-        "order_total": "الإجمالي"
+        "order_total": "الإجمالي",
+        "total_orders": "إجمالي الطلبات",
+        "total_spent": "إجمالي المنفق",
+        "welcome_back": "مرحباً بعودتك،",
+        "phone_number": "رقم الهاتف",
+        "business_address": "عنوان العمل",
+        "items_count": "{count} عناصر",
+        "more_items": "+ {count} أخرى",
+        "review_checkout": "المراجعة والدفع",
+        "stock_ready": "المخزون جاهز",
+        "browse_catalog": "تصفح الكتالوج",
+        "recent_orders": "الطلبات الأخيرة",
+        "view_all": "عرض الكل",
+        "order_history": "سجل الطلبات",
+        "order_history_subtitle": "إدارة وتتبع شحنات الجملة الخاصة بك.",
+        "no_orders_found": "لم يتم العثور على طلبات",
+        "no_orders_hint": "لم تقم بتقديم أي طلبات بعد. تفضل بزيارة متجرنا لتصفح أحدث مجموعاتنا.",
+        "start_shopping": "ابدأ التسوق",
+        "order_id_label": "رقم الطلب",
+        "date_label": "التاريخ",
+        "status_label": "الحالة",
+        "total_amount_label": "المبلغ الإجمالي",
+        "action_label": "الإجراء",
+        "details_label": "التفاصيل",
+        "manage_label": "إدارة",
+        "pagination_showing": "عرض {start} إلى {end} من أصل {total} طلبات",
+        "order_info": "معلومات الطلب",
+        "shipment_tracking": "تتبع الشحنة",
+        "download_invoice": "تحميل الفاتورة",
+        "order_cancelled": "تم إلغاء الطلب",
+        "order_cancelled_desc": "تم إلغاء هذا الطلب واستعادة المخزون. إذا كنت تعتقد أن هذا خطأ، يرجى الاتصال بالدعم.",
+        "current_status": "الحالة الحالية",
+        "products_ordered": "المنتجات المطلوبة",
+        "per_unit_label": "/ وحدة",
+        "shipping": "الشحن",
+        "free_b2b": "مجاني B2B",
+        "delivery_info": "معلومات التوصيل",
+        "tracking_number_label": "رقم التتبع",
+        "ship_with_label": "تم الشحن مع {company}",
+        "status": {
+            "PENDING": "قيد الانتظار",
+            "CONFIRMED": "تم التأكيد",
+            "PACKED": "تم التغليف",
+            "SHIPPED": "تم الشحن",
+            "DELIVERED": "تم التوصيل",
+            "CANCELLED": "ملغى"
+        }
     }
 }

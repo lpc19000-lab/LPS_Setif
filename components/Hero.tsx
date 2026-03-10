@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
+import { useTranslations } from "next-intl";
 
 export default function Hero() {
+    const t = useTranslations("home");
     return (
         <section className="relative h-screen flex items-center justify-center overflow-hidden bg-black">
             {/* Fallback for background video - using a luxury image for now */}
@@ -27,20 +29,19 @@ export default function Hero() {
                     transition={{ duration: 0.8 }}
                 >
                     <span className="text-primary font-medium tracking-[0.3em] uppercase mb-4 block">
-                        LPS Perfume Setif
+                        {t('lps')} {t('perfume')} Setif
                     </span>
                     <h1 className="text-5xl md:text-7xl lg:text-8xl text-white font-serif mb-6 leading-tight">
-                        The Essence of <br />
-                        <span className="text-primary italic">Global Luxury</span>
+                        {t('hero.title_part1')} <br />
+                        <span className="text-primary italic">{t('hero.title_part2')}</span>
                     </h1>
                     <p className="max-w-2xl mx-auto text-gray-300 text-lg md:text-xl mb-10 font-light">
-                        Algeria's premier B2B destination for premium wholesale perfumes.
-                        Exclusivity, Elegance, and Excellence in every bottle.
+                        {t('hero.subtitle')}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button size="lg">Browse Collections</Button>
+                        <Button size="lg">{t('hero.browse_collections')}</Button>
                         <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-black">
-                            Become a Partner
+                            {t('hero.become_partner')}
                         </Button>
                     </div>
                 </motion.div>

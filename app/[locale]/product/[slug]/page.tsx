@@ -204,7 +204,7 @@ export default function ProductPage() {
                                         <span className="text-5xl font-bold">
                                             {(selectedVolume?.price || 0).toLocaleString()}
                                         </span>
-                                        <span className="text-xl text-gray-500 font-serif">DA</span>
+                                        <span className="text-xl text-gray-500 font-serif">{useTranslations('common')('currency')}</span>
                                         <span className="ml-4 text-gray-400 text-sm font-light tracking-wide italic">
                                             {t("per_unit")} {selectedVolume ? (selectedVolume.weight >= 1000 ? `${selectedVolume.weight / 1000}kg` : `${selectedVolume.weight}g`) : ""}
                                         </span>
@@ -221,7 +221,7 @@ export default function ProductPage() {
                                         <div className="space-y-1">
                                             <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">{t("order_total")}</p>
                                             <p className="text-lg font-bold text-[#D4AF37]">
-                                                {((selectedVolume?.price || 0) * quantity).toLocaleString()} DA
+                                                {((selectedVolume?.price || 0) * quantity).toLocaleString()} {useTranslations('common')('currency')}
                                             </p>
                                         </div>
                                     </div>

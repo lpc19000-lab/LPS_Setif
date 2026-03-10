@@ -19,7 +19,7 @@ interface ProductProps {
 
 export default function ProductCard({ product }: ProductProps) {
     const t = useTranslations("product");
-    const b = useTranslations("common.buttons");
+    const com = useTranslations("common");
     const locale = useLocale();
 
     return (
@@ -51,9 +51,9 @@ export default function ProductCard({ product }: ProductProps) {
                     <div className="flex items-center justify-between">
                         <div className="flex flex-col">
                             <span className="text-xs text-gray-400 uppercase tracking-widest">
-                                {t("base_price")} (100g)
+                                {t("base_price")} ({com("labels.per_100ml")})
                             </span>
-                            <span className="text-2xl font-semibold text-primary">{product.basePrice} DZD</span>
+                            <span className="text-2xl font-semibold text-primary">{product.basePrice} {com("labels.currency")}</span>
                         </div>
                     </div>
 

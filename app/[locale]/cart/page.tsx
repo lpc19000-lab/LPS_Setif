@@ -12,6 +12,7 @@ export default function CartPage() {
     const { items, totalPrice, updateQuantity, removeItem } = useCart();
     const [mounted, setMounted] = useState(false);
     const t = useTranslations("cart");
+    const com = useTranslations("common");
     const locale = useLocale();
     const isRtl = locale === 'ar';
 
@@ -147,7 +148,7 @@ export default function CartPage() {
                                                 <div className="text-right">
                                                     <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-1">{t("subtotal")}</p>
                                                     <p className="font-bold text-gray-900 text-2xl">
-                                                        {(Number(item.product.basePrice) * item.quantity).toLocaleString()} <span className="text-sm text-gray-400 font-normal">DA</span>
+                                                        {(Number(item.product.basePrice) * item.quantity).toLocaleString()} <span className="text-sm text-gray-400 font-normal">{useTranslations('common')('currency')}</span>
                                                     </p>
                                                 </div>
                                             </div>
@@ -170,7 +171,7 @@ export default function CartPage() {
                                 <div className="space-y-5 mb-10">
                                     <div className="flex justify-between items-center text-sm">
                                         <span className="text-gray-400">{t("subtotal_products")}</span>
-                                        <span className="font-bold leading-none">{totalPrice.toLocaleString()} <span className="text-[10px] text-gray-600 font-normal">DA</span></span>
+                                        <span className="font-bold leading-none">{totalPrice.toLocaleString()} <span className="text-[10px] text-gray-600 font-normal">{useTranslations('common')('currency')}</span></span>
                                     </div>
                                     <div className="flex justify-between items-center text-sm">
                                         <span className="text-gray-400">{t("shipping_fees")}</span>
@@ -184,7 +185,7 @@ export default function CartPage() {
                                             <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#D4AF37] mb-2">{t("grand_total")}</p>
                                             <p className="text-5xl font-serif font-bold tracking-tight">{totalPrice.toLocaleString()}</p>
                                         </div>
-                                        <span className="text-sm text-gray-500 mb-2 font-bold">DA</span>
+                                        <span className="text-sm text-gray-500 mb-2 font-bold">{useTranslations('common')('currency')}</span>
                                     </div>
                                 </div>
 

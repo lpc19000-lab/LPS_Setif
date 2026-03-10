@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ShoppingCart, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
 
 interface ReorderButtonProps {
     orderId: string;
@@ -11,6 +12,8 @@ interface ReorderButtonProps {
 export default function ReorderButton({ orderId }: ReorderButtonProps) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const t = useTranslations("common");
+    const locale = useLocale();
 
     const handleReorder = async () => {
         setLoading(true);
@@ -24,14 +27,14 @@ export default function ReorderButton({ orderId }: ReorderButtonProps) {
             const data = await response.json();
 
             if (data.success) {
-                router.push("/cart");
+                router.push(`/${locale}/cart`);
                 router.refresh();
             } else {
-                alert(data.error || "Failed to add items to cart");
+                alert(data.error || t("alerts.reorder_failed"));
             }
         } catch (error) {
             console.error("Reorder failed:", error);
-            alert("Something went wrong. Please try again.");
+            alert(t("alerts.generic"));
         } finally {
             setLoading(false);
         }
@@ -48,7 +51,7 @@ export default function ReorderButton({ orderId }: ReorderButtonProps) {
             ) : (
                 <ShoppingCart className="w-4 h-4 group-hover:scale-110 transition-transform" />
             )}
-            Reorder
+            {t("buttons.reorder")}
         </button>
     );
 }

@@ -5,7 +5,10 @@
             "boutique": "Boutique",
             "panier": "Panier",
             "compte": "Compte",
-            "admin": "Admin"
+            "admin": "Admin",
+            "admin_portal": "Portail Admin",
+            "perfume": "Parfum",
+            "lps": "LPS"
         },
         "buttons": {
             "save": "Enregistrer",
@@ -20,7 +23,11 @@
             "my_account": "Mon Compte",
             "loading": "Chargement...",
             "discover_more": "Découvrir plus",
-            "view": "Voir"
+            "view": "Voir",
+            "reorder": "Commander à nouveau",
+            "confirm_cancellation": "Confirmer l'annulation",
+            "back": "Retour",
+            "cancel_order": "Annuler la commande"
         },
         "labels": {
             "all_categories": "Toutes les catégories",
@@ -28,7 +35,17 @@
             "in_stock_only": "En stock uniquement",
             "out_of_stock": "Rupture de stock",
             "low_stock": "Stock faible",
-            "per_100ml": "Par 100ml référence"
+            "per_100ml": "Par 100ml référence",
+            "currency": "DA",
+            "select_wilaya": "Sélectionner une Wilaya",
+            "search_wilaya": "Rechercher une wilaya...",
+            "no_results": "Aucun résultat trouvé",
+            "are_you_sure": "Êtes-vous sûr ?"
+        },
+        "alerts": {
+            "reorder_failed": "Échec de l'ajout des articles au panier",
+            "cancel_failed": "Échec de l'annulation de la commande",
+            "generic": "Quelque chose s'est mal passé. Veuillez réessayer."
         }
     },
     "registration": {
@@ -45,7 +62,10 @@
         "placeholder_shop": "Nom légal de l'entreprise",
         "placeholder_address": "Adresse complète, rue et localité",
         "already_registered": "Déjà inscrit ?",
-        "sign_in_link": "Connectez-vous à votre compte"
+        "sign_in_link": "Connectez-vous à votre compte",
+        "placeholder_phone": "05 / 06 / 07 ...",
+        "error_registration_failed": "L'inscription a échoué. Veuillez réessayer.",
+        "error_generic": "Quelque chose s'est mal passé. Veuillez réessayer."
     },
     "login": {
         "title": "Accès Commerçant",
@@ -150,16 +170,80 @@
         "features_title": "Pourquoi Nous Choisir",
         "cta_title": "Rejoignez Notre Réseau",
         "cta_subtitle": "Commencez à vendre des parfums de luxe dès aujourd'hui",
+        "cta_browse_catalog": "Parcourir le Catalogue",
+        "hero": {
+            "title_part1": "L'Essence du",
+            "title_part2": "Luxe Mondial",
+            "subtitle": "La première destination B2B d'Algérie pour les parfums haut de gamme en gros. Exclusivité, Élégance et Excellence dans chaque flacon.",
+            "browse_collections": "Parcourir les Collections",
+            "become_partner": "Devenir Partenaire"
+        },
+        "features": {
+            "wholesale_title": "Parfums en Gros",
+            "wholesale_desc": "Parfums de haute qualité en gros pour les revendeurs à travers l'Algérie.",
+            "flexible_title": "Volume Flexible",
+            "flexible_desc": "Commandez exactement la quantité dont vous avez besoin avec notre système au ml.",
+            "fast_delivery_title": "Livraison Rapide",
+            "fast_delivery_desc": "Livraison nationale dans les 58 wilayas sous 48 heures."
+        },
         "footer_rights": "Tous droits réservés"
     },
     "account": {
         "title": "Mon Compte",
+        "trader_account": "Compte Commerçant",
         "orders": "Mes Commandes",
         "saved_cart": "Panier Sauvegardé",
         "no_orders": "Aucune commande pour le moment",
+        "no_orders_placed": "Aucune commande passée pour le moment.",
         "order_id": "Commande",
         "order_date": "Date",
         "order_status": "Statut",
-        "order_total": "Total"
+        "order_total": "Total",
+        "total_orders": "Total des commandes",
+        "total_spent": "Total dépensé",
+        "welcome_back": "Bon retour,",
+        "phone_number": "Numéro de téléphone",
+        "business_address": "Adresse de l'entreprise",
+        "items_count": "{count} Articles",
+        "more_items": "+ {count} autres",
+        "review_checkout": "Vérifier et Payer",
+        "stock_ready": "Le stock est prêt",
+        "browse_catalog": "Parcourir le Catalogue",
+        "recent_orders": "Commandes Récentes",
+        "view_all": "Voir Tout",
+        "order_history": "Historique des Commandes",
+        "order_history_subtitle": "Gérez et suivez vos expéditions de gros.",
+        "no_orders_found": "Aucune commande trouvée",
+        "no_orders_hint": "Vous n'avez pas encore passé de commande. Visitez notre boutique pour parcourir notre dernière collection.",
+        "start_shopping": "Commencer les achats",
+        "order_id_label": "ID Commande",
+        "date_label": "Date",
+        "status_label": "Statut",
+        "total_amount_label": "Montant Total",
+        "action_label": "Action",
+        "details_label": "Détails",
+        "manage_label": "Gérer",
+        "pagination_showing": "Affichage de {start} à {end} sur {total} commandes",
+        "order_info": "Informations de la Commande",
+        "shipment_tracking": "Suivi de l'expédition",
+        "download_invoice": "Télécharger la facture",
+        "order_cancelled": "Commande annulée",
+        "order_cancelled_desc": "Cette commande a été annulée et le stock a été restauré. Si vous pensez qu'il s'agit d'une erreur, veuillez contacter le support.",
+        "current_status": "Statut Actuel",
+        "products_ordered": "Produits commandés",
+        "per_unit_label": "/ unité",
+        "shipping": "Livraison",
+        "free_b2b": "Gratuit B2B",
+        "delivery_info": "Informations de livraison",
+        "tracking_number_label": "Numéro de suivi",
+        "ship_with_label": "Expédié avec {company}",
+        "status": {
+            "PENDING": "En attente",
+            "CONFIRMED": "Confirmée",
+            "PACKED": "Emballée",
+            "SHIPPED": "Expédiée",
+            "DELIVERED": "Livrée",
+            "CANCELLED": "Annulée"
+        }
     }
 }

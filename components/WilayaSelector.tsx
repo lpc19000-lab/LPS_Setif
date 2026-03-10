@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Search, ChevronDown, Check } from "lucide-react";
 import { WILAYAS } from "@/lib/constants/wilayas";
+import { useTranslations } from "next-intl";
 
 interface WilayaSelectorProps {
     value: string;
@@ -14,6 +15,7 @@ interface WilayaSelectorProps {
 export default function WilayaSelector({ value, onChange, error, label }: WilayaSelectorProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const t = useTranslations("common.labels");
     const containerRef = useRef<HTMLDivElement>(null);
 
     const selectedWilaya = WILAYAS.find(w => w.id === value || w.name === value);
@@ -43,7 +45,7 @@ export default function WilayaSelector({ value, onChange, error, label }: Wilaya
                     }`}
             >
                 <span className={selectedWilaya ? "text-gray-900" : "text-gray-400"}>
-                    {selectedWilaya ? `${selectedWilaya.id} - ${selectedWilaya.name}` : "Sélectionner une Wilaya"}
+                    {selectedWilaya ? `${selectedWilaya.id} - ${selectedWilaya.name}` : t("select_wilaya")}
                 </span>
                 <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </button>
@@ -54,7 +56,7 @@ export default function WilayaSelector({ value, onChange, error, label }: Wilaya
                         <Search className="w-4 h-4 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="Rechercher une wilaya..."
+                            placeholder={t("search_wilaya")}
                             className="w-full bg-transparent border-none focus:ring-0 text-sm py-1"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -80,7 +82,7 @@ export default function WilayaSelector({ value, onChange, error, label }: Wilaya
                                 </button>
                             ))
                         ) : (
-                            <div className="px-4 py-3 text-sm text-gray-500 text-center">Aucun résultat trouvé</div>
+                            <div className="px-4 py-3 text-sm text-gray-500 text-center">{t("no_results")}</div>
                         )}
                     </div>
                 </div>

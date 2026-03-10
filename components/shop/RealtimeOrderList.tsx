@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, ArrowRight } from "lucide-react";
+import { ShoppingBag, ArrowRight, ArrowLeft } from "lucide-react";
 import { useRealtime } from "@/hooks/use-realtime";
+import { useTranslations, useLocale } from "next-intl";
 
 interface Order {
     id: string;
@@ -30,6 +31,9 @@ function mapRealtimeOrder(raw: Record<string, any>): Partial<Order> {
 
 export default function RealtimeOrderList({ initialOrders, customerId }: RealtimeOrderListProps) {
     const [orders, setOrders] = useState<Order[]>(initialOrders);
+    const t = useTranslations("account");
+    const com = useTranslations("common");
+    const locale = useLocale();
 
     useRealtime("orders", (payload: any) => {
         const mapped = mapRealtimeOrder(payload.new);
@@ -51,8 +55,8 @@ export default function RealtimeOrderList({ initialOrders, customerId }: Realtim
         return (
             <div className="p-16 text-center">
                 <ShoppingBag className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                <p className="text-gray-500">No orders placed yet.</p>
-                <Link href="/catalog" className="text-primary font-bold mt-4 inline-block">Start Shopping</Link>
+                <p className="text-gray-500">{t("no_orders_placed")}</p>
+                <Link href={`/${locale}/catalog`} className="text-primary font-bold mt-4 inline-block">{t("start_shopping")}</Link>
             </div>
         );
     }
@@ -70,7 +74,7 @@ export default function RealtimeOrderList({ initialOrders, customerId }: Realtim
                         transition={{ duration: 0.3 }}
                     >
                         <Link
-                            href={`/account/orders/${order.id}`}
+                            href={`/${locale}/account/orders/${order.id}`}
                             className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors group"
                         >
                             <div className="flex items-center gap-4">
@@ -78,21 +82,25 @@ export default function RealtimeOrderList({ initialOrders, customerId }: Realtim
                                     <ShoppingBag className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-bold text-gray-900">Order #{order.id.slice(-6).toUpperCase()}</p>
-                                    <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString()}</p>
+                                    <p className="text-sm font-bold text-gray-900">{t("order_id")} #{order.id.slice(-6).toUpperCase()}</p>
+                                    <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString(locale)}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-6 text-right">
                                 <div>
-                                    <p className="text-sm font-bold text-gray-900">{Number(order.totalPrice).toLocaleString()} DA</p>
+                                    <p className="text-sm font-bold text-gray-900">{Number(order.totalPrice).toLocaleString()} {com("labels.currency")}</p>
                                     <span className={`text-[10px] font-black uppercase tracking-widest ${order.status === "DELIVERED" ? "text-emerald-600" :
                                         order.status === "CANCELLED" ? "text-red-600" :
                                             "text-amber-500"
                                         }`}>
-                                        {order.status}
+                                        {t(`status.${order.status}`)}
                                     </span>
                                 </div>
-                                <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                                {locale === "ar" ? (
+                                    <ArrowLeft className="w-4 h-4 text-gray-300 group-hover:text-primary group-hover:-translate-x-1 transition-all" />
+                                ) : (
+                                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                                )}
                             </div>
                         </Link>
                     </motion.div>

@@ -10,11 +10,9 @@ import {
     CheckCircle2,
     Truck,
     XCircle,
-    Package,
-    ArrowLeft,
-    ArrowRight
-} from "lucide-react";
+import { Package, ArrowLeft, ArrowRight, ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +48,9 @@ interface PageProps {
 }
 
 export default async function OrderHistoryPage({ params, searchParams }: PageProps) {
-    await params;
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: "account" });
+    const com = await getTranslations({ locale, namespace: "common" });
     const customer = await requireCustomerSession();
     const resolvedSearchParams = await searchParams;
     const page = parseInt(resolvedSearchParams.page || "1");
@@ -68,14 +68,14 @@ export default async function OrderHistoryPage({ params, searchParams }: PagePro
         <div className="max-w-7xl mx-auto px-6 pt-32 pb-20">
             <div className="flex items-center gap-4 mb-10">
                 <Link
-                    href="/account"
+                    href={`/${locale}/account`}
                     className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary/20 transition-all"
                 >
-                    <ChevronRight className="w-5 h-5 rotate-180" />
+                    {locale === "ar" ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
                 </Link>
                 <div>
-                    <h1 className="text-3xl font-serif font-bold text-primary-dark">Order History</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage and track your wholesale shipments.</p>
+                    <h1 className="text-3xl font-serif font-bold text-primary-dark">{t("order_history")}</h1>
+                    <p className="text-sm text-gray-500 mt-1">{t("order_history_subtitle")}</p>
                 </div>
             </div>
 
@@ -84,10 +84,10 @@ export default async function OrderHistoryPage({ params, searchParams }: PagePro
                     <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-200">
                         <ShoppingBag className="w-10 h-10" />
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">No orders found</h2>
-                    <p className="text-gray-500 mb-8 max-w-sm mx-auto">You haven't placed any orders yet. Visit our shop to browse our latest collection.</p>
-                    <Link href="/catalog" className="bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
-                        Start Shopping
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">{t("no_orders_found")}</h2>
+                    <p className="text-gray-500 mb-8 max-w-sm mx-auto">{t("no_orders_hint")}</p>
+                    <Link href={`/${locale}/catalog`} className="bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
+                        {t("start_shopping")}
                     </Link>
                 </div>
             ) : (
@@ -97,11 +97,11 @@ export default async function OrderHistoryPage({ params, searchParams }: PagePro
                         <table className="w-full text-left">
                             <thead>
                                 <tr className="bg-gray-50/50 border-b border-gray-100">
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Order ID</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Date</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Status</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">Total Amount</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">Action</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{t("order_id_label")}</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{t("date_label")}</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{t("status_label")}</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">{t("total_amount_label")}</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">{t("action_label")}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
@@ -138,16 +138,16 @@ export default async function OrderHistoryPage({ params, searchParams }: PagePro
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2 text-gray-900 font-bold">
                                                     <span className="text-sm">{Number(order.totalPrice).toLocaleString()}</span>
-                                                    <span className="text-[10px] text-gray-400">DA</span>
+                                                    <span className="text-[10px] text-gray-400">{com("labels.currency")}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <Link
-                                                    href={`/account/orders/${order.id}`}
+                                                    href={`/${locale}/account/orders/${order.id}`}
                                                     className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:text-primary-dark transition-colors"
                                                 >
-                                                    Details
-                                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                                                    {t("details_label")}
+                                                    {locale === "ar" ? <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> : <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />}
                                                 </Link>
                                             </td>
                                         </tr>
@@ -164,7 +164,7 @@ export default async function OrderHistoryPage({ params, searchParams }: PagePro
                             return (
                                 <Link
                                     key={order.id}
-                                    href={`/account/orders/${order.id}`}
+                                    href={`/${locale}/account/orders/${order.id}`}
                                     className="block bg-white p-5 rounded-2xl border border-gray-100 shadow-sm active:scale-[0.98] transition-all"
                                 >
                                     <div className="flex items-center justify-between mb-4">
@@ -181,12 +181,12 @@ export default async function OrderHistoryPage({ params, searchParams }: PagePro
                                     </div>
                                     <div className="flex items-end justify-between">
                                         <div>
-                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Amount</p>
-                                            <p className="text-lg font-bold text-gray-900">{Number(order.totalPrice).toLocaleString()} <span className="text-xs font-normal text-gray-400">DA</span></p>
+                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t("total_amount_label")}</p>
+                                            <p className="text-lg font-bold text-gray-900">{Number(order.totalPrice).toLocaleString()} <span className="text-xs font-normal text-gray-400">{com("labels.currency")}</span></p>
                                         </div>
                                         <div className="flex items-center gap-1 text-xs font-bold text-primary">
-                                            Manage
-                                            <ChevronRight className="w-4 h-4" />
+                                            {t("manage_label")}
+                                            {locale === "ar" ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                                         </div>
                                     </div>
                                 </Link>
@@ -198,20 +198,24 @@ export default async function OrderHistoryPage({ params, searchParams }: PagePro
                     {totalPages > 1 && (
                         <div className="flex items-center justify-between pt-6 border-t border-gray-100">
                             <p className="text-xs text-gray-500 font-medium">
-                                Showing <span className="text-gray-900 font-bold">{skip + 1}</span> to <span className="text-gray-900 font-bold">{Math.min(skip + limit, totalOrders)}</span> of <span className="text-gray-900 font-bold">{totalOrders}</span> orders
+                                {t("pagination_showing", {
+                                    start: skip + 1,
+                                    end: Math.min(skip + limit, totalOrders),
+                                    total: totalOrders
+                                })}
                             </p>
                             <div className="flex items-center gap-2">
                                 <Link
-                                    href={`/account/orders?page=${page - 1}`}
+                                    href={`/${locale}/account/orders?page=${page - 1}`}
                                     className={`w-10 h-10 rounded-xl border border-gray-100 flex items-center justify-center transition-all ${page <= 1 ? "opacity-30 pointer-events-none" : "hover:bg-gray-50 hover:border-gray-200 active:scale-95"}`}
                                 >
-                                    <ArrowLeft className="w-4 h-4" />
+                                    {locale === "ar" ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
                                 </Link>
                                 <div className="flex items-center gap-1">
                                     {[...Array(totalPages)].map((_, i) => (
                                         <Link
                                             key={i}
-                                            href={`/account/orders?page=${i + 1}`}
+                                            href={`/${locale}/account/orders?page=${i + 1}`}
                                             className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${page === i + 1 ? "bg-primary text-white shadow-lg shadow-primary/20" : "hover:bg-gray-50 text-gray-500"}`}
                                         >
                                             {i + 1}
@@ -219,10 +223,10 @@ export default async function OrderHistoryPage({ params, searchParams }: PagePro
                                     ))}
                                 </div>
                                 <Link
-                                    href={`/account/orders?page=${page + 1}`}
+                                    href={`/${locale}/account/orders?page=${page + 1}`}
                                     className={`w-10 h-10 rounded-xl border border-gray-100 flex items-center justify-center transition-all ${page >= totalPages ? "opacity-30 pointer-events-none" : "hover:bg-gray-50 hover:border-gray-200 active:scale-95"}`}
                                 >
-                                    <ArrowRight className="w-4 h-4" />
+                                    {locale === "ar" ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
                                 </Link>
                             </div>
                         </div>

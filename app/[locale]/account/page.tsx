@@ -16,11 +16,14 @@ import LogoutButton from "@/components/shop/LogoutButton";
 import RealtimeOrderList from "@/components/shop/RealtimeOrderList";
 import { getCart } from "@/services/cart-service";
 import SafeImage from "@/components/SafeImage";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AccountPage({ params }: { params: Promise<{ locale: string }> }) {
-    await params;
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: "account" });
+    const com = await getTranslations({ locale, namespace: "common" });
     const customer = await requireCustomerSession();
     const [rawOrders, cart] = await Promise.all([
         getOrdersByCustomer(customer.id),
@@ -50,16 +53,16 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
         .reduce((sum, order) => sum + Number(order.totalPrice), 0);
 
     const stats = [
-        { label: "Total Orders", value: orders.length, icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
-        { label: "Total Spent", value: `${totalSpent.toLocaleString()} DA`, icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
+        { label: t("total_orders"), value: orders.length, icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
+        { label: t("total_spent"), value: `${totalSpent.toLocaleString()} ${com("labels.currency")}`, icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
     ];
 
     return (
         <div className="max-w-7xl mx-auto px-6 pt-32 pb-20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                 <div>
-                    <h1 className="text-3xl font-serif font-bold text-primary-dark">Trader Account</h1>
-                    <p className="text-gray-500 mt-1">Welcome back, {customer.name}</p>
+                    <h1 className="text-3xl font-serif font-bold text-primary-dark">{t("trader_account")}</h1>
+                    <p className="text-gray-500 mt-1">{t("welcome_back")} {customer.name}</p>
                 </div>
                 <LogoutButton variant="trader" />
             </div>
@@ -84,7 +87,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                                     <Phone className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">Phone Number</p>
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">{t("phone_number")}</p>
                                     <p className="text-sm font-medium text-gray-900">{customer.phone}</p>
                                 </div>
                             </div>
@@ -94,7 +97,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                                     <MapPin className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">Business Address</p>
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">{t("business_address")}</p>
                                     <p className="text-sm font-medium text-gray-900 leading-relaxed">
                                         {customer.address}, {customer.wilaya}
                                     </p>
@@ -109,10 +112,10 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="font-bold text-gray-900 flex items-center gap-2">
                                     <ShoppingCart className="w-4 h-4 text-primary" />
-                                    Saved Cart
+                                    {t("saved_cart")}
                                 </h3>
                                 <span className="text-[10px] font-black bg-gray-100 px-2 py-0.5 rounded-full uppercase text-gray-400">
-                                    {enrichedCartItems.length} Items
+                                    {t("items_count", { count: enrichedCartItems.length })}
                                 </span>
                             </div>
                             <div className="space-y-4 mb-6">
@@ -132,7 +135,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                                                 </span>
                                                 <div className="w-1 h-1 rounded-full bg-gray-200" />
                                                 <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
-                                                    Qty: {item.quantity} · {item.weight}g
+                                                    {useTranslations("checkout")("qty")}: {item.quantity} · {item.weight}g
                                                 </span>
                                             </div>
                                         </div>
@@ -140,27 +143,27 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                                 ))}
                                 {enrichedCartItems.length > 3 && (
                                     <p className="text-[10px] text-center text-gray-400 font-medium">
-                                        + {enrichedCartItems.length - 3} more items
+                                        {t("more_items", { count: enrichedCartItems.length - 3 })}
                                     </p>
                                 )}
                             </div>
                             <Link
-                                href="/cart"
+                                href={`/${locale}/cart`}
                                 className="w-full flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all"
                             >
                                 <ShoppingCart className="w-3.5 h-3.5" />
-                                Review & Checkout
+                                {t("review_checkout")}
                             </Link>
                         </div>
                     )}
 
                     <Link
-                        href="/catalog"
+                        href={`/${locale}/catalog`}
                         className="flex items-center justify-between p-6 bg-primary rounded-2xl text-white group hover:bg-primary-dark transition-all shadow-lg shadow-primary/20"
                     >
                         <div>
-                            <p className="text-sm font-medium opacity-80 mb-1">Stock is ready</p>
-                            <p className="text-lg font-bold">Browse Catalog</p>
+                            <p className="text-sm font-medium opacity-80 mb-1">{t("stock_ready")}</p>
+                            <p className="text-lg font-bold">{t("browse_catalog")}</p>
                         </div>
                         <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                     </Link>
@@ -186,9 +189,9 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                     {/* Recent Orders Preview */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                            <h3 className="font-bold text-gray-900">Recent Orders</h3>
-                            <Link href="/account/orders" className="text-sm font-bold text-primary hover:text-primary-dark transition-colors">
-                                View All
+                            <h3 className="font-bold text-gray-900">{t("recent_orders")}</h3>
+                            <Link href={`/${locale}/account/orders`} className="text-sm font-bold text-primary hover:text-primary-dark transition-colors">
+                                {t("view_all")}
                             </Link>
                         </div>
 

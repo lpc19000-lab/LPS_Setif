@@ -54,10 +54,10 @@ export default function RegisterPage() {
                 router.push(`/${locale}/account`);
                 router.refresh();
             } else {
-                setError(data.error || "Registration failed");
+                setError(data.error || t("error_registration_failed"));
             }
         } catch (err) {
-            setError("Something went wrong. Please try again.");
+            setError(t("error_generic"));
         } finally {
             setLoading(false);
         }
@@ -106,7 +106,7 @@ export default function RegisterPage() {
                                                 required
                                                 value={formData.phone}
                                                 onChange={handleChange}
-                                                placeholder="05 / 06 / 07 ..."
+                                                placeholder={t("placeholder_phone")}
                                                 className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-medium"
                                             />
                                         </div>
