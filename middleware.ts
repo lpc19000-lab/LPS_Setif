@@ -59,6 +59,7 @@ export async function middleware(request: NextRequest) {
             }
             return handleIntl(request);
         } catch (error) {
+            console.error("Admin auth error:", error);
             return NextResponse.redirect(new URL("/admin/login", request.url));
         }
     }
@@ -72,11 +73,12 @@ export async function middleware(request: NextRequest) {
 
         try {
             const payload = await verifyJwtToken(token);
-            if (!payload || payload.role !== "TRADER") {
+            if (!payload || payload?.role !== "TRADER") {
                 return NextResponse.redirect(new URL("/login", request.url));
             }
             return handleIntl(request);
         } catch (error) {
+            console.error("Customer auth error:", error);
             return NextResponse.redirect(new URL("/login", request.url));
         }
     }

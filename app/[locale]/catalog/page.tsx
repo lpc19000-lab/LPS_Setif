@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 import SafeImage from "@/components/SafeImage";
 import { useTranslations, useLocale } from "next-intl";
 
@@ -154,16 +153,20 @@ function CatalogContent() {
                 </div>
 
                 {/* Products Grid */}
-                {loading ? (
+                {loading && (
                     <div className="flex justify-center py-20">
                         <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                     </div>
-                ) : products.length === 0 ? (
+                )}
+
+                {!loading && products.length === 0 && (
                     <div className="text-center py-20">
                         <p className="text-gray-400 text-lg">{t("no_products")}</p>
                         <p className="text-gray-300 text-sm mt-2">{t("no_products_hint")}</p>
                     </div>
-                ) : (
+                )}
+
+                {!loading && products.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {products.map((product, i) => (
                             <motion.div

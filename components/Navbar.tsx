@@ -17,7 +17,14 @@ interface NavbarProps {
     customerName?: string | null;
 }
 
-export default function Navbar({ customerName }: NavbarProps) {
+function getLinkClass(isActive: boolean, isHero: boolean): string {
+    if (isActive) {
+        return isHero ? "text-[#D4AF37]" : "text-primary font-semibold";
+    }
+    return isHero ? "text-white/70 hover:text-white" : "text-gray-500 hover:text-primary";
+}
+
+export default function Navbar({ customerName }: Readonly<NavbarProps>) {
     const pathname = usePathname();
     const locale = useLocale();
     const t = useTranslations('common.nav');
@@ -67,14 +74,7 @@ export default function Navbar({ customerName }: NavbarProps) {
                             key={link.href}
                             href={link.href}
                             prefetch={true}
-                            className={`text-sm tracking-wide transition-colors duration-300 ${pathname === link.href
-                                ? isHeroPage
-                                    ? "text-[#D4AF37]"
-                                    : "text-primary font-semibold"
-                                : isHeroPage
-                                    ? "text-white/70 hover:text-white"
-                                    : "text-gray-500 hover:text-primary"
-                                }`}
+                            className={`text-sm tracking-wide transition-colors duration-300 ${getLinkClass(pathname === link.href, isHeroPage)}`}
                         >
                             {link.label}
                         </Link>

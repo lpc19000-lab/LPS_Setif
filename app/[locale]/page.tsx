@@ -58,8 +58,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                                 <div className="h-4 w-64 bg-gray-100 rounded mx-auto animate-pulse" />
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {Array.from({ length: 4 }).map((_, i) => (
-                                    <div key={i} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                                {["skeleton-1", "skeleton-2", "skeleton-3", "skeleton-4"].map((id) => (
+                                    <div key={id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
                                         <div className="aspect-square bg-gray-100 animate-pulse" />
                                         <div className="p-5 space-y-3">
                                             <div className="h-3 w-16 bg-gray-100 rounded animate-pulse" />

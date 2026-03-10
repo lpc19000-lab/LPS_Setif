@@ -35,6 +35,7 @@ export default function LoginPage() {
                 setError(data.error || t("error_login_failed"));
             }
         } catch (err) {
+            console.error("Login error:", err);
             setError(t("error_generic"));
         } finally {
             setLoading(false);

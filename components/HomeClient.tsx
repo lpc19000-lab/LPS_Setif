@@ -15,7 +15,7 @@ interface Product {
     category: { name: string } | null;
 }
 
-function ProductCard({ product, i }: { product: Product; i: number }) {
+function ProductCard({ product, i }: Readonly<{ product: Product; i: number }>) {
     const locale = useLocale();
     return (
         <motion.div
@@ -53,7 +53,7 @@ function ProductCard({ product, i }: { product: Product; i: number }) {
     );
 }
 
-export function ProductSection({ title, subtitle, products }: { title: string; subtitle: string; products: Product[] }) {
+export function ProductSection({ title, subtitle, products }: Readonly<{ title: string; subtitle: string; products: Product[] }>) {
     const locale = useLocale();
     const t = useTranslations("catalog");
     if (products.length === 0) return null;
@@ -135,7 +135,7 @@ export function FeaturesSection() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {features.map((f, i) => (
                         <motion.div
-                            key={i}
+                            key={f.icon}
                             initial={{ opacity: 0, y: 40 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
