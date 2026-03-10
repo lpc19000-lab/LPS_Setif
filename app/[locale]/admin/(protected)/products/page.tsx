@@ -3,7 +3,8 @@ import ProductClientView from "@/components/admin/ProductClientView";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminProductsPage() {
+export default async function AdminProductsPage({ params }: { params: Promise<{ locale: string }> }) {
+    await params;
     const [products, categories, collections, tags] = await Promise.all([
         prisma.product.findMany({
             include: {

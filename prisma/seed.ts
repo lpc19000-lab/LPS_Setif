@@ -22,7 +22,9 @@ async function main() {
     console.log("Data cleaned.");
 
     // 1. Create Admin User
-    const hashedAdminPassword = await bcrypt.hash("123123123", 10);
+    const adminPassword = process.env.ADMIN_INITIAL_PASSWORD;
+    if (!adminPassword) throw new Error("ADMIN_INITIAL_PASSWORD env var is not set");
+    const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
     await prisma.admin.upsert({
         where: { email: "admin@gmail.com" },
         update: {
@@ -37,7 +39,7 @@ async function main() {
             role: "SUPER_ADMIN",
         },
     });
-    console.log("Admin account: admin@gmail.com / 123123123");
+    console.log(`Admin account: admin@gmail.com / (Check your ADMIN_INITIAL_PASSWORD env var)`);
 
     // 2. Create Initial Categories
     const categories = [

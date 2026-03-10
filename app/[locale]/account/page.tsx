@@ -19,7 +19,8 @@ import SafeImage from "@/components/SafeImage";
 
 export const dynamic = "force-dynamic";
 
-export default async function AccountPage() {
+export default async function AccountPage({ params }: { params: Promise<{ locale: string }> }) {
+    await params;
     const customer = await requireCustomerSession();
     const [rawOrders, cart] = await Promise.all([
         getOrdersByCustomer(customer.id),

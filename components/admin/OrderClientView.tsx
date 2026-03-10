@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Search, ChevronDown, CheckCircle2, Clock, Truck, PackageCheck, XCircle, FileText, X } from "lucide-react";
 import { adminUpdateOrderStatus } from "@/app/admin/actions/order";
 import { OrderStatus } from "@prisma/client";
+import SafeImage from "@/components/SafeImage";
 
 export default function OrderClientView({ orders }: { orders: any[] }) {
     const router = useRouter();
@@ -179,7 +180,7 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                                     <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 p-2 rounded-lg transition-colors">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden relative shrink-0">
-                                                <img src={item.product?.imageUrl || ''} alt={item.product?.name} className="object-cover w-full h-full" />
+                                                <SafeImage src={item.product?.imageUrl || ''} alt={item.product?.name || 'Product'} fill className="object-cover" />
                                             </div>
                                             <div>
                                                 <p className="text-sm font-medium text-gray-900">{item.product?.name || "Unknown Product"}</p>

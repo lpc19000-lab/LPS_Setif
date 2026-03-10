@@ -7,7 +7,8 @@ import RealtimeReloader from "@/components/admin/RealtimeReloader";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminDashboard() {
+export default async function AdminDashboard({ params }: { params: Promise<{ locale: string }> }) {
+    await params;
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);

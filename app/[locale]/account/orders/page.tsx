@@ -45,10 +45,12 @@ const getStatusIcon = (status: string) => {
 };
 
 interface PageProps {
+    params: Promise<{ locale: string }>;
     searchParams: Promise<{ page?: string }>;
 }
 
-export default async function OrderHistoryPage({ searchParams }: PageProps) {
+export default async function OrderHistoryPage({ params, searchParams }: PageProps) {
+    await params;
     const customer = await requireCustomerSession();
     const resolvedSearchParams = await searchParams;
     const page = parseInt(resolvedSearchParams.page || "1");

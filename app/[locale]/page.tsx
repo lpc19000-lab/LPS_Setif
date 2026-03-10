@@ -5,7 +5,6 @@ import { getNewArrivals, getBestSellers, getFeaturedProducts } from "@/services/
 import { ProductSection, FeaturesSection, CTASection } from "@/components/HomeClient";
 
 const FragranceScroll = dynamic(() => import("@/components/FragranceScroll"), {
-    ssr: false,
     loading: () => <div className="h-screen bg-[#121212] animate-pulse" />,
 });
 
@@ -38,7 +37,8 @@ async function ProductSections() {
     );
 }
 
-export default function HomePage() {
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+    await params;
     return (
         <main>
             {/* ── Cinematic Hero ──── */}

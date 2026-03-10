@@ -3,7 +3,8 @@ import OrderClientView from "@/components/admin/OrderClientView";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminOrdersPage() {
+export default async function AdminOrdersPage({ params }: { params: Promise<{ locale: string }> }) {
+    await params;
     const orders = await getOrders();
 
     // Serialize Decimal amounts for the Client Component
