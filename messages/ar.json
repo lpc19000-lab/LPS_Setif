@@ -97,12 +97,21 @@
         "discover_more": "اكتشف المزيد"
     },
     "cart": {
-        "title": "سلة التسوق",
+        "title": "سلة الجملة",
         "empty": "سلة التسوق فارغة حاليًا.",
+        "empty_subtitle": "املأ سلتك بأرقى العطور الفاخرة لتجارتك بالجملة.",
         "continue_shopping": "مواصلة التسوق",
         "subtotal": "المجموع الفرعي",
+        "subtotal_products": "إجمالي المنتجات",
+        "shipping_fees": "مصاريف الشحن",
+        "shipping_standard": "شحن الجملة القياسي (مجاني)",
+        "grand_total": "المؤشر الإجمالي",
         "view_cart": "عرض السلة",
-        "checkout_now": "إتمام الطلب الآن"
+        "checkout_now": "إتمام الطلب الآن",
+        "terms_agree": "بالمضي قدماً، فإنك توافق على شروط خدمة الجملة B2B.",
+        "back_to_catalog": "العودة إلى الكتالوج",
+        "units_of": "وحدات من",
+        "edition": "إصدار"
     },
     "checkout": {
         "title": "إتمام الطلب",

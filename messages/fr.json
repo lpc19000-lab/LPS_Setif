@@ -97,12 +97,21 @@
         "discover_more": "Découvrir plus"
     },
     "cart": {
-        "title": "Votre Panier",
+        "title": "Panier Grossiste",
         "empty": "Votre panier est actuellement vide.",
+        "empty_subtitle": "Remplissez votre panier avec les meilleurs parfums de luxe pour votre commerce de gros.",
         "continue_shopping": "Continuer les achats",
         "subtotal": "Sous-total",
+        "subtotal_products": "Total des produits",
+        "shipping_fees": "Frais de livraison",
+        "shipping_standard": "Standard B2B (Gratuit)",
+        "grand_total": "Total Global",
         "view_cart": "Voir le panier",
-        "checkout_now": "Passer à la caisse"
+        "checkout_now": "Passer à la caisse",
+        "terms_agree": "En continuant, vous acceptez les conditions de service de vente en gros B2B.",
+        "back_to_catalog": "Retour au catalogue",
+        "units_of": "Unités de",
+        "edition": "Édition"
     },
     "checkout": {
         "title": "Paiement",
