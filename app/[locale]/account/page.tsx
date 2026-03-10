@@ -17,6 +17,7 @@ import RealtimeOrderList from "@/components/shop/RealtimeOrderList";
 import { getCart } from "@/services/cart-service";
 import SafeImage from "@/components/SafeImage";
 import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 
 export const dynamic = "force-dynamic";
 
