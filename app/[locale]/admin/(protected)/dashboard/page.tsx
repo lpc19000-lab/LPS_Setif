@@ -4,11 +4,15 @@ import { getInventoryHealthScore } from "@/services/intelligence-service";
 import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 import RealtimeReloader from "@/components/admin/RealtimeReloader";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminDashboard({ params }: { params: Promise<{ locale: string }> }) {
-    await params;
+export default async function AdminDashboard({ params }: { params: { locale: string } }) {
+    const { locale } = params;
+    const t = await getTranslations({ locale, namespace: "admin.dashboard" });
+    const tc = await getTranslations({ locale, namespace: "common" });
+    const ts = await getTranslations({ locale, namespace: "common.status" });
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -76,11 +80,14 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
     });
 
     const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat("en-US", { style: "currency", currency: "DZD" }).format(amount).replace("DZD", "DA");
+        return new Intl.NumberFormat(locale === "ar" ? "ar-DZ" : "fr-FR", {
+            style: "currency",
+            currency: "DZD"
+        }).format(amount).replace("DZD", "DA").replace("د.ج.‏", "د.ج");
     };
 
     const formatDate = (date: Date) => {
-        return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" }).format(date);
+        return new Intl.DateTimeFormat(locale === "ar" ? "ar-DZ" : "fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(date);
     };
 
     const getStatusColor = (status: string) => {
@@ -105,10 +112,10 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className={`space-y-8 animate-in fade-in duration-500 ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
             <div>
-                <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">Dashboard Overview</h1>
-                <p className="text-gray-500 mt-1 tracking-wide">Welcome back. Here is what is happening with your store today.</p>
+                <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">{t("title")}</h1>
+                <p className="text-gray-500 mt-1 tracking-wide">{t("subtitle")}</p>
             </div>
 
             {/* Financial Overview Grid (Phase 6) */}
@@ -122,7 +129,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
                             <DollarSign className="w-5 h-5" />
                         </div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Total Revenue</h3>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("total_revenue")}</h3>
                     </div>
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{formatCurrency(revenue)}</p>
                 </div>
@@ -136,10 +143,10 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         <div className="p-3 bg-red-50 text-red-600 rounded-xl">
                             <AlertTriangle className="w-5 h-5" />
                         </div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Unpaid Balance</h3>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("unpaid_balance")}</h3>
                     </div>
                     <p className="text-2xl font-bold text-red-600 relative z-10">{formatCurrency(unpaidBalance)}</p>
-                    <p className="text-xs text-gray-400 mt-2 font-medium">Includes {partiallyPaidOrders} partially paid orders</p>
+                    <p className="text-xs text-gray-400 mt-2 font-medium">{t("unpaid_note", { count: partiallyPaidOrders })}</p>
                 </div>
 
                 {/* Daily Revenue */}
@@ -148,7 +155,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
                             <Activity className="w-5 h-5" />
                         </div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Daily Revenue</h3>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("daily_revenue")}</h3>
                     </div>
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{formatCurrency(dailyRevenue)}</p>
                 </div>
@@ -159,7 +166,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
                             <Activity className="w-5 h-5" />
                         </div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Monthly Revenue</h3>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("monthly_revenue")}</h3>
                     </div>
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{formatCurrency(monthlyRevenue)}</p>
                 </div>
@@ -176,7 +183,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                             }`}>
                             <Activity className="w-5 h-5" />
                         </div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Health Score</h3>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("health_score")}</h3>
                     </div>
                     <p className={`text-2xl font-bold font-serif relative z-10 ${inventoryHealthScore >= 90 ? "text-emerald-600" :
                         inventoryHealthScore >= 70 ? "text-amber-600" :
@@ -195,7 +202,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
                             <ShoppingCart className="w-5 h-5" />
                         </div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Total Orders</h3>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("total_orders")}</h3>
                     </div>
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{totalOrders}</p>
                 </div>
@@ -209,7 +216,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
                             <Clock className="w-5 h-5" />
                         </div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Pending</h3>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("pending")}</h3>
                     </div>
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{pendingOrders}</p>
                 </div>
@@ -223,7 +230,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
                             <Users className="w-5 h-5" />
                         </div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Customers</h3>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("customers")}</h3>
                     </div>
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{totalCustomers}</p>
                 </div>
@@ -237,7 +244,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
                             <Package className="w-5 h-5" />
                         </div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">Products</h3>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("products")}</h3>
                     </div>
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{totalProducts}</p>
                 </div>
@@ -246,25 +253,25 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
             {/* Recent Orders Table */}
             <div className="bg-white rounded-2xl border border-primary/10 shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-primary-dark">Recent Orders</h2>
+                    <h2 className="text-lg font-bold text-primary-dark">{t("recent_orders")}</h2>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                         <thead className="text-xs text-gray-500 uppercase tracking-wider bg-gray-50/50">
                             <tr>
-                                <th className="px-6 py-4 font-medium">Order ID</th>
-                                <th className="px-6 py-4 font-medium">Customer</th>
-                                <th className="px-6 py-4 font-medium">Date</th>
-                                <th className="px-6 py-4 font-medium">Total</th>
-                                <th className="px-6 py-4 font-medium">Payment</th>
-                                <th className="px-6 py-4 font-medium">Status</th>
+                                <th className="px-6 py-4 font-medium">{t("order_id")}</th>
+                                <th className="px-6 py-4 font-medium">{t("customer")}</th>
+                                <th className="px-6 py-4 font-medium">{t("date")}</th>
+                                <th className="px-6 py-4 font-medium">{t("total")}</th>
+                                <th className="px-6 py-4 font-medium">{t("payment")}</th>
+                                <th className="px-6 py-4 font-medium">{t("status")}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {recentOrders.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                                        No orders found yet.
+                                        {t("no_orders")}
                                     </td>
                                 </tr>
                             ) : (
@@ -285,12 +292,12 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1 text-[10px] font-bold rounded-full border ${getPaymentStatusColor(order.paymentStatus)}`}>
-                                                {order.paymentStatus.replace('_', ' ')}
+                                                {ts(order.paymentStatus)}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1 text-[10px] font-bold rounded-full border ${getStatusColor(order.status)}`}>
-                                                {order.status}
+                                                {ts(order.status)}
                                             </span>
                                         </td>
                                     </tr>
@@ -305,15 +312,15 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
             {(unreadNotifications > 0 || lowStockProducts > 0) && (
                 <div className="flex gap-4">
                     {unreadNotifications > 0 && (
-                        <Link href="/admin/notifications" prefetch={true} className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition-colors">
+                        <Link href={`/${locale}/admin/notifications`} prefetch={true} className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition-colors">
                             <Bell className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm font-semibold text-blue-700">{unreadNotifications} Unread Notification{unreadNotifications > 1 ? 's' : ''}</span>
+                            <span className="text-sm font-semibold text-blue-700">{t("notifications.unread", { count: unreadNotifications })}</span>
                         </Link>
                     )}
                     {lowStockProducts > 0 && (
-                        <Link href="/admin/inventory" prefetch={true} className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-100 rounded-xl hover:bg-amber-100 transition-colors">
+                        <Link href={`/${locale}/admin/inventory`} prefetch={true} className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-100 rounded-xl hover:bg-amber-100 transition-colors">
                             <AlertTriangle className="w-4 h-4 text-amber-600" />
-                            <span className="text-sm font-semibold text-amber-700">{lowStockProducts} Low Stock Alert{lowStockProducts > 1 ? 's' : ''}</span>
+                            <span className="text-sm font-semibold text-amber-700">{t("inventory_alerts.low_stock", { count: lowStockProducts })}</span>
                         </Link>
                     )}
                 </div>
@@ -324,17 +331,17 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                 <div className="bg-white rounded-2xl border border-primary/10 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-gray-100 flex items-center gap-3">
                         <Trophy className="w-5 h-5 text-[#D4AF37]" />
-                        <h2 className="text-lg font-bold text-primary-dark">Best Sellers</h2>
+                        <h2 className="text-lg font-bold text-primary-dark">{t("best_sellers")}</h2>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
                             <thead className="text-xs text-gray-500 uppercase tracking-wider bg-gray-50/50">
                                 <tr>
                                     <th className="px-6 py-4 font-medium">#</th>
-                                    <th className="px-6 py-4 font-medium">Product</th>
-                                    <th className="px-6 py-4 font-medium">Category</th>
-                                    <th className="px-6 py-4 font-medium">Units Sold</th>
-                                    <th className="px-6 py-4 font-medium">Revenue</th>
+                                    <th className="px-6 py-4 font-medium">{t("products")}</th>
+                                    <th className="px-6 py-4 font-medium">{tc("nav.categories") || "Category"}</th>
+                                    <th className="px-6 py-4 font-medium">{t("units_sold")}</th>
+                                    <th className="px-6 py-4 font-medium">{t("revenue")}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">

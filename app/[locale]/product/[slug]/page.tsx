@@ -122,12 +122,12 @@ export default function ProductPage() {
     }
 
     return (
-        <main className="pt-24 pb-20 min-h-screen bg-[#FAFAF8]">
+        <main className={`pt-24 pb-20 min-h-screen bg-[#FAFAF8] ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
             <div className="max-w-7xl mx-auto px-6">
                 {/* Header Actions */}
                 <div className="flex items-center justify-between mb-12">
                     <Link href={`/${locale}/catalog`} className="flex items-center gap-2 text-gray-400 hover:text-primary transition-all font-bold group text-sm uppercase tracking-widest">
-                        <ArrowLeft className={`w-4 h-4 group-hover:${isRtl ? "translate-x-1" : "-translate-x-1"} transition-transform`} />
+                        <ArrowLeft className={`w-4 h-4 group-hover:${isRtl ? "translate-x-1" : "-translate-x-1"} transition-transform ${isRtl ? "rotate-180" : ""}`} />
                         {t("back_to_catalog")}
                     </Link>
                 </div>
@@ -150,7 +150,7 @@ export default function ProductPage() {
                             />
 
                             {/* Overlay Badge */}
-                            <div className="absolute top-8 right-8 bg-black/5 backdrop-blur-md px-4 py-2 rounded-full border border-black/5 flex items-center gap-2">
+                            <div className={`absolute top-8 ${isRtl ? "left-8" : "right-8"} bg-black/5 backdrop-blur-md px-4 py-2 rounded-full border border-black/5 flex items-center gap-2`}>
                                 <ShieldCheck className="w-4 h-4 text-primary" />
                                 <span className="text-[10px] font-black uppercase tracking-widest">{t("authentic")}</span>
                             </div>
@@ -163,6 +163,7 @@ export default function ProductPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.2 }}
+                            className={isRtl ? "text-right" : "text-left"}
                         >
                             <span className="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-6">
                                 {product.category?.name || t("premium_fragrance")}
@@ -172,20 +173,20 @@ export default function ProductPage() {
                                 {product.name}
                             </h1>
 
-                            <div className="flex items-center gap-4 mb-10">
+                            <div className="flex items-center gap-4 mb-10 overflow-x-auto whitespace-nowrap">
                                 <p className="text-xl text-gray-400 font-light font-serif italic">{product.brand}</p>
-                                <div className="h-4 w-px bg-gray-200"></div>
+                                <div className="h-4 w-px bg-gray-200 shrink-0"></div>
                                 {product.stockWeight > 0 ? (
-                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${product.stockWeight <= 500 ? "bg-amber-50 text-amber-600" : "bg-green-50 text-green-600"
+                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest shrink-0 ${product.stockWeight <= 500 ? "bg-amber-50 text-amber-600" : "bg-green-50 text-green-600"
                                         }`}>
                                         <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${product.stockWeight <= 500 ? "bg-amber-500" : "bg-green-500"
                                             }`}></div>
                                         {product.stockWeight <= 500
-                                            ? `${t("low_stock")} (${product.stockWeight >= 1000 ? (product.stockWeight / 1000).toFixed(1) + "kg" : product.stockWeight + "g"})`
+                                            ? `${t("low_stock")} (${product.stockWeight >= 1000 ? (product.stockWeight / 1000).toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR', { minimumFractionDigits: 1 }) + "kg" : product.stockWeight + "g"})`
                                             : t("in_stock")}
                                     </div>
                                 ) : (
-                                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest">
+                                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest shrink-0">
                                         <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
                                         {t("out_of_stock")}
                                     </div>
@@ -199,13 +200,13 @@ export default function ProductPage() {
                             {/* Price Card */}
                             <div className="bg-[#1A1A1A] rounded-[2.5rem] p-10 mb-12 text-white relative overflow-hidden group">
                                 <div className="relative z-10">
-                                    <p className="text-[#D4AF37] text-xs font-black uppercase tracking-[0.3em] mb-3">{t("professional_grade")}</p>
-                                    <div className="flex items-baseline gap-3 mb-8">
+                                    <p className={`text-[#D4AF37] text-xs font-black uppercase tracking-[0.3em] mb-3 ${isRtl ? "text-right" : "text-left"}`}>{t("professional_grade")}</p>
+                                    <div className={`flex items-baseline gap-3 mb-8 ${isRtl ? "flex-row-reverse justify-end" : "flex-row"}`}>
                                         <span className="text-5xl font-bold">
-                                            {(selectedVolume?.price || 0).toLocaleString()}
+                                            {(selectedVolume?.price || 0).toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')}
                                         </span>
                                         <span className="text-xl text-gray-500 font-serif">{useTranslations('common')('currency')}</span>
-                                        <span className="ml-4 text-gray-400 text-sm font-light tracking-wide italic">
+                                        <span className={`text-gray-400 text-sm font-light tracking-wide italic ${isRtl ? "mr-4" : "ml-4"}`}>
                                             {t("per_unit")} {selectedVolume ? (selectedVolume.weight >= 1000 ? `${selectedVolume.weight / 1000}kg` : `${selectedVolume.weight}g`) : ""}
                                         </span>
                                     </div>
@@ -213,7 +214,7 @@ export default function ProductPage() {
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-1">
                                             <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">{t("selected_size")}</p>
-                                            <p className="text-lg font-bold flex items-center gap-2">
+                                            <p className={`text-lg font-bold flex items-center gap-2 ${isRtl ? "flex-row-reverse mr-0" : ""}`}>
                                                 <Box className="w-4 h-4 text-[#D4AF37]" />
                                                 {selectedVolume ? (selectedVolume.weight >= 1000 ? `${selectedVolume.weight / 1000}kg` : `${selectedVolume.weight}g`) : ""}
                                             </p>
@@ -221,12 +222,12 @@ export default function ProductPage() {
                                         <div className="space-y-1">
                                             <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">{t("order_total")}</p>
                                             <p className="text-lg font-bold text-[#D4AF37]">
-                                                {((selectedVolume?.price || 0) * quantity).toLocaleString()} {useTranslations('common')('currency')}
+                                                {((selectedVolume?.price || 0) * quantity).toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')} {useTranslations('common')('currency')}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF37]/5 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+                                <div className={`absolute top-0 ${isRtl ? "left-0" : "right-0"} w-64 h-64 bg-[#D4AF37]/5 rounded-full blur-[100px] ${isRtl ? "-ml-32" : "-mr-32"} -mt-32`}></div>
                             </div>
 
                             {/* Controls */}
@@ -258,7 +259,7 @@ export default function ProductPage() {
                                                 disabled={quantity <= 1}
                                                 className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
                                             >
-                                                −
+                                                {isRtl ? "+" : "−"}
                                             </button>
                                             <div className="px-8 text-center min-w-[120px]">
                                                 <span className="block text-2xl font-bold text-gray-950">{quantity}</span>
@@ -271,7 +272,7 @@ export default function ProductPage() {
                                                 disabled={(quantity + 1) * (selectedVolume?.weight || 0) > product.stockWeight}
                                                 className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
                                             >
-                                                +
+                                                {isRtl ? "−" : "+"}
                                             </button>
                                         </div>
                                     </div>
@@ -305,7 +306,7 @@ export default function ProductPage() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className={`mt-8 p-4 rounded-xl text-center text-sm font-bold ${message.includes("success") ? "bg-green-50 text-green-600 border border-green-100" : "bg-red-50 text-red-600 border border-red-100"
+                                    className={`mt-8 p-4 rounded-xl text-center text-sm font-bold ${message.includes("success") || message === t("added_success") ? "bg-green-50 text-green-600 border border-green-100" : "bg-red-50 text-red-600 border border-red-100"
                                         }`}
                                 >
                                     {message}

@@ -6,12 +6,16 @@ import { Search, ChevronDown, CheckCircle2, Clock, Truck, PackageCheck, XCircle,
 import { adminUpdateOrderStatus } from "@/app/admin/actions/order";
 import { OrderStatus } from "@prisma/client";
 import SafeImage from "@/components/SafeImage";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function OrderClientView({ orders }: { orders: any[] }) {
     const router = useRouter();
     const [search, setSearch] = useState("");
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+    const t = useTranslations("admin.orders");
+    const tStatus = useTranslations("common.status");
+    const locale = useLocale();
 
     // Dynamic data refreshing (Polling) for real-time feel
     useEffect(() => {
@@ -27,15 +31,15 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
     );
 
     const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat("en-US", { style: "currency", currency: "DZD" }).format(amount);
+        return new Intl.NumberFormat(locale === "ar" ? "ar-DZ" : "fr-FR", { style: "currency", currency: "DZD" }).format(amount).replace("DZD", "DA");
     };
 
     const formatDate = (dateString: string) => {
-        return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" }).format(new Date(dateString));
+        return new Intl.DateTimeFormat(locale === "ar" ? "ar-DZ" : "fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(dateString));
     };
 
     const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
-        if (!confirm(`Are you sure you want to change this order status to ${newStatus}?`)) return;
+        if (!confirm(t("update_confirm", { status: tStatus(newStatus) }))) return;
 
         setUpdatingId(orderId);
         const res = await adminUpdateOrderStatus(orderId, newStatus);
@@ -46,12 +50,12 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
 
     const StatusBadge = ({ status }: { status: string }) => {
         switch (status) {
-            case "PENDING": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium"><Clock className="w-3.5 h-3.5" /> Pending</span>;
-            case "CONFIRMED": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium"><CheckCircle2 className="w-3.5 h-3.5" /> Confirmed</span>;
-            case "PROCESSING": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-medium"><PackageCheck className="w-3.5 h-3.5" /> Processing</span>;
-            case "SHIPPED": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-purple-50 text-purple-700 rounded-lg text-xs font-medium"><Truck className="w-3.5 h-3.5" /> Shipped</span>;
-            case "DELIVERED": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium"><CheckCircle2 className="w-3.5 h-3.5" /> Delivered</span>;
-            case "CANCELLED": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-700 rounded-lg text-xs font-medium"><XCircle className="w-3.5 h-3.5" /> Cancelled</span>;
+            case "PENDING": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium"><Clock className="w-3.5 h-3.5" /> {tStatus("PENDING")}</span>;
+            case "CONFIRMED": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium"><CheckCircle2 className="w-3.5 h-3.5" /> {tStatus("CONFIRMED")}</span>;
+            case "PROCESSING": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-medium"><PackageCheck className="w-3.5 h-3.5" /> {tStatus("PACKED")}</span>; // Using PACKED as fallback for PROCESSING
+            case "SHIPPED": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-purple-50 text-purple-700 rounded-lg text-xs font-medium"><Truck className="w-3.5 h-3.5" /> {tStatus("SHIPPED")}</span>;
+            case "DELIVERED": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium"><CheckCircle2 className="w-3.5 h-3.5" /> {tStatus("DELIVERED")}</span>;
+            case "CANCELLED": return <span className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-700 rounded-lg text-xs font-medium"><XCircle className="w-3.5 h-3.5" /> {tStatus("CANCELLED")}</span>;
             default: return <span>{status}</span>;
         }
     };
@@ -60,11 +64,11 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="relative w-full sm:w-96">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 rtl:left-auto rtl:right-3" />
                     <input
                         type="text"
-                        placeholder="Search by Order ID or Shop Name..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+                        placeholder={t("search_placeholder")}
+                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 rtl:pl-4 rtl:pr-10"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
@@ -76,11 +80,11 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                     <table className="w-full text-sm text-left">
                         <thead className="text-xs text-gray-500 uppercase tracking-wider bg-gray-50/50">
                             <tr>
-                                <th className="px-6 py-4 font-medium">Order Details</th>
-                                <th className="px-6 py-4 font-medium">Customer Info</th>
-                                <th className="px-6 py-4 font-medium">Total Amount</th>
-                                <th className="px-6 py-4 font-medium">Status & Action</th>
-                                <th className="px-6 py-4 font-medium text-right">Invoice</th>
+                                <th className="px-6 py-4 font-medium">{t("table.order_details")}</th>
+                                <th className="px-6 py-4 font-medium">{t("table.customer_info")}</th>
+                                <th className="px-6 py-4 font-medium">{t("table.total_amount")}</th>
+                                <th className="px-6 py-4 font-medium">{t("table.status_action")}</th>
+                                <th className="px-6 py-4 font-medium text-right rtl:text-left">{t("table.invoice")}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -90,7 +94,7 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                                         <div className="font-mono text-xs font-medium text-gray-800">#{order.id.slice(0, 8).toUpperCase()}</div>
                                         <div className="text-xs text-gray-500 mt-1">{formatDate(order.createdAt)}</div>
                                         <div className="text-xs text-primary mt-1 cursor-pointer hover:underline" onClick={() => setSelectedOrder(order)}>
-                                            {order.items.length} items
+                                            {t("items_count", { count: order.items.length })}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
@@ -106,29 +110,29 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                                             <StatusBadge status={order.status} />
                                             <div className="relative">
                                                 <select
-                                                    className="appearance-none bg-white border border-gray-200 text-xs rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 text-gray-600 disabled:opacity-50"
+                                                    className="appearance-none bg-white border border-gray-200 text-xs rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 text-gray-600 disabled:opacity-50 rtl:pl-8 rtl:pr-3"
                                                     value={order.status}
                                                     onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
                                                     disabled={updatingId === order.id}
                                                 >
                                                     {Object.keys(OrderStatus).map(status => (
-                                                        <option key={status} value={status}>{status}</option>
+                                                        <option key={status} value={status}>{tStatus(status)}</option>
                                                     ))}
                                                 </select>
-                                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none rtl:right-auto rtl:left-2.5" />
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
+                                    <td className="px-6 py-4 text-right rtl:text-left">
                                         {order.invoice ? (
                                             <div className="flex flex-col items-end gap-1">
                                                 <span className="text-xs font-mono text-gray-500">{order.invoice.invoiceNumber}</span>
-                                                <button className="text-xs text-blue-600 hover:underline flex items-center gap-1">
-                                                    <FileText className="w-3.5 h-3.5" /> View
+                                                <button className="text-xs text-blue-600 hover:underline flex items-center gap-1 rtl:flex-row-reverse">
+                                                    <FileText className="w-3.5 h-3.5" /> {t("view_invoice")}
                                                 </button>
                                             </div>
                                         ) : (
-                                            <span className="text-xs text-gray-400 italic">No invoice</span>
+                                            <span className="text-xs text-gray-400 italic">{t("no_invoice")}</span>
                                         )}
                                     </td>
                                 </tr>
@@ -136,7 +140,7 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                             {filteredOrders.length === 0 && (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-10 text-center text-gray-500">
-                                        No orders found matching your search.
+                                        {t("no_orders")}
                                     </td>
                                 </tr>
                             )}
@@ -151,7 +155,7 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                     <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl relative flex flex-col max-h-[90vh]">
                         <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-gray-50/50 shrink-0">
                             <div>
-                                <h2 className="text-lg font-bold text-primary-dark font-serif">Order Details</h2>
+                                <h2 className="text-lg font-bold text-primary-dark font-serif">{t("modal.title")}</h2>
                                 <p className="text-xs font-mono text-gray-500">#{selectedOrder.id}</p>
                             </div>
                             <button onClick={() => setSelectedOrder(null)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-full transition-colors">
@@ -162,29 +166,29 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                         <div className="p-6 overflow-y-auto">
                             <div className="mb-6 grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Customer</p>
+                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{t("modal.customer")}</p>
                                     <p className="text-sm font-semibold text-gray-900">{selectedOrder.customer.shopName}</p>
                                     <p className="text-sm text-gray-600">{selectedOrder.customer.name} | {selectedOrder.customer.phone}</p>
                                     <p className="text-sm text-gray-600">{selectedOrder.customer.address}, {selectedOrder.customer.wilaya}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Status</p>
+                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{t("table.status_action")}</p>
                                     <div className="flex justify-end mb-2"><StatusBadge status={selectedOrder.status} /></div>
                                     <p className="text-xs text-gray-500">{formatDate(selectedOrder.createdAt)}</p>
                                 </div>
                             </div>
 
-                            <h3 className="font-medium text-gray-900 mb-3 border-b border-gray-100 pb-2">Items Included</h3>
+                            <h3 className="font-medium text-gray-900 mb-3 border-b border-gray-100 pb-2">{t("modal.items_included")}</h3>
                             <div className="space-y-3">
                                 {selectedOrder.items.map((item: any, idx: number) => (
                                     <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 p-2 rounded-lg transition-colors">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden relative shrink-0">
-                                                <SafeImage src={item.product?.imageUrl || ''} alt={item.product?.name || 'Product'} fill className="object-cover" />
+                                                <SafeImage src={item.product?.imageUrl || ''} alt={item.product?.name || t("modal.unknown_product")} fill className="object-cover" />
                                             </div>
                                             <div>
-                                                <p className="text-sm font-medium text-gray-900">{item.product?.name || "Unknown Product"}</p>
-                                                <p className="text-xs text-gray-500">{formatCurrency(item.price)} per unit</p>
+                                                <p className="text-sm font-medium text-gray-900">{item.product?.name || t("modal.unknown_product")}</p>
+                                                <p className="text-xs text-gray-500">{formatCurrency(item.price)} {t("modal.per_unit")}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
@@ -196,7 +200,7 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                             </div>
 
                             <div className="mt-6 border-t border-gray-100 pt-4 flex justify-between items-center bg-primary/5 p-4 rounded-xl border-primary/10">
-                                <span className="font-serif font-bold text-gray-900">Total Validated</span>
+                                <span className="font-serif font-bold text-gray-900">{t("modal.total_validated")}</span>
                                 <span className="text-xl font-bold text-primary-dark">{formatCurrency(selectedOrder.totalPrice)}</span>
                             </div>
                         </div>

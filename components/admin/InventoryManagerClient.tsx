@@ -1,4 +1,5 @@
-"use client";
+import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { useState } from "react";
 import { Package, AlertTriangle, XCircle, Search, Edit2, ArrowRightLeft, History } from "lucide-react";
@@ -21,6 +22,9 @@ export default function InventoryManagerClient({
 }: {
     initialProducts: ProductWithStock[]
 }) {
+    const t = useTranslations("admin.inventory");
+    const params = useParams();
+    const locale = params.locale as string;
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("ALL");
     const [isAdjusting, setIsAdjusting] = useState<string | null>(null);
@@ -38,9 +42,9 @@ export default function InventoryManagerClient({
 
     const getStatusDisplay = (status: string) => {
         switch (status) {
-            case "NORMAL": return <span className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><Package className="w-3 h-3" /> Normal</span>;
-            case "LOW_STOCK": return <span className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><AlertTriangle className="w-3 h-3" /> Low Stock</span>;
-            case "OUT_OF_STOCK": return <span className="flex items-center gap-1 text-red-600 bg-red-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><XCircle className="w-3 h-3" /> Out of Stock</span>;
+            case "NORMAL": return <span className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><Package className="w-3 h-3" /> {t("modal.type.SET").split(" ")[0]}</span>;
+            case "LOW_STOCK": return <span className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><AlertTriangle className="w-3 h-3" /> {t("modal.reason_placeholder").split(",")[1].trim()}</span>;
+            case "OUT_OF_STOCK": return <span className="flex items-center gap-1 text-red-600 bg-red-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><XCircle className="w-3 h-3" /> {t("modal.reason_placeholder").split(",")[0].trim()}</span>;
             default: return null;
         }
     };
@@ -85,13 +89,13 @@ export default function InventoryManagerClient({
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
                 <div className="relative w-full sm:max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 rtl:left-auto rtl:right-3" />
                     <input
                         type="text"
-                        placeholder="Search inventory..."
+                        placeholder={t("search_placeholder")}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                        className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 rtl:pl-4 rtl:pr-10"
                     />
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
@@ -115,11 +119,11 @@ export default function InventoryManagerClient({
                     <table className="w-full text-sm text-left">
                         <thead className="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-widest">
                             <tr>
-                                <th className="px-6 py-4 font-bold">Product</th>
-                                <th className="px-6 py-4 font-bold">Status</th>
-                                <th className="px-6 py-4 font-bold text-center">In Stock</th>
-                                <th className="px-6 py-4 font-bold text-center">Low Thresh</th>
-                                <th className="px-6 py-4 font-bold text-right">Actions</th>
+                                <th className="px-6 py-4 font-bold">{t("table.product")}</th>
+                                <th className="px-6 py-4 font-bold">{t("table.brand")}</th>
+                                <th className="px-6 py-4 font-bold text-center">{t("table.stock")}</th>
+                                <th className="px-6 py-4 font-bold text-center">{t("modal.current_stock")}</th>
+                                <th className="px-6 py-4 font-bold text-right rtl:text-left">{t("table.actions")}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -151,9 +155,9 @@ export default function InventoryManagerClient({
                                         {product.lowStockThreshold}g
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center justify-end gap-2">
+                                        <div className="flex items-center justify-end gap-2 rtl:justify-start">
                                             <Link
-                                                href={`/admin/inventory/history?productId=${product.id}`}
+                                                href={`/${locale}/admin/inventory/history?productId=${product.id}`}
                                                 className="p-2 text-gray-400 hover:text-primary bg-gray-50 hover:bg-primary/5 rounded-lg transition-colors tooltip-trigger relative group"
                                             >
                                                 <History className="w-4 h-4" />
@@ -163,7 +167,7 @@ export default function InventoryManagerClient({
                                                 onClick={() => setIsAdjusting(isAdjusting === product.id ? null : product.id)}
                                                 className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 hover:bg-primary-dark hover:text-white text-gray-600 text-xs font-bold rounded-lg transition-colors border border-gray-100 uppercase tracking-widest"
                                             >
-                                                <ArrowRightLeft className="w-3 h-3" /> Adjust
+                                                <ArrowRightLeft className="w-3 h-3" /> {t("modal.adjust_stock").split(" ")[0]}
                                             </button>
                                         </div>
                                     </td>
@@ -179,7 +183,7 @@ export default function InventoryManagerClient({
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="font-serif font-bold text-xl text-primary-dark tracking-tight">Adjust Inventory</h3>
+                            <h3 className="font-serif font-bold text-xl text-primary-dark tracking-tight">{t("modal.adjust_stock")}</h3>
                             <button onClick={() => setIsAdjusting(null)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
                                 <XCircle className="w-5 h-5" />
                             </button>
@@ -195,12 +199,12 @@ export default function InventoryManagerClient({
                                         </div>
                                         <div>
                                             <div className="font-bold text-gray-900 text-sm">{p.name}</div>
-                                            <div className="text-xs text-gray-500 font-medium tracking-wide">Current Stock: <span className="font-bold text-primary-dark">{p.stockWeight}g</span></div>
+                                            <div className="text-xs text-gray-500 font-medium tracking-wide">{t("modal.current_stock")} <span className="font-bold text-primary-dark">{p.stockWeight}g</span></div>
                                         </div>
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Adjustment Quantity (g)</label>
+                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 rtl:ml-0 rtl:mr-1">{t("modal.amount_label")}</label>
                                         <div className="relative">
                                             <input
                                                 type="number"
@@ -231,7 +235,7 @@ export default function InventoryManagerClient({
                                         disabled={loading || adjustQuantity === 0 || !adjustReason}
                                         className="w-full py-4 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all disabled:opacity-50 disabled:shadow-none mt-4"
                                     >
-                                        {loading ? "Processing..." : "Confirm Adjustment"}
+                                        {loading ? t("modal.updating") : t("modal.update")}
                                     </button>
                                 </div>
                             );

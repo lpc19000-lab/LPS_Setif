@@ -118,9 +118,9 @@ export default function CheckoutPage() {
     }
 
     return (
-        <main className="pt-24 pb-20 min-h-screen bg-[#FAFAF8]">
+        <main className={`pt-24 pb-20 min-h-screen bg-[#FAFAF8] ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
             <div className="max-w-7xl mx-auto px-6">
-                <h1 className="text-3xl md:text-4xl font-serif text-primary-dark mb-8">
+                <h1 className={`text-3xl md:text-4xl font-serif text-primary-dark mb-8 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                     {t("title")}
                 </h1>
 
@@ -136,9 +136,9 @@ export default function CheckoutPage() {
                         {/* Order Details Column */}
                         <div className="space-y-6">
                             <div className="bg-white rounded-xl p-6 border border-gray-100">
-                                <h2 className="font-serif text-lg text-gray-800 mb-4">{t("shipping_details")}</h2>
+                                <h2 className={`font-serif text-lg text-gray-800 mb-4 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t("shipping_details")}</h2>
                                 <div className="space-y-4">
-                                    <div>
+                                    <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                                         <label className="block text-sm text-gray-500 mb-1">{t("company_name")}</label>
                                         <input
                                             type="text"
@@ -150,7 +150,7 @@ export default function CheckoutPage() {
                                         />
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
+                                        <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                                             <label className="block text-sm text-gray-500 mb-1">{t("phone")}</label>
                                             <input
                                                 type="text"
@@ -158,10 +158,10 @@ export default function CheckoutPage() {
                                                 value={form.phone}
                                                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                                                 className="input-luxury w-full"
-                                                placeholder="e.g. 0555..."
+                                                placeholder={t("placeholder_phone")}
                                             />
                                         </div>
-                                        <div>
+                                        <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                                             <label className="block text-sm text-gray-500 mb-1">{t("wilaya")}</label>
                                             <WilayaSelector
                                                 value={form.wilayaNumber}
@@ -169,7 +169,7 @@ export default function CheckoutPage() {
                                             />
                                         </div>
                                     </div>
-                                    <div>
+                                    <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                                         <label className="block text-sm text-gray-500 mb-1">{t("address")}</label>
                                         <input
                                             type="text"
@@ -180,7 +180,7 @@ export default function CheckoutPage() {
                                             placeholder={t("placeholder_address")}
                                         />
                                     </div>
-                                    <div>
+                                    <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                                         <label className="block text-sm text-gray-500 mb-1">{t("order_notes")}</label>
                                         <textarea
                                             value={form.notes}
@@ -197,19 +197,19 @@ export default function CheckoutPage() {
                         <div className="space-y-6">
                             {/* Order Items */}
                             <div className="bg-white rounded-xl p-6 border border-gray-100">
-                                <h2 className="font-serif text-lg text-gray-800 mb-4">{t("order_summary")}</h2>
+                                <h2 className={`font-serif text-lg text-gray-800 mb-4 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t("order_summary")}</h2>
                                 <div className="divide-y divide-gray-50 max-h-60 overflow-y-auto pr-2">
                                     {items.map((item) => (
                                         <div
                                             key={item.id}
-                                            className="flex justify-between items-center py-3"
+                                            className={`flex justify-between items-center py-3 ${locale === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}
                                         >
-                                            <div>
+                                            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                                                 <p className="text-gray-800 font-medium">
                                                     {item.product.name}
                                                 </p>
                                                 <p className="text-gray-400 text-sm">
-                                                    {t("qty")}: {item.quantity} × {Number(item.product.basePrice).toLocaleString()} {tCommon("currency")}
+                                                    {t("qty")}: {item.quantity} × {Number(item.product.basePrice).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')} {tCommon("currency")}
                                                 </p>
                                                 <p className="text-[10px] text-primary font-bold">
                                                     {item.product.weight >= 1000 ? `${item.product.weight / 1000}kg` : `${item.product.weight}g`}
@@ -218,7 +218,7 @@ export default function CheckoutPage() {
                                             <p className="font-bold text-gray-700">
                                                 {(
                                                     Number(item.product.basePrice) * item.quantity
-                                                ).toLocaleString()}{" "}
+                                                ).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')}{" "}
                                                 {tCommon("currency")}
                                             </p>
                                         </div>
@@ -227,18 +227,18 @@ export default function CheckoutPage() {
                             </div>
 
                             <div className="bg-white rounded-xl p-6 border border-gray-100">
-                                <div className="flex justify-between items-center text-lg mb-4">
+                                <div className={`flex justify-between items-center text-lg mb-4 ${locale === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                                     <span className="font-serif text-gray-800">{t("total")}</span>
                                     <span className="font-bold text-primary-dark text-2xl">
-                                        {totalPrice.toLocaleString()} {tCommon("currency")}
+                                        {totalPrice.toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')} {tCommon("currency")}
                                     </span>
                                 </div>
-                                <div className="text-sm">
+                                <div className={`text-sm ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                                     {isValidOrder ? (
                                         <p className="text-green-600 font-medium">✓ {t("min_order_met")}</p>
                                     ) : (
                                         <p className="text-red-500 font-medium">
-                                            {t("min_order_error", { amount: (MIN_ORDER_AMOUNT - totalPrice).toLocaleString() })}
+                                            {t("min_order_error", { amount: (MIN_ORDER_AMOUNT - totalPrice).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR') })}
                                         </p>
                                     )}
                                 </div>
@@ -246,7 +246,7 @@ export default function CheckoutPage() {
 
                             {/* Error */}
                             {status === "error" && (
-                                <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-600 text-sm">
+                                <div className={`bg-red-50 border border-red-200 rounded-xl p-4 text-red-600 text-sm ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                                     {errorMsg}
                                 </div>
                             )}

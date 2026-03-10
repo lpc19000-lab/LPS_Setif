@@ -59,9 +59,9 @@ export default async function AccountPage({ params }: { params: { locale: string
     ];
 
     return (
-        <div className="max-w-7xl mx-auto px-6 pt-32 pb-20">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-                <div>
+        <div className={`max-w-7xl mx-auto px-6 pt-32 pb-20 ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
+            <div className={`flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 ${locale === 'ar' ? 'md:flex-row-reverse' : ''}`}>
+                <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                     <h1 className="text-3xl font-serif font-bold text-primary-dark">{t("trader_account")}</h1>
                     <p className="text-gray-500 mt-1">{t("welcome_back")} {customer.name}</p>
                 </div>
@@ -72,18 +72,18 @@ export default async function AccountPage({ params }: { params: { locale: string
                 {/* Profile Card & Saved Cart */}
                 <div className="lg:col-span-1 space-y-6">
                     <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
-                        <div className="flex items-center gap-4 mb-8">
+                        <div className={`flex items-center gap-4 mb-8 ${locale === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl font-serif font-bold">
                                 {(customer.name || "?").charAt(0)}
                             </div>
-                            <div>
+                            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                                 <h2 className="text-xl font-bold text-gray-900">{customer.shopName}</h2>
                                 <p className="text-sm text-gray-500">{customer.name}</p>
                             </div>
                         </div>
 
                         <div className="space-y-6">
-                            <div className="flex items-start gap-4">
+                            <div className={`flex items-start gap-4 ${locale === 'ar' ? 'flex-row-reverse text-right' : 'text-left'}`}>
                                 <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
                                     <Phone className="w-5 h-5" />
                                 </div>
@@ -93,7 +93,7 @@ export default async function AccountPage({ params }: { params: { locale: string
                                 </div>
                             </div>
 
-                            <div className="flex items-start gap-4">
+                            <div className={`flex items-start gap-4 ${locale === 'ar' ? 'flex-row-reverse text-right' : 'text-left'}`}>
                                 <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
                                     <MapPin className="w-5 h-5" />
                                 </div>
@@ -110,8 +110,8 @@ export default async function AccountPage({ params }: { params: { locale: string
                     {/* Saved Cart Preview */}
                     {enrichedCartItems.length > 0 && (
                         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                            <div className={`flex items-center justify-between mb-6 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
+                                <h3 className={`font-bold text-gray-900 flex items-center gap-2 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
                                     <ShoppingCart className="w-4 h-4 text-primary" />
                                     {t("saved_cart")}
                                 </h3>
@@ -121,22 +121,28 @@ export default async function AccountPage({ params }: { params: { locale: string
                             </div>
                             <div className="space-y-4 mb-6">
                                 {enrichedCartItems.slice(0, 3).map((item) => (
-                                    <div key={item.id} className="flex items-center gap-3">
+                                    <div key={item.id} className={`flex items-center gap-3 ${locale === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                                         <div className="w-10 h-10 bg-gray-50 rounded-lg border border-gray-100 p-1 flex-shrink-0 relative overflow-hidden">
                                             <SafeImage src={item.product.imageUrl} alt={item.product.name} fill className="object-contain" />
                                         </div>
                                         {/* Item Info */}
-                                        <div className="flex-1 min-w-0">
+                                        <div className={`flex-1 min-w-0 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                                             <h4 className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors truncate">
                                                 {item.product.name}
                                             </h4>
-                                            <div className="flex items-center gap-2 mt-1">
+                                            <div className={`flex items-center gap-2 mt-1 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
                                                 <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider truncate">
                                                     {item.product.brand}
                                                 </span>
                                                 <div className="w-1 h-1 rounded-full bg-gray-200" />
                                                 <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
-                                                    {useTranslations("checkout")("qty")}: {item.quantity} · {item.weight}g
+                                                    {locale === 'ar' ? (
+                                                        <span className="flex flex-row-reverse gap-1">
+                                                            {item.weight}g · {item.quantity} :{com("labels.qty" as any) || "Quantité"}
+                                                        </span>
+                                                    ) : (
+                                                        `${com("labels.qty" as any) || "Quantité"}: ${item.quantity} · ${item.weight}g`
+                                                    )}
                                                 </span>
                                             </div>
                                         </div>
@@ -150,7 +156,7 @@ export default async function AccountPage({ params }: { params: { locale: string
                             </div>
                             <Link
                                 href={`/${locale}/cart`}
-                                className="w-full flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all"
+                                className={`w-full flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all ${locale === 'ar' ? 'flex-row-reverse' : ''}`}
                             >
                                 <ShoppingCart className="w-3.5 h-3.5" />
                                 {t("review_checkout")}
@@ -160,13 +166,13 @@ export default async function AccountPage({ params }: { params: { locale: string
 
                     <Link
                         href={`/${locale}/catalog`}
-                        className="flex items-center justify-between p-6 bg-primary rounded-2xl text-white group hover:bg-primary-dark transition-all shadow-lg shadow-primary/20"
+                        className={`flex items-center justify-between p-6 bg-primary rounded-2xl text-white group hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}
                     >
-                        <div>
+                        <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                             <p className="text-sm font-medium opacity-80 mb-1">{t("stock_ready")}</p>
                             <p className="text-lg font-bold">{t("browse_catalog")}</p>
                         </div>
-                        <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className={`w-6 h-6 group-hover:translate-x-1 transition-transform ${locale === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
                     </Link>
                 </div>
 
@@ -175,8 +181,8 @@ export default async function AccountPage({ params }: { params: { locale: string
                     {/* Stats Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {stats.map((stat) => (
-                            <div key={stat.label} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                                <div>
+                            <div key={stat.label} className={`bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
+                                <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
                                     <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                                 </div>
@@ -189,7 +195,7 @@ export default async function AccountPage({ params }: { params: { locale: string
 
                     {/* Recent Orders Preview */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                        <div className={`p-6 border-b border-gray-100 flex items-center justify-between ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
                             <h3 className="font-bold text-gray-900">{t("recent_orders")}</h3>
                             <Link href={`/${locale}/account/orders`} className="text-sm font-bold text-primary hover:text-primary-dark transition-colors">
                                 {t("view_all")}

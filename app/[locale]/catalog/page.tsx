@@ -100,7 +100,7 @@ function CatalogContent() {
     const brands = Array.from(new Set(products.map((p) => p.brand).filter(Boolean)));
 
     return (
-        <main className="pt-24 pb-20 min-h-screen bg-[#FAFAF8]">
+        <main className={`pt-24 pb-20 min-h-screen bg-[#FAFAF8] ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
             <div className="max-w-7xl mx-auto px-6">
                 {/* Header */}
                 <div className="text-center mb-12">
@@ -114,13 +114,15 @@ function CatalogContent() {
 
                 {/* Filters */}
                 <div className="flex flex-col md:flex-row gap-4 mb-10">
-                    <input
-                        type="text"
-                        placeholder={t("search_placeholder")}
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="input-luxury flex-1"
-                    />
+                    <div className="relative flex-1">
+                        <input
+                            type="text"
+                            placeholder={t("search_placeholder")}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="input-luxury w-full"
+                        />
+                    </div>
                     <select
                         value={categoryFilter}
                         onChange={(e) => setCategoryFilter(e.target.value)}
@@ -176,7 +178,7 @@ function CatalogContent() {
                                 transition={{ delay: i * 0.05, duration: 0.5 }}
                             >
                                 <Link href={`/${locale}/product/${product.id}`}>
-                                    <div className="product-card group cursor-pointer">
+                                    <div className={`product-card group cursor-pointer ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                                         <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
                                             <SafeImage
                                                 src={product.imageUrl}
@@ -185,12 +187,12 @@ function CatalogContent() {
                                                 className="object-cover group-hover:scale-105 transition-transform duration-700"
                                             />
                                             {product.stockWeight <= 0 && (
-                                                <span className="absolute top-3 right-3 bg-gray-900/80 text-white text-xs px-2.5 py-1 rounded-full">
+                                                <span className={`absolute top-3 ${locale === 'ar' ? 'left-3' : 'right-3'} bg-gray-900/80 text-white text-xs px-2.5 py-1 rounded-full`}>
                                                     {tCommon("out_of_stock")}
                                                 </span>
                                             )}
                                             {product.stockWeight > 0 && product.stockWeight <= product.lowStockThreshold && (
-                                                <span className="absolute top-3 right-3 bg-red-500/90 text-white text-xs px-2.5 py-1 rounded-full">
+                                                <span className={`absolute top-3 ${locale === 'ar' ? 'left-3' : 'right-3'} bg-red-500/90 text-white text-xs px-2.5 py-1 rounded-full`}>
                                                     {tCommon("low_stock")}
                                                 </span>
                                             )}
@@ -206,15 +208,15 @@ function CatalogContent() {
                                             </h3>
                                             <p className="text-gray-400 text-sm mb-3">{product.brand}</p>
                                             <div className="flex items-end justify-between">
-                                                <div>
+                                                <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                                                     <p className="text-primary-dark font-bold text-xl">
-                                                        {Number(product.basePrice).toLocaleString()} {tCommon("currency")}
+                                                        {Number(product.basePrice).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')} {tCommon("currency")}
                                                     </p>
                                                     <p className="text-gray-400 text-xs mt-0.5">
                                                         {tCommon("per_100ml")}
                                                     </p>
                                                 </div>
-                                                <span className="text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <span className={`text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity ${locale === 'ar' ? 'rotate-180' : ''}`}>
                                                     {tBtn("view")} →
                                                 </span>
                                             </div>

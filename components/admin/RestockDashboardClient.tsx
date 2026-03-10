@@ -1,4 +1,6 @@
-"use client";
+import { AlertTriangle, TrendingDown, PackageOpen, AlertCircle, Ghost } from "lucide-react";
+import Image from "next/image";
+import { useTranslations, useLocale } from "next-intl";
 
 import { AlertTriangle, TrendingDown, PackageOpen, AlertCircle, Ghost } from "lucide-react";
 import Image from "next/image";
@@ -28,8 +30,10 @@ type DeadStock = {
 };
 
 export default function RestockDashboardClient({ suggestions, deadStock }: { suggestions: Suggestion[], deadStock: DeadStock[] }) {
+    const t = useTranslations("admin.restock");
+    const locale = useLocale();
 
-    const formatCurrency = (amt: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "DZD", maximumFractionDigits: 0 }).format(amt);
+    const formatCurrency = (amt: number) => new Intl.NumberFormat(locale === "ar" ? "ar-DZ" : "fr-FR", { style: "currency", currency: "DZD", maximumFractionDigits: 0 }).format(amt);
 
     const getStatusStyle = (status: string) => {
         switch (status) {
@@ -48,21 +52,21 @@ export default function RestockDashboardClient({ suggestions, deadStock }: { sug
             <section>
                 <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
-                        <PackageOpen className="w-5 h-5" />
+                        <PackageOpen className="w-5 h-5 px-0" />
                     </div>
-                    <h2 className="text-xl font-bold text-primary-dark">Restock Suggestions</h2>
+                    <h2 className="text-xl font-bold text-primary-dark">{t("suggestions.title")}</h2>
                 </div>
 
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                     <div className="overflow-x-auto custom-scrollbar max-h-[600px]">
-                        <table className="w-full text-sm text-left relative">
+                        <table className="w-full text-sm text-left rtl:text-right relative">
                             <thead className="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-widest sticky top-0 z-10 backdrop-blur-md">
                                 <tr>
-                                    <th className="px-6 py-4 font-bold">Product</th>
-                                    <th className="px-6 py-4 font-bold text-center">In Stock (g)</th>
-                                    <th className="px-6 py-4 font-bold text-center">30d Velocity (g)</th>
-                                    <th className="px-6 py-4 font-bold text-center">Runway</th>
-                                    <th className="px-6 py-4 font-bold">Recommendation</th>
+                                    <th className="px-6 py-4 font-bold">{t("suggestions.table.product")}</th>
+                                    <th className="px-6 py-4 font-bold text-center">{t("suggestions.table.in_stock")}</th>
+                                    <th className="px-6 py-4 font-bold text-center">{t("suggestions.table.velocity")}</th>
+                                    <th className="px-6 py-4 font-bold text-center">{t("suggestions.table.runway")}</th>
+                                    <th className="px-6 py-4 font-bold">{t("suggestions.table.recommendation")}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
@@ -96,7 +100,7 @@ export default function RestockDashboardClient({ suggestions, deadStock }: { sug
                                                         "text-emerald-500"
                                                 }`}>
                                                 {p.estimatedDaysLeft === 999 ? "∞" : p.estimatedDaysLeft}
-                                                <span className="text-xs font-sans text-gray-400 font-bold uppercase tracking-widest ml-1">Days</span>
+                                                <span className="text-xs font-sans text-gray-400 font-bold uppercase tracking-widest ml-1 rtl:ml-0 rtl:mr-1">{t("suggestions.days")}</span>
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
@@ -119,8 +123,8 @@ export default function RestockDashboardClient({ suggestions, deadStock }: { sug
                         <Ghost className="w-5 h-5" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold text-primary-dark">Dead Stock Analysis</h2>
-                        <p className="text-xs text-gray-500 mt-0.5">Products with 0 sales in the last 60 days.</p>
+                        <h2 className="text-xl font-bold text-primary-dark">{t("dead_stock.title")}</h2>
+                        <p className="text-xs text-gray-500 mt-0.5">{t("dead_stock.subtitle")}</p>
                     </div>
                 </div>
 
@@ -129,19 +133,19 @@ export default function RestockDashboardClient({ suggestions, deadStock }: { sug
                         <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-4">
                             <TrendingDown className="w-8 h-8" />
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900">No Dead Stock Detected</h3>
-                        <p className="text-sm text-gray-500 mt-2 max-w-sm">All products in your warehouse have seen movement in the last 60 days. Your inventory is highly liquid.</p>
+                        <h3 className="text-lg font-bold text-gray-900">{t("dead_stock.no_dead_stock")}</h3>
+                        <p className="text-sm text-gray-500 mt-2 max-w-sm">{t("dead_stock.no_dead_stock_desc")}</p>
                     </div>
                 ) : (
                     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="overflow-x-auto custom-scrollbar max-h-[500px]">
-                            <table className="w-full text-sm text-left relative">
+                            <table className="w-full text-sm text-left rtl:text-right relative">
                                 <thead className="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-widest sticky top-0 z-10 backdrop-blur-md">
                                     <tr>
-                                        <th className="px-6 py-4 font-bold">Product</th>
-                                        <th className="px-6 py-4 font-bold text-center">Unsold Stock</th>
-                                        <th className="px-6 py-4 font-bold text-center">Days Stagnant</th>
-                                        <th className="px-6 py-4 font-bold text-right">Value Tied Up</th>
+                                        <th className="px-6 py-4 font-bold">{t("dead_stock.table.product")}</th>
+                                        <th className="px-6 py-4 font-bold text-center">{t("dead_stock.table.unsold")}</th>
+                                        <th className="px-6 py-4 font-bold text-center">{t("dead_stock.table.days_stagnant")}</th>
+                                        <th className="px-6 py-4 font-bold text-right rtl:text-left">{t("dead_stock.table.value")}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
@@ -164,7 +168,7 @@ export default function RestockDashboardClient({ suggestions, deadStock }: { sug
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <div className="flex items-center justify-center gap-1.5 text-red-500 font-bold">
-                                                    <AlertCircle className="w-4 h-4" /> {p.daysSinceAdded} days
+                                                    <AlertCircle className="w-4 h-4" /> {p.daysSinceAdded} {t("suggestions.days")}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-right">
@@ -173,7 +177,7 @@ export default function RestockDashboardClient({ suggestions, deadStock }: { sug
                                         </tr>
                                     ))}
                                     <tr className="bg-gray-50/50">
-                                        <td colSpan={3} className="px-6 py-4 text-right font-bold text-gray-500 uppercase tracking-widest text-xs">Total Dead Capital:</td>
+                                        <td colSpan={3} className="px-6 py-4 text-right rtl:text-left font-bold text-gray-500 uppercase tracking-widest text-xs">{t("dead_stock.total_capital")}</td>
                                         <td className="px-6 py-4 text-right font-serif font-bold text-2xl text-purple-700">
                                             {formatCurrency(deadStock.reduce((sum, item) => sum + item.valueTieUp, 0))}
                                         </td>

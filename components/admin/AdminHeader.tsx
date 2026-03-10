@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, AlertCircle, Info, ChevronRight, Activity, Bell } from "lucide-react";
 import Link from "next/link";
+import { useTranslations, useLocale } from "next-intl";
 
 type Alert = {
     type: "CRITICAL" | "WARNING" | "INFO";
@@ -10,6 +10,8 @@ type Alert = {
 };
 
 export default function AdminHeader() {
+    const locale = useLocale();
+    const t = useTranslations("admin.header");
     const [alerts, setAlerts] = useState<Alert[]>([]);
     const [healthScore, setHealthScore] = useState<number>(100);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -83,22 +85,22 @@ export default function AdminHeader() {
         <header className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-8">
             <div className="flex items-center gap-4 flex-1">
                 {highestAlert ? (
-                    <Link href="/admin/restock" className={`flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-colors group ${getAlertStyle(highestAlert.type)} hover:opacity-90`}>
+                    <Link href={`/${locale}/admin/restock`} className={`flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-colors group ${getAlertStyle(highestAlert.type)} hover:opacity-90`}>
                         <div className="flex items-center gap-3">
                             {getAlertIcon(highestAlert.type)}
                             <div>
-                                <span className="font-bold text-sm block leading-none mb-1">Smart Alert Active</span>
+                                <span className="font-bold text-sm block leading-none mb-1">{t("smart_alert")}</span>
                                 <span className="text-xs opacity-80">{highestAlert.message}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                            View Details <ChevronRight className="w-4 h-4" />
+                            {t("view_details")} <ChevronRight className="w-4 h-4" />
                         </div>
                     </Link>
                 ) : (
                     <div className="flex-1 px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 flex items-center gap-3 text-gray-400">
                         <Info className="w-5 h-5" />
-                        <span className="text-sm font-medium">No active alerts. Systems normal.</span>
+                        <span className="text-sm font-medium">{t("no_alerts")}</span>
                     </div>
                 )}
             </div>
@@ -106,7 +108,7 @@ export default function AdminHeader() {
             {/* Notifications and Health */}
             <div className="shrink-0 flex items-center gap-6 pl-4 sm:border-l border-gray-100">
                 {/* Notification Bell */}
-                <Link href="/admin/notifications" className="relative p-2 text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-xl">
+                <Link href={`/${locale}/admin/notifications`} className="relative p-2 text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-xl">
                     <Bell className="w-6 h-6" />
                     {unreadCount > 0 && (
                         <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white ring-2 ring-red-500/10">
@@ -117,17 +119,17 @@ export default function AdminHeader() {
 
                 <div className="flex items-center gap-4">
                     <div className="text-right">
-                        <span className="block text-[10px] uppercase tracking-widest font-bold text-gray-400">Inventory Health</span>
+                        <span className="block text-[10px] uppercase tracking-widest font-bold text-gray-400">{t("inventory_health")}</span>
                         <span className={`font-serif text-2xl font-bold ${healthScore >= 90 ? "text-emerald-500" :
-                                healthScore >= 70 ? "text-amber-500" :
-                                    "text-red-500"
+                            healthScore >= 70 ? "text-amber-500" :
+                                "text-red-500"
                             }`}>
                             {healthScore}%
                         </span>
                     </div>
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center border-4 ${healthScore >= 90 ? "border-emerald-100 bg-emerald-50 text-emerald-500" :
-                            healthScore >= 70 ? "border-amber-100 bg-amber-50 text-amber-500" :
-                                "border-red-100 bg-red-50 text-red-500"
+                        healthScore >= 70 ? "border-amber-100 bg-amber-50 text-amber-500" :
+                            "border-red-100 bg-red-50 text-red-500"
                         }`}>
                         <Activity className="w-5 h-5" />
                     </div>

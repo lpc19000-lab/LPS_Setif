@@ -10,8 +10,8 @@ const FragranceScroll = dynamic(() => import("@/components/FragranceScroll"), {
 });
 
 // Server-side data fetching — runs on the server with caching
-async function ProductSections() {
-    const t = await getTranslations("home");
+async function ProductSections({ locale }: { locale: string }) {
+    const t = await getTranslations({ locale, namespace: "home" });
     const [newArrivals, bestSellers, featured] = await Promise.all([
         getNewArrivals(8),
         getBestSellers(4),
@@ -41,10 +41,11 @@ async function ProductSections() {
 
 export default async function HomePage({ params }: { params: { locale: string } }) {
     const { locale } = params;
-    const t = await getTranslations("home");
+    const t = await getTranslations({ locale, namespace: "home" });
+    const tc = await getTranslations({ locale, namespace: "common" });
 
     return (
-        <main>
+        <main className={locale === 'ar' ? 'rtl' : 'ltr'}>
             {/* ── Cinematic Hero ──── */}
             <FragranceScroll />
 
@@ -73,7 +74,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
                     </section>
                 }
             >
-                <ProductSections />
+                <ProductSections locale={locale} />
             </Suspense>
 
             {/* ── Features Section ──── */}
@@ -86,16 +87,16 @@ export default async function HomePage({ params }: { params: { locale: string } 
             <footer className="py-12 bg-[#0a0a0a] border-t border-white/5">
                 <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-2">
-                        <span className="font-serif text-xl font-bold text-[#D4AF37]">{t('common.nav.lps')}</span>
-                        <span className="text-white/30 text-xs tracking-[0.3em] uppercase">{t('common.nav.perfume')}</span>
+                        <span className="font-serif text-xl font-bold text-[#D4AF37]">{tc('nav.lps')}</span>
+                        <span className="text-white/30 text-xs tracking-[0.3em] uppercase">{tc('nav.perfume')}</span>
                     </div>
                     <div className="flex gap-8 text-white/40 text-sm">
-                        <Link href={`/${locale}/catalog`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">{t('common.nav.boutique')}</Link>
-                        <Link href={`/${locale}/register`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">{t('common.buttons.register')}</Link>
-                        <Link href={`/${locale}/login`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">{t('common.buttons.sign_in')}</Link>
+                        <Link href={`/${locale}/catalog`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">{tc('nav.boutique')}</Link>
+                        <Link href={`/${locale}/register`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">{tc('buttons.register')}</Link>
+                        <Link href={`/${locale}/login`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">{tc('buttons.sign_in')}</Link>
                     </div>
                     <p className="text-white/20 text-xs">
-                        © {new Date().getFullYear()} {t('common.nav.lps')} {t('common.nav.perfume')}. {t("footer_rights")}.
+                        © {new Date().getFullYear()} {tc('nav.lps')} {tc('nav.perfume')}. {t("footer_rights")}.
                     </p>
                 </div>
             </footer>

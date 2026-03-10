@@ -1,11 +1,13 @@
-import prisma from "@/lib/db";
-import InventoryManagerClient from "@/components/admin/InventoryManagerClient";
 import { PackageSearch, History } from "lucide-react";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminInventoryPage() {
+export default async function AdminInventoryPage({ params }: { params: { locale: string } }) {
+    const { locale } = params;
+    const t = await getTranslations({ locale, namespace: "admin.inventory" });
+
     const products = await prisma.product.findMany({
         orderBy: { name: 'asc' },
     });
@@ -16,15 +18,15 @@ export default async function AdminInventoryPage() {
                 <div>
                     <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight flex items-center gap-3">
                         <PackageSearch className="w-8 h-8 text-[#D4AF37]" />
-                        Warehouse Overview
+                        {t("title")}
                     </h1>
-                    <p className="text-sm text-gray-500 mt-2 font-medium">Manage stock levels, perform adjustments, and view inventory history.</p>
+                    <p className="text-sm text-gray-500 mt-2 font-medium">{t("subtitle")}</p>
                 </div>
                 <Link
-                    href="/admin/inventory/history"
+                    href={`/${locale}/admin/inventory/history`}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-bold uppercase tracking-widest rounded-2xl transition-all border border-gray-100 shadow-sm"
                 >
-                    <History className="w-4 h-4" /> Move History
+                    <History className="w-4 h-4" /> {t("move_history")}
                 </Link>
             </div>
 

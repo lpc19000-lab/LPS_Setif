@@ -7,6 +7,7 @@ import {
 } from "recharts";
 import { TrendingUp, Users, ShoppingBag, AlertTriangle, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import { useTranslations, useLocale } from "next-intl";
 
 type AnalyticsData = {
     productAnalytics: any[];
@@ -21,8 +22,10 @@ type AnalyticsData = {
 };
 
 export default function AnalyticsDashboardClient({ productAnalytics, revenueMetrics, topCustomers, profitSnapshot }: AnalyticsData) {
+    const t = useTranslations("admin.analytics");
+    const locale = useLocale();
 
-    const formatCurrency = (amt: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "DZD", maximumFractionDigits: 0 }).format(amt);
+    const formatCurrency = (amt: number) => new Intl.NumberFormat(locale === "ar" ? "ar-DZ" : "fr-FR", { style: "currency", currency: "DZD", maximumFractionDigits: 0 }).format(amt);
 
     // Summary stats
     const totalRevenue30d = useMemo(() => revenueMetrics.dailyRevenue.reduce((sum, d) => sum + d.revenue, 0), [revenueMetrics]);
@@ -38,7 +41,7 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                             <TrendingUp className="w-5 h-5" />
                         </div>
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">30-Day Revenue</h3>
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t("stats.revenue_30d")}</h3>
                     </div>
                     <p className="text-3xl font-serif font-bold text-primary-dark relative z-10">{formatCurrency(totalRevenue30d)}</p>
                 </div>
@@ -49,7 +52,7 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                         <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
                             <ShoppingBag className="w-5 h-5" />
                         </div>
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">30-Day Orders</h3>
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t("stats.orders_30d")}</h3>
                     </div>
                     <p className="text-3xl font-serif font-bold text-primary-dark relative z-10">{totalOrders30d}</p>
                 </div>
@@ -60,7 +63,7 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                         <div className="w-10 h-10 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37]">
                             <Users className="w-5 h-5" />
                         </div>
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Top Buyers</h3>
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t("stats.top_buyers")}</h3>
                     </div>
                     <p className="text-3xl font-serif font-bold text-primary-dark relative z-10">{topCustomers.length}</p>
                 </div>
@@ -71,7 +74,7 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                         <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
                             <TrendingUp className="w-5 h-5" />
                         </div>
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">30-Day Profit</h3>
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t("stats.profit_30d")}</h3>
                     </div>
                     <p className="text-3xl font-serif font-bold text-primary-dark relative z-10">{formatCurrency(profitSnapshot.overallProfit)}</p>
                 </div>
@@ -82,7 +85,7 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                         <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">
                             <ArrowUpRight className="w-5 h-5" />
                         </div>
-                        <h3 className="text-xs font-bold text-white/60 uppercase tracking-widest">High Demand Items</h3>
+                        <h3 className="text-xs font-bold text-white/60 uppercase tracking-widest">{t("stats.high_demand")}</h3>
                     </div>
                     <p className="text-3xl font-serif font-bold text-[#D4AF37] relative z-10">
                         {productAnalytics.filter(p => p.demandForecast === "High Demand").length}
@@ -94,7 +97,7 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="mb-6">
-                        <h2 className="text-lg font-bold text-primary-dark">Daily Revenue (Last 30 Days)</h2>
+                        <h2 className="text-lg font-bold text-primary-dark">{t("charts.daily_revenue")}</h2>
                     </div>
                     <div className="h-72">
                         <ResponsiveContainer width="100%" height="100%">
@@ -109,7 +112,7 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af' }} tickFormatter={(val) => val.slice(5)} />
                                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af' }} tickFormatter={(val) => `${val / 1000}k`} />
                                 <RechartsTooltip
-                                    formatter={(value: any) => [formatCurrency(Number(value) || 0), "Revenue"]}
+                                    formatter={(value: any) => [formatCurrency(Number(value) || 0), t("charts.revenue")]}
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                 />
                                 <Area type="monotone" dataKey="revenue" stroke="#1E2A38" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
@@ -120,9 +123,9 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
 
                 <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="mb-6 flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-primary-dark">Daily Profit & Cost</h2>
+                        <h2 className="text-lg font-bold text-primary-dark">{t("charts.daily_profit_cost")}</h2>
                         <div className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-bold border border-purple-100">
-                            Avg Margin: {profitSnapshot.globalMarginPercent.toFixed(1)}%
+                            {t("charts.avg_margin")} {profitSnapshot.globalMarginPercent.toFixed(1)}%
                         </div>
                     </div>
                     <div className="h-72">
@@ -142,7 +145,10 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af' }} tickFormatter={(val) => val.slice(5)} />
                                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af' }} tickFormatter={(val) => `${val / 1000}k`} />
                                 <RechartsTooltip
-                                    formatter={(value: any, name: string | undefined) => [formatCurrency(Number(value) || 0), name ? name.charAt(0).toUpperCase() + name.slice(1) : ""]}
+                                    formatter={(value: any, name: string | undefined) => [
+                                        formatCurrency(Number(value) || 0),
+                                        name === "profit" ? t("charts.profit") : name === "cost" ? t("charts.cost") : name
+                                    ]}
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                 />
                                 <Area type="monotone" dataKey="profit" stroke="#9333ea" strokeWidth={3} fillOpacity={1} fill="url(#colorProfit)" />
@@ -154,7 +160,7 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
 
                 <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="mb-6">
-                        <h2 className="text-lg font-bold text-primary-dark">Daily Orders (Last 30 Days)</h2>
+                        <h2 className="text-lg font-bold text-primary-dark">{t("charts.daily_orders")}</h2>
                     </div>
                     <div className="h-72">
                         <ResponsiveContainer width="100%" height="100%">
@@ -164,6 +170,7 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af' }} />
                                 <RechartsTooltip
                                     cursor={{ fill: '#f9fafb' }}
+                                    formatter={(value: any) => [value, t("charts.orders")]}
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                 />
                                 <Bar dataKey="orders" fill="#D4AF37" radius={[4, 4, 0, 0]} maxBarSize={40} />
@@ -177,16 +184,16 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                 {/* Product Performance Table */}
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden lg:col-span-2 flex flex-col">
                     <div className="p-6 border-b border-gray-50 flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-primary-dark">Product Performance & Forecast</h2>
+                        <h2 className="text-lg font-bold text-primary-dark">{t("performance.title")}</h2>
                     </div>
                     <div className="overflow-x-auto flex-1 custom-scrollbar max-h-[500px]">
                         <table className="w-full text-sm text-left relative">
                             <thead className="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-widest sticky top-0 z-10 backdrop-blur-md">
                                 <tr>
-                                    <th className="px-6 py-4 font-bold">Product</th>
-                                    <th className="px-6 py-4 font-bold text-center">30d Demand</th>
-                                    <th className="px-6 py-4 font-bold text-right">Lifetime Sold</th>
-                                    <th className="px-6 py-4 font-bold text-right">Revenue</th>
+                                    <th className="px-6 py-4 font-bold">{t("performance.table.product")}</th>
+                                    <th className="px-6 py-4 font-bold text-center">{t("performance.table.demand")}</th>
+                                    <th className="px-6 py-4 font-bold text-right rtl:text-left">{t("performance.table.lifetime_sold")}</th>
+                                    <th className="px-6 py-4 font-bold text-right rtl:text-left">{t("performance.table.revenue")}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
@@ -209,9 +216,9 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                                                     p.demandForecast === "Medium Demand" ? "bg-amber-50 text-amber-600 border border-amber-100" :
                                                         "bg-gray-50 text-gray-500 border border-gray-100"
                                                     }`}>
-                                                    {p.demandForecast}
+                                                    {t(`performance.demand_levels.${p.demandForecast}`)}
                                                 </span>
-                                                <span className="text-xs text-gray-500 font-medium">({p.recentUnits30d} units)</span>
+                                                <span className="text-xs text-gray-500 font-medium">({p.recentUnits30d} {t("performance.units")})</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
@@ -230,8 +237,8 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                 {/* Top Customers LTV */}
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                     <div className="p-6 border-b border-gray-50">
-                        <h2 className="text-lg font-bold text-primary-dark">Top Customers (LTV)</h2>
-                        <p className="text-xs text-gray-500 mt-1">Highest total spend value</p>
+                        <h2 className="text-lg font-bold text-primary-dark">{t("top_customers.title")}</h2>
+                        <p className="text-xs text-gray-500 mt-1">{t("top_customers.subtitle")}</p>
                     </div>
                     <div className="p-2 space-y-1 overflow-y-auto custom-scrollbar max-h-[500px]">
                         {topCustomers.map((c, i) => (
@@ -245,13 +252,13 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <h4 className="font-bold text-gray-900 truncate">{c.shopName}</h4>
-                                    <p className="text-xs text-gray-500 truncate">{c.name} • {c.orderCount} orders</p>
+                                    <p className="text-xs text-gray-500 truncate">{c.name} • {c.orderCount} {t("top_customers.orders")}</p>
                                     <p className="font-serif font-bold text-primary-dark text-lg mt-1">{formatCurrency(c.totalSpent)}</p>
                                 </div>
                             </div>
                         ))}
                         {topCustomers.length === 0 && (
-                            <div className="p-8 text-center text-gray-400 text-sm">No valid orders found to rank customers.</div>
+                            <div className="p-8 text-center text-gray-400 text-sm">{t("top_customers.no_data")}</div>
                         )}
                     </div>
                 </div>
@@ -259,8 +266,8 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                 {/* Top Profitable Products */}
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                     <div className="p-6 border-b border-gray-50">
-                        <h2 className="text-lg font-bold text-primary-dark">Top Profitable Products</h2>
-                        <p className="text-xs text-gray-500 mt-1">Products generating the highest absolute profit</p>
+                        <h2 className="text-lg font-bold text-primary-dark">{t("top_profitable.title")}</h2>
+                        <p className="text-xs text-gray-500 mt-1">{t("top_profitable.subtitle")}</p>
                     </div>
                     <div className="p-2 space-y-1 overflow-y-auto custom-scrollbar max-h-[500px]">
                         {profitSnapshot.topProfitableProducts.map((p, i) => (
@@ -274,13 +281,13 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <h4 className="font-bold text-gray-900 truncate">{p.name}</h4>
-                                    <p className="text-xs text-gray-500 truncate">{p.unitsSold} units sold • {p.marginPercent.toFixed(1)}% margin</p>
+                                    <p className="text-xs text-gray-500 truncate">{p.unitsSold} {t("top_profitable.units_sold")} • {p.marginPercent.toFixed(1)}% {t("top_profitable.margin")}</p>
                                     <p className="font-serif font-bold text-purple-700 text-lg mt-1">{formatCurrency(p.totalProfit)}</p>
                                 </div>
                             </div>
                         ))}
                         {profitSnapshot.topProfitableProducts.length === 0 && (
-                            <div className="p-8 text-center text-gray-400 text-sm">No sales data available.</div>
+                            <div className="p-8 text-center text-gray-400 text-sm">{t("top_profitable.no_data")}</div>
                         )}
                     </div>
                 </div>

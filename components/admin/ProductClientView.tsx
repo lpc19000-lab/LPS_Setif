@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Search, Edit2, Trash2, X, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { createProduct, updateProduct, deleteProduct } from "@/app/admin/actions/product";
+import { useTranslations, useLocale } from "next-intl";
 
 type ProductWithCategory = any;
 
@@ -29,6 +30,8 @@ export default function ProductClientView({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<ProductWithCategory | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const t = useTranslations("admin.products");
+    const locale = useLocale();
 
     const filteredProducts = products.filter((p) => {
         const matchesSearch =
@@ -39,7 +42,7 @@ export default function ProductClientView({
     });
 
     const formatCurrency = (amount: number) =>
-        new Intl.NumberFormat("en-US", { style: "currency", currency: "DZD" }).format(amount);
+        new Intl.NumberFormat(locale === "ar" ? "ar-DZ" : "fr-FR", { style: "currency", currency: "DZD" }).format(amount).replace("DZD", "DA");
 
     const handleOpenModal = (product: ProductWithCategory | null = null) => {
         setEditingProduct(product);
@@ -70,7 +73,7 @@ export default function ProductClientView({
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this product?")) return;
+        if (!confirm(t("delete_confirm"))) return;
         setIsLoading(true);
         const res = await deleteProduct(id);
         setIsLoading(false);
@@ -87,11 +90,11 @@ export default function ProductClientView({
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex gap-3 w-full sm:w-auto">
                     <div className="relative flex-1 sm:w-80">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 rtl:left-auto rtl:right-3" />
                         <input
                             type="text"
-                            placeholder="Search products..."
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+                            placeholder={t("search_placeholder")}
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 rtl:pl-4 rtl:pr-10"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -101,10 +104,10 @@ export default function ProductClientView({
                         onChange={(e) => setStatusFilter(e.target.value)}
                         className="bg-white border border-gray-200 rounded-xl text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
                     >
-                        <option value="">All Status</option>
-                        <option value="ACTIVE">Active</option>
-                        <option value="INACTIVE">Inactive</option>
-                        <option value="DRAFT">Draft</option>
+                        <option value="">{t("all_status")}</option>
+                        <option value="ACTIVE">{t("status.ACTIVE")}</option>
+                        <option value="INACTIVE">{t("status.INACTIVE")}</option>
+                        <option value="DRAFT">{t("status.DRAFT")}</option>
                     </select>
                 </div>
                 <button
@@ -112,7 +115,7 @@ export default function ProductClientView({
                     className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-primary-dark shadow-sm transition-all"
                 >
                     <Plus className="w-4 h-4" />
-                    Add Product
+                    {t("add_product")}
                 </button>
             </div>
 
@@ -122,12 +125,12 @@ export default function ProductClientView({
                     <table className="w-full text-sm text-left">
                         <thead className="text-xs text-gray-500 uppercase tracking-wider bg-gray-50/50">
                             <tr>
-                                <th className="px-6 py-4 font-medium">Product</th>
-                                <th className="px-6 py-4 font-medium">Category</th>
-                                <th className="px-6 py-4 font-medium">Base Price (100g)</th>
-                                <th className="px-6 py-4 font-medium">Total Stock (g)</th>
-                                <th className="px-6 py-4 font-medium">Status</th>
-                                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                                <th className="px-6 py-4 font-medium">{t("table.product")}</th>
+                                <th className="px-6 py-4 font-medium">{t("table.category")}</th>
+                                <th className="px-6 py-4 font-medium">{t("table.price")}</th>
+                                <th className="px-6 py-4 font-medium">{t("table.stock")}</th>
+                                <th className="px-6 py-4 font-medium">{t("table.status")}</th>
+                                <th className="px-6 py-4 font-medium text-right rtl:text-left">{t("table.actions")}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -151,7 +154,7 @@ export default function ProductClientView({
                                     </td>
                                     <td className="px-6 py-4 text-gray-500">
                                         <span className="px-2.5 py-1 bg-gray-100 rounded-lg text-xs font-medium">
-                                            {product.category?.name || "Uncategorized"}
+                                            {product.category?.name || t("uncategorized")}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 font-medium text-gray-900">
@@ -162,21 +165,21 @@ export default function ProductClientView({
                                             className={`px-2.5 py-1 rounded-lg text-xs font-medium ${product.stockWeight < 500 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-600"
                                                 }`}
                                         >
-                                            {product.stockWeight >= 1000 ? `${(product.stockWeight / 1000).toFixed(2)}kg` : `${product.stockWeight}g`} available
+                                            {product.stockWeight >= 1000 ? `${(product.stockWeight / 1000).toFixed(2)}kg` : `${product.stockWeight}g`} {t("available")}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${STATUS_COLORS[product.status] || "bg-gray-100 text-gray-500"}`}>
-                                            {product.status}
+                                            {t(`status.${product.status}`)}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-2">
+                                    <td className="px-6 py-4 text-right rtl:text-left">
+                                        <div className="flex items-center justify-end rtl:justify-start gap-2">
                                             <button
                                                 onClick={() => handleOpenModal(product)}
                                                 className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                             >
-                                                <Edit2 className="w-4 h-4" />
+                                                <Edit2 className="w-4 h-4 rtl:scale-x-[-1]" />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(product.id)}
@@ -192,7 +195,7 @@ export default function ProductClientView({
                             {filteredProducts.length === 0 && (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
-                                        No products found.
+                                        {t("no_products")}
                                     </td>
                                 </tr>
                             )}
@@ -207,7 +210,7 @@ export default function ProductClientView({
                     <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl relative">
                         <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-gray-50/50">
                             <h2 className="text-lg font-bold text-primary-dark font-serif">
-                                {editingProduct ? "Edit Product" : "Create New Product"}
+                                {editingProduct ? t("modal.edit") : t("modal.create")}
                             </h2>
                             <button onClick={handleCloseModal} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-full transition-colors">
                                 <X className="w-5 h-5" />
@@ -218,20 +221,20 @@ export default function ProductClientView({
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 {/* Name */}
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Product Name</label>
-                                    <input name="name" defaultValue={editingProduct?.name} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="e.g. LPS Royal Gold" />
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.name_label")}</label>
+                                    <input name="name" defaultValue={editingProduct?.name} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder={t("modal.name_placeholder")} />
                                 </div>
                                 {/* Brand */}
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Brand</label>
-                                    <input name="brand" defaultValue={editingProduct?.brand} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="e.g. AURA Luxe" />
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.brand_label")}</label>
+                                    <input name="brand" defaultValue={editingProduct?.brand} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder={t("modal.brand_placeholder")} />
                                 </div>
 
                                 {/* Category */}
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Category</label>
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.category_label")}</label>
                                     <select name="categoryId" defaultValue={editingProduct?.categoryId} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none">
-                                        <option value="">Select Category</option>
+                                        <option value="">{t("modal.category_label")}</option>
                                         {categories.map((c) => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
@@ -240,39 +243,39 @@ export default function ProductClientView({
 
                                 {/* Status */}
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Status</label>
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.status_label")}</label>
                                     <select name="status" defaultValue={editingProduct?.status || "ACTIVE"} className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none">
-                                        <option value="ACTIVE">Active</option>
-                                        <option value="INACTIVE">Inactive</option>
-                                        <option value="DRAFT">Draft</option>
+                                        <option value="ACTIVE">{t("status.ACTIVE")}</option>
+                                        <option value="INACTIVE">{t("status.INACTIVE")}</option>
+                                        <option value="DRAFT">{t("status.DRAFT")}</option>
                                     </select>
                                 </div>
 
                                 {/* Image URL */}
                                 <div className="space-y-1.5 md:col-span-2">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Primary Image URL</label>
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.image_label")}</label>
                                     <input name="imageUrl" defaultValue={editingProduct?.imageUrl} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="https://..." />
                                 </div>
 
                                 {/* Pricing & Stock */}
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Base Price (Per 100g) (DZD)</label>
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.price_label")}</label>
                                     <input type="number" step="0.01" name="basePrice" defaultValue={editingProduct?.basePrice} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Total Stock (Grams)</label>
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.stock_label")}</label>
                                     <input type="number" name="stockWeight" defaultValue={editingProduct?.stockWeight || 5000} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
                                 </div>
 
                                 {/* Info */}
                                 <div className="space-y-1.5 md:col-span-2 p-4 bg-amber-50 rounded-2xl border border-amber-100 italic text-[11px] text-amber-700">
-                                    Note: Products will automatically be available in 200g, 250g, 500g, and 1kg variants based on the base price.
+                                    {t("modal.pricing_note")}
                                 </div>
 
                                 {/* Collections */}
                                 {collections.length > 0 && (
                                     <div className="space-y-1.5 md:col-span-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Collections</label>
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.collections_label")}</label>
                                         <div className="flex flex-wrap gap-2">
                                             {collections.map((c) => (
                                                 <label key={c.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f8f9fa] border border-gray-200 rounded-lg text-sm cursor-pointer hover:border-[#D4AF37]/40 transition-colors has-[:checked]:bg-[#D4AF37]/10 has-[:checked]:border-[#D4AF37]/40">
@@ -293,7 +296,7 @@ export default function ProductClientView({
                                 {/* Tags */}
                                 {tags.length > 0 && (
                                     <div className="space-y-1.5 md:col-span-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Tags</label>
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.tags_label")}</label>
                                         <div className="flex flex-wrap gap-2">
                                             {tags.map((t) => (
                                                 <label key={t.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f8f9fa] border border-gray-200 rounded-lg text-sm cursor-pointer hover:border-[#D4AF37]/40 transition-colors has-[:checked]:bg-[#D4AF37]/10 has-[:checked]:border-[#D4AF37]/40">
@@ -313,17 +316,17 @@ export default function ProductClientView({
 
                                 {/* Description */}
                                 <div className="space-y-1.5 md:col-span-2">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Description</label>
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.description_label")}</label>
                                     <textarea name="description" defaultValue={editingProduct?.description} required rows={3} className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
                                 </div>
                             </div>
 
                             <div className="mt-8 flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
                                 <button type="button" onClick={handleCloseModal} className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                                    Cancel
+                                    {t("modal.cancel")}
                                 </button>
                                 <button type="submit" disabled={isLoading} className="px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-primary hover:bg-primary-dark shadow-md shadow-primary/20 transition-all disabled:opacity-50">
-                                    {isLoading ? "Saving..." : "Save Product"}
+                                    {isLoading ? t("modal.saving") : t("modal.save")}
                                 </button>
                             </div>
                         </form>

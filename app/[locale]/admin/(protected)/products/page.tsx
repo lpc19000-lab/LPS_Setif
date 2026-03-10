@@ -1,10 +1,12 @@
 import prisma from "@/lib/db";
 import ProductClientView from "@/components/admin/ProductClientView";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminProductsPage({ params }: { params: Promise<{ locale: string }> }) {
-    await params;
+export default async function AdminProductsPage({ params }: { params: { locale: string } }) {
+    const { locale } = params;
+    const t = await getTranslations({ locale, namespace: "admin.products" });
     const [products, categories, collections, tags] = await Promise.all([
         prisma.product.findMany({
             include: {
@@ -29,8 +31,8 @@ export default async function AdminProductsPage({ params }: { params: Promise<{ 
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">Products</h1>
-                    <p className="text-gray-500 mt-1 tracking-wide">Manage your perfume catalog, pricing, and B2B constraints.</p>
+                    <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">{t("title")}</h1>
+                    <p className="text-gray-500 mt-1 tracking-wide">{t("subtitle")}</p>
                 </div>
             </div>
 

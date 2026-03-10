@@ -1,10 +1,14 @@
 import { getAdminLogs, getSystemErrors } from "@/services/audit-service";
 import { History, AlertTriangle, User, Clock, ShieldAlert } from "lucide-react";
 import { format } from "date-fns";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminLogsPage() {
+export default async function AdminLogsPage({ params }: { params: { locale: string } }) {
+    const { locale } = params;
+    const t = await getTranslations({ locale, namespace: "admin.logs" });
+
     const [adminLogs, systemErrors] = await Promise.all([
         getAdminLogs(50),
         getSystemErrors(50),
@@ -13,8 +17,8 @@ export default async function AdminLogsPage() {
     return (
         <div className="space-y-8 pb-12">
             <div>
-                <h1 className="text-2xl font-serif font-bold text-primary-dark">Activity & Error Logs</h1>
-                <p className="text-gray-500 text-sm mt-1">Audit trail for administrative actions and backend stability.</p>
+                <h1 className="text-2xl font-serif font-bold text-primary-dark">{t("title")}</h1>
+                <p className="text-gray-500 text-sm mt-1">{t("subtitle")}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -25,10 +29,10 @@ export default async function AdminLogsPage() {
                             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                                 <History className="w-5 h-5" />
                             </div>
-                            <h2 className="font-semibold text-gray-900">Admin Activity</h2>
+                            <h2 className="font-semibold text-gray-900">{t("admin_activity")}</h2>
                         </div>
                         <span className="text-xs font-medium px-2.5 py-1 bg-white rounded-full border border-gray-100 text-gray-500 uppercase tracking-wider">
-                            Real-time
+                            {t("real_time")}
                         </span>
                     </div>
 
@@ -36,7 +40,7 @@ export default async function AdminLogsPage() {
                         {adminLogs.length === 0 ? (
                             <div className="p-12 text-center text-gray-400">
                                 <Clock className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                                <p>No activity logs found</p>
+                                <p>{t("no_activity")}</p>
                             </div>
                         ) : (
                             adminLogs.map((log) => (
@@ -58,7 +62,7 @@ export default async function AdminLogsPage() {
                                                 <span className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider">
                                                     {log.action}
                                                 </span>
-                                                <span className="text-gray-400 text-xs">on</span>
+                                                <span className="text-gray-400 text-xs">{t("on")}</span>
                                                 <span className="text-gray-900 font-medium text-xs">
                                                     {log.targetType}
                                                     {log.targetId && <span className="text-gray-400 font-normal ml-1">#{log.targetId.slice(-6)}</span>}
@@ -84,10 +88,10 @@ export default async function AdminLogsPage() {
                             <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center text-red-600">
                                 <AlertTriangle className="w-5 h-5" />
                             </div>
-                            <h2 className="font-semibold text-gray-900">System Errors</h2>
+                            <h2 className="font-semibold text-gray-900">{t("system_errors")}</h2>
                         </div>
                         <span className="text-xs font-medium px-2.5 py-1 bg-white rounded-full border border-red-100 text-red-600 uppercase tracking-wider">
-                            Critical
+                            {t("critical")}
                         </span>
                     </div>
 
@@ -95,7 +99,7 @@ export default async function AdminLogsPage() {
                         {systemErrors.length === 0 ? (
                             <div className="p-12 text-center text-gray-400">
                                 <ShieldAlert className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                                <p>No system errors detected</p>
+                                <p>{t("no_errors")}</p>
                             </div>
                         ) : (
                             systemErrors.map((error) => (
@@ -119,7 +123,7 @@ export default async function AdminLogsPage() {
                                             {error.stackTrace && (
                                                 <details className="mt-2 outline-none">
                                                     <summary className="text-[10px] text-gray-400 cursor-pointer hover:text-gray-600 transition-colors uppercase font-bold tracking-widest">
-                                                        Show Stack Trace
+                                                        {t("show_stack_trace")}
                                                     </summary>
                                                     <pre className="mt-2 text-[10px] text-red-700 bg-red-50/50 p-3 rounded-lg border border-red-100 whitespace-pre-wrap font-mono">
                                                         {error.stackTrace}

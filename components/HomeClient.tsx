@@ -25,7 +25,7 @@ function ProductCard({ product, i }: Readonly<{ product: Product; i: number }>) 
             transition={{ delay: i * 0.08, duration: 0.5 }}
         >
             <Link href={`/${locale}/product/${product.slug || product.id}`} prefetch={true}>
-                <div className="product-card group cursor-pointer">
+                <div className={`product-card group cursor-pointer ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                     <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
                         <SafeImage
                             src={product.imageUrl}
@@ -44,7 +44,7 @@ function ProductCard({ product, i }: Readonly<{ product: Product; i: number }>) 
                         </h3>
                         <p className="text-gray-400 text-sm mb-3">{product.brand}</p>
                         <p className="text-primary-dark font-bold text-xl">
-                            {Number(product.basePrice).toLocaleString()} DA
+                            {Number(product.basePrice).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')} DA
                         </p>
                     </div>
                 </div>
@@ -58,7 +58,7 @@ export function ProductSection({ title, subtitle, products }: Readonly<{ title: 
     const t = useTranslations("catalog");
     if (products.length === 0) return null;
     return (
-        <section className="py-20 bg-[#FAFAF8]">
+        <section className={`py-20 bg-[#FAFAF8] ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
             <div className="max-w-7xl mx-auto px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -90,6 +90,7 @@ export function ProductSection({ title, subtitle, products }: Readonly<{ title: 
 }
 
 export function FeaturesSection() {
+    const locale = useLocale();
     const t = useTranslations("home");
 
     const features = [
@@ -111,7 +112,7 @@ export function FeaturesSection() {
     ];
 
     return (
-        <section className="py-24 bg-white">
+        <section className={`py-24 bg-white ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
             <div className="max-w-6xl mx-auto px-6">
                 <motion.h2
                     initial={{ opacity: 0, y: 30 }}
@@ -140,9 +141,9 @@ export function FeaturesSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.15, duration: 0.6 }}
-                            className="text-center p-8 rounded-2xl bg-[#FAFAF8] border border-gray-100 hover:border-primary/20 transition-all duration-500 hover:shadow-lg"
+                            className={`text-center p-8 rounded-2xl bg-[#FAFAF8] border border-gray-100 hover:border-primary/20 transition-all duration-500 hover:shadow-lg ${locale === 'ar' ? 'text-right' : 'text-center'}`}
                         >
-                            <span className="text-primary text-3xl mb-4 block">{f.icon}</span>
+                            <span className="text-primary text-3xl mb-4 block text-center">{f.icon}</span>
                             <h3 className="text-lg font-serif font-semibold text-gray-800 mb-2">{t(f.titleKey)}</h3>
                             <p className="text-gray-500 text-sm leading-relaxed">{t(f.descKey)}</p>
                         </motion.div>
@@ -159,7 +160,7 @@ export function CTASection() {
     const b = useTranslations("common.buttons");
 
     return (
-        <section className="py-24 bg-[#121212] text-center">
+        <section className={`py-24 bg-[#121212] text-center ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}

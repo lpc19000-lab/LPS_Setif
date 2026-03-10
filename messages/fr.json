@@ -46,6 +46,17 @@
             "reorder_failed": "Échec de l'ajout des articles au panier",
             "cancel_failed": "Échec de l'annulation de la commande",
             "generic": "Quelque chose s'est mal passé. Veuillez réessayer."
+        },
+        "status": {
+            "PENDING": "En attente",
+            "CONFIRMED": "Confirmée",
+            "PACKED": "Emballée",
+            "SHIPPED": "Expédiée",
+            "DELIVERED": "Livrée",
+            "CANCELLED": "Annulée",
+            "PAID": "Payée",
+            "PARTIALLY_PAID": "Partiellement payée",
+            "UNPAID": "Impayée"
         }
     },
     "registration": {
@@ -144,6 +155,7 @@
         "wilaya": "Wilaya *",
         "address": "Adresse *",
         "placeholder_address": "Adresse de livraison détaillée",
+        "placeholder_phone": "05 / 06 / 07 ...",
         "order_notes": "Notes de commande (Optionnel)",
         "placeholder_notes": "Instructions spéciales pour la préparation ou livraison...",
         "order_summary": "Résumé de la commande",
@@ -172,11 +184,32 @@
         "cta_subtitle": "Commencez à vendre des parfums de luxe dès aujourd'hui",
         "cta_browse_catalog": "Parcourir le Catalogue",
         "hero": {
-            "title_part1": "L'Essence du",
-            "title_part2": "Luxe Mondial",
-            "subtitle": "La première destination B2B d'Algérie pour les parfums haut de gamme en gros. Exclusivité, Élégance et Excellence dans chaque flacon.",
+            "title_part1": "Essence de",
+            "title_part2": "Luxe Global",
+            "subtitle": "La destination numéro un pour la vente en gros de parfums de luxe en Algérie. Exclusivité, élégance et excellence dans chaque flacon.",
             "browse_collections": "Parcourir les Collections",
-            "become_partner": "Devenir Partenaire"
+            "become_partner": "Devenez Partenaire",
+            "beats": [
+                {
+                    "heading": "AURA Luxe.",
+                    "sub": "L'Essence de la Présence."
+                },
+                {
+                    "heading": "Conçu à Grasse.",
+                    "sub": "Verre émeraude pur, fini à la main."
+                },
+                {
+                    "heading": "L'Anatomie du Parfum.",
+                    "sub": "Atomisation de précision."
+                },
+                {
+                    "heading": "Votre Signature.",
+                    "sub": "Découvrez l'Invisible."
+                }
+            ],
+            "experience_now": "Découvrir Maintenant",
+            "scroll_down": "Faites défiler",
+            "crafting_scent": "Création du Parfum"
         },
         "features": {
             "wholesale_title": "Parfums en Gros",
@@ -244,6 +277,449 @@
             "SHIPPED": "Expédiée",
             "DELIVERED": "Livrée",
             "CANCELLED": "Annulée"
+        }
+    },
+    "admin": {
+        "dashboard": {
+            "title": "Aperçu du Tableau de Bord",
+            "subtitle": "Bon retour. Voici ce qui se passe dans votre boutique aujourd'hui.",
+            "total_revenue": "Chiffre d'Affaire Total",
+            "unpaid_balance": "Solde Impayé",
+            "unpaid_note": "Inclut {count} commandes partiellement payées",
+            "daily_revenue": "Chiffre d'Affaire du Jour",
+            "monthly_revenue": "Chiffre d'Affaire du Mois",
+            "health_score": "Score de Santé",
+            "total_orders": "Total des Commandes",
+            "pending": "En attente",
+            "customers": "Clients",
+            "products": "Produits",
+            "recent_orders": "Commandes Récentes",
+            "order_id": "ID Commande",
+            "customer": "Client",
+            "date": "Date",
+            "total": "Total",
+            "payment": "Paiement",
+            "status": "Statut",
+            "no_orders": "Aucune commande trouvée pour le moment.",
+            "view_details": "Voir les détails",
+            "best_sellers": "Meilleurs Ventes",
+            "units_sold": "Unités Vendues",
+            "revenue": "Revenu",
+            "notifications": {
+                "unread": "{count} Notification(s) non lue(s)"
+            },
+            "inventory_alerts": {
+                "low_stock": "{count} Alerte(s) de stock faible"
+            }
+        },
+        "products": {
+            "title": "Produits",
+            "subtitle": "Gérez votre catalogue de parfums, les prix et les contraintes B2B.",
+            "search_placeholder": "Rechercher des produits...",
+            "all_status": "Tous les statuts",
+            "add_product": "Ajouter un Produit",
+            "table": {
+                "product": "Produit",
+                "category": "Catégorie",
+                "price": "Prix de base (100g)",
+                "stock": "Stock total (g)",
+                "status": "Statut",
+                "actions": "Actions"
+            },
+            "status": {
+                "ACTIVE": "Actif",
+                "INACTIVE": "Inactif",
+                "DRAFT": "Brouillon"
+            },
+            "available": "disponible",
+            "uncategorized": "Non catégorisé",
+            "no_products": "Aucun produit trouvé.",
+            "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce produit ?",
+            "modal": {
+                "create": "Créer un Nouveau Produit",
+                "edit": "Modifier le Produit",
+                "name_label": "Nom du Produit",
+                "name_placeholder": "ex: LPS Royal Gold",
+                "brand_label": "Marque",
+                "brand_placeholder": "ex: AURA Luxe",
+                "category_label": "Catégorie",
+                "status_label": "Statut",
+                "image_label": "URL de l'image principale",
+                "price_label": "Prix de base (Par 100g) (DZD)",
+                "stock_label": "Stock total (Grammes)",
+                "pricing_note": "Note : Les produits seront automatiquement disponibles en variantes de 200g, 250g, 500g et 1kg basées sur le prix de base.",
+                "collections_label": "Collections",
+                "tags_label": "Tags",
+                "description_label": "Description",
+                "cancel": "Annuler",
+                "save": "Enregistrer le Produit",
+                "saving": "Enregistrement..."
+            }
+        },
+        "customers": {
+            "title": "Clients",
+            "subtitle": "Gérez les propriétaires de boutiques B2B et les affiliés enregistrés.",
+            "search_placeholder": "Rechercher par boutique ou nom...",
+            "table": {
+                "business_shop": "Entreprise / Boutique",
+                "owner_contact": "Contact Propriétaire",
+                "location": "Localisation",
+                "joined": "Rejoint le",
+                "total_orders": "Total Commandes",
+                "access": "Accès"
+            },
+            "orders_count": "{count} commandes",
+            "suspend": "Suspendre",
+            "suspend_title": "Désactiver ce compte",
+            "no_customers": "Aucun client enregistré trouvé."
+        },
+        "categories": {
+            "title": "Catégories",
+            "subtitle": "Gérez les collections et les lignes de parfums.",
+            "search_placeholder": "Rechercher des catégories...",
+            "add_category": "Créer une Catégorie",
+            "table": {
+                "name": "Nom de la Catégorie",
+                "description": "Description",
+                "products": "Produits Associés",
+                "actions": "Actions"
+            },
+            "products_count": "{count} produits",
+            "no_categories": "Aucune catégorie trouvée.",
+            "delete_confirm": "Êtes-vous sûr de vouloir supprimer cette catégorie ?",
+            "delete_error": "Impossible de supprimer cette catégorie. Elle contient {count} produits actifs.",
+            "modal": {
+                "create": "Nouvelle Catégorie",
+                "edit": "Modifier la Catégorie",
+                "name_label": "Nom de la Catégorie",
+                "name_placeholder": "ex: Blue Edition",
+                "desc_label": "Description (Optionnel)",
+                "desc_placeholder": "Ajoutez une description pour cette ligne de parfums...",
+                "cancel": "Annuler",
+                "save": "Enregistrer la Catégorie",
+                "saving": "Enregistrement..."
+            }
+        },
+        "collections": {
+            "title": "Collections",
+            "subtitle": "Gérez les collections de parfums thématiques.",
+            "search_placeholder": "Rechercher des collections...",
+            "add_collection": "Créer une Collection",
+            "table": {
+                "name": "Nom de la Collection",
+                "description": "Description",
+                "products": "Produits",
+                "actions": "Actions"
+            },
+            "no_collections": "Aucune collection trouvée.",
+            "modal": {
+                "create": "Nouvelle Collection",
+                "edit": "Modifier la Collection",
+                "name_label": "Nom de la Collection",
+                "desc_label": "Description",
+                "cancel": "Annuler",
+                "save": "Enregistrer la Collection"
+            }
+        },
+        "tags": {
+            "title": "Tags",
+            "subtitle": "Gérez les étiquettes pour filtrer les produits.",
+            "search_placeholder": "Rechercher des tags...",
+            "add_tag": "Créer un Tag",
+            "table": {
+                "name": "Nom du Tag",
+                "usage": "Utilisation",
+                "actions": "Actions"
+            },
+            "no_tags": "Aucun tag trouvé.",
+            "modal": {
+                "create": "Nouveau Tag",
+                "edit": "Modifier le Tag",
+                "name_label": "Nom du Tag",
+                "cancel": "Annuler",
+                "save": "Enregistrer le Tag"
+            }
+        },
+        "orders": {
+            "title": "Commandes",
+            "subtitle": "Gérez les commandes B2B et mettez à jour les statuts de suivi.",
+            "search_placeholder": "Rechercher par ID de commande ou nom de boutique...",
+            "table": {
+                "order_details": "Détails de la Commande",
+                "customer_info": "Infos Client",
+                "total_amount": "Montant Total",
+                "status_action": "Statut & Action",
+                "invoice": "Facture"
+            },
+            "items_count": "{count} articles",
+            "no_invoice": "Pas de facture",
+            "view_invoice": "Voir",
+            "no_orders": "Aucune commande trouvée correspondant à votre recherche.",
+            "update_confirm": "Êtes-vous sûr de vouloir changer le statut de cette commande en {status} ?",
+            "modal": {
+                "title": "Détails de la Commande",
+                "customer": "Client",
+                "items_included": "Articles Inclus",
+                "total_validated": "Total Validé",
+                "per_unit": "par unité",
+                "unknown_product": "Produit Inconnu"
+            }
+        },
+        "restock": {
+            "title": "Réapprovisionnement Intelligent & Stock Dormant",
+            "subtitle": "Prédictions d'inventaire basées sur l'IA selon la vélocité des ventes des 30 derniers jours et l'analyse du capital immobilisé.",
+            "suggestions": {
+                "title": "Suggestions de Réapprovisionnement",
+                "table": {
+                    "product": "Produit",
+                    "in_stock": "En Stock (g)",
+                    "velocity": "Vélocité 30j (g)",
+                    "runway": "Autonomie",
+                    "recommendation": "Recommandation"
+                },
+                "days": "Jours"
+            },
+            "dead_stock": {
+                "title": "Analyse du Stock Dormant",
+                "subtitle": "Produits sans ventes au cours des 60 derniers jours.",
+                "no_dead_stock": "Aucun stock dormant détecté",
+                "no_dead_stock_desc": "Tous les produits de votre entrepôt ont connu un mouvement au cours des 60 derniers jours. Votre inventaire est très liquide.",
+                "table": {
+                    "product": "Produit",
+                    "unsold": "Stock Invendu",
+                    "days_stagnant": "Jours de Stagnation",
+                    "value": "Valeur Immobilisée"
+                },
+                "total_capital": "Total Capital Immobilisé :"
+            }
+        },
+        "inventory": {
+            "title": "Aperçu de l'Entrepôt",
+            "subtitle": "Gérez les niveaux de stock, effectuez des ajustements et consultez l'historique de l'inventaire.",
+            "move_history": "Historique des Mouvements",
+            "search_placeholder": "Rechercher un produit...",
+            "table": {
+                "product": "Produit",
+                "brand": "Marque",
+                "stock": "Stock Actuel (g)",
+                "actions": "Actions"
+            },
+            "no_products": "Aucun produit trouvé dans l'inventaire.",
+            "modal": {
+                "adjust_stock": "Ajuster le Stock",
+                "modify": "Modifier le stock pour",
+                "current_stock": "Stock actuel :",
+                "type_label": "Type d'ajustement",
+                "type": {
+                    "ADD": "Ajouter du stock (+)",
+                    "REMOVE": "Retirer du stock (-)",
+                    "SET": "Définir le stock exact (=)"
+                },
+                "amount_label": "Quantité (g)",
+                "reason_label": "Raison (interne)",
+                "reason_placeholder": "Réapprovisionnement, correction d'erreur, etc.",
+                "cancel": "Annuler",
+                "update": "Mettre à jour l'inventaire",
+                "updating": "Mise à jour..."
+            }
+        },
+        "invoices": {
+            "title": "Factures",
+            "subtitle": "Registres historiques des reçus et factures commerciales générés.",
+            "search_placeholder": "Rechercher une facture #...",
+            "table": {
+                "number": "N° de Facture",
+                "customer": "Client",
+                "date": "Date d'Émission",
+                "amount": "Montant",
+                "document": "Document"
+            },
+            "view_output": "Voir Sortie",
+            "no_invoices": "Aucune facture générée pour le moment. Les factures sont créées automatiquement lors du traitement des commandes."
+        },
+        "analytics": {
+            "title": "Business Intelligence",
+            "subtitle": "Revenus détaillés, meilleurs clients et prévisions de la demande de produits.",
+            "stats": {
+                "revenue_30d": "Revenu (30j)",
+                "orders_30d": "Commandes (30j)",
+                "top_buyers": "Meilleurs Acheteurs",
+                "profit_30d": "Bénéfice (30j)",
+                "high_demand": "Articles à Forte Demande"
+            },
+            "charts": {
+                "daily_revenue": "Revenu Quotidien (Derniers 30 jours)",
+                "daily_profit_cost": "Bénéfice et Coût Quotidiens",
+                "daily_orders": "Commandes Quotidiennes (Derniers 30 jours)",
+                "avg_margin": "Marge Moyenne :",
+                "revenue": "Revenu",
+                "profit": "Bénéfice",
+                "cost": "Coût",
+                "orders": "Commandes"
+            },
+            "performance": {
+                "title": "Performance et Prévisions des Produits",
+                "table": {
+                    "product": "Produit",
+                    "demand": "Demande (30j)",
+                    "lifetime_sold": "Vendus à vie",
+                    "revenue": "Revenu"
+                },
+                "demand_levels": {
+                    "High Demand": "Forte Demande",
+                    "Medium Demand": "Demande Moyenne",
+                    "Low Demand": "Faible Demande"
+                },
+                "units": "unités"
+            },
+            "top_customers": {
+                "title": "Meilleurs Clients (LTV)",
+                "subtitle": "Valeur totale de dépense la plus élevée",
+                "orders": "commandes",
+                "no_data": "Aucune commande valide trouvée pour classer les clients."
+            },
+            "top_profitable": {
+                "title": "Produits les Plus Rentables",
+                "subtitle": "Produits générant le bénéfice absolu le plus élevé",
+                "units_sold": "unités vendues",
+                "margin": "marge",
+                "no_data": "Aucune donnée de vente disponible."
+            }
+        },
+        "reports": {
+            "title": "Rapports d'Activité",
+            "subtitle": "Exportez des données brutes au format CSV pour une analyse approfondie et la comptabilité.",
+            "export_csv": "Exporter CSV",
+            "inventory": {
+                "title": "Rapport d'Inventaire",
+                "subtitle": "Instantané actuel du stock de l'entrepôt, des seuils de stock bas et des données de prix pour tous les produits."
+            },
+            "sales": {
+                "title": "Rapport de Ventes",
+                "subtitle": "Historique complet des commandes valides, incluant les dates, les chiffres de revenus exacts et les clients connectés."
+            },
+            "customers": {
+                "title": "Rapport Clients",
+                "subtitle": "Liste de tous les clients B2B sur la plateforme, combinée à leur valeur à vie et à leur nombre total d'achats."
+            }
+        },
+        "logs": {
+            "title": "Journaux d'Activité et d'Erreur",
+            "subtitle": "Piste d'audit pour les actions administratives et la stabilité du backend.",
+            "admin_activity": "Activité Admin",
+            "system_errors": "Erreurs Système",
+            "real_time": "Temps réel",
+            "critical": "Critique",
+            "no_activity": "Aucun journal d'activité trouvé",
+            "no_errors": "Aucune erreur système détectée",
+            "on": "sur",
+            "show_stack_trace": "Afficher la Trace d'Empilement",
+            "hide_stack_trace": "Masquer la Trace d'Empilement"
+        },
+        "sidebar": {
+            "portal": "Portail d'Administration",
+            "overview": "Tableau de Bord",
+            "products": "Produits",
+            "categories": "Catégories",
+            "collections": "Collections",
+            "tags": "Tags",
+            "orders": "Commandes",
+            "customers": "Clients",
+            "restock": "Réapprovisionnement",
+            "inventory": "Inventaire",
+            "invoices": "Factures",
+            "analytics": "Business Intelligence",
+            "reports": "Rapports",
+            "logs": "Journaux d'audit",
+            "system": "Santé Système",
+            "notifications": "Notifications"
+        },
+        "notifications": {
+            "title": "Centre de Notifications",
+            "subtitle": "Gérez vos alertes système et les communications avec les clients.",
+            "all_notifications": "Toute la Liste",
+            "unread": "Non lues",
+            "read": "Lues",
+            "no_notifications": "Aucune notification trouvée.",
+            "mark_read": "Marquer comme lu",
+            "delete": "Supprimer",
+            "unread_count": "{count} alerte{s} non lue{s}",
+            "no_unread": "Tout est à jour !",
+            "no_notifications_desc": "Aucune notification pour le moment."
+        },
+        "system": {
+            "title": "Santé et État du Système",
+            "subtitle": "Surveillez les performances du serveur, la connectivité de la base de données et les services externes.",
+            "metrics": {
+                "total_products": "Total Produits",
+                "total_customers": "Total Clients",
+                "total_orders": "Total Commandes",
+                "orders_today": "Commandes du Jour"
+            },
+            "status": {
+                "title": "État du Système",
+                "HEALTHY": "Sain",
+                "WARNING": "Avertissement",
+                "DEGRADED": "Dégradé",
+                "healthy_desc": "Tous les systèmes sont opérationnels. Aucune erreur critique détectée au cours des dernières 24 heures.",
+                "warning_desc": "Le système rencontre des problèmes mineurs. Consultez les journaux d'erreurs pour plus de détails.",
+                "degraded_desc": "La santé du système est dégradée. Une attention immédiate est requise."
+            },
+            "infrastructure": {
+                "title": "Infrastructure",
+                "db_engine": "Moteur de Base de Données",
+                "app_server": "Serveur d'Application",
+                "orm_layer": "Couche ORM"
+            },
+            "inventory_health": {
+                "title": "Santé de l'Inventaire",
+                "low_stock": "Articles en Stock Faible",
+                "dead_stock": "Articles en Stock Dormant"
+            },
+            "error_frequency": {
+                "title": "Fréquence des Erreurs",
+                "errors_24h": "Erreurs au cours des dernières 24h",
+                "footer": "La surveillance de la fréquence des erreurs aide à identifier précocement les bogues de régression et les problèmes de délai d'attente de l'API."
+            },
+            "maintenance": {
+                "title": "Système Prêt pour la Production",
+                "mode": "Mode Maintenance",
+                "desc": "Tous les audits de performance et les validations d'intégrité suggèrent que la plateforme fonctionne à son efficacité maximale. Les sauvegardes automatiques et les vérifications de santé sont actives."
+            }
+        }
+    },
+    "header": {
+        "smart_alert": "Alerte Intelligente Active",
+        "no_alerts": "Aucune alerte active. Systèmes normaux.",
+        "inventory_health": "Santé de l'Inventaire"
+    },
+    "inventory_history": {
+        "title": "Historique de l'Inventaire",
+        "subtitle": "Suivi de tous les mouvements de stock à travers les ventes, annulations et ajustements manuels.",
+        "filter_product": "Produit",
+        "filter_all_products": "Tous les Produits",
+        "filter_type": "Type de Changement",
+        "filter_all_types": "Tous les Types",
+        "filter_source": "Source",
+        "filter_all_sources": "Toutes les Sources",
+        "filter_button": "Filtrer",
+        "filter_reset": "Réinitialiser",
+        "table_date": "Date & Heure",
+        "table_product": "Produit",
+        "table_type": "Type",
+        "table_change": "Changement",
+        "table_source_reason": "Source & Raison",
+        "no_history": "Aucun historique d'inventaire trouvé correspondant aux filtres.",
+        "types": {
+            "SALE": "Vente",
+            "CANCEL": "Annulation",
+            "RESTOCK": "Réapprovisionnement",
+            "MANUAL_ADJUSTMENT": "Ajustement Manuel"
+        },
+        "sources": {
+            "ORDER": "Commande",
+            "ADMIN": "Admin",
+            "SYSTEM": "Système"
         }
     }
 }

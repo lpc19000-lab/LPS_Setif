@@ -4,6 +4,7 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import NextImage from "next/image";
+import { useTranslations, useLocale } from "next-intl";
 
 /* ── Asset Config ─────────────────────────────────────────── */
 const TOTAL_FRAMES = 240;
@@ -14,15 +15,12 @@ function getFrameSrc(index: number): string {
     return `/hero/ezgif-frame-${num}.jpg`;
 }
 
-const storyBeats = [
-    { start: 0.0, end: 0.2, heading: "AURA Luxe.", sub: "The Essence of Presence." },
-    { start: 0.23, end: 0.45, heading: "Crafted in Grasse.", sub: "Pure emerald glass, hand-finished." },
-    { start: 0.55, end: 0.75, heading: "The Anatomy of Scent.", sub: "Precision-engineered atomization." },
-    { start: 0.85, end: 1.0, heading: "Your Signature.", sub: "Experience the Unseen.", cta: true },
-];
+// We will now handle storyBeats dynamically inside the component to use translations
 
 /* ── Error Boundary Fallback ────────────────────────────────── */
 function StaticHeroFallback() {
+    const t = useTranslations("home.hero");
+    const locale = useLocale();
     return (
         <div className="relative h-screen w-full bg-[#121212] flex items-center justify-center overflow-hidden">
             <NextImage
@@ -34,16 +32,16 @@ function StaticHeroFallback() {
             />
             <div className="text-center z-10 px-6">
                 <h1 className="text-[#D4AF37] text-5xl md:text-7xl font-serif font-bold tracking-wide mb-6">
-                    LPS Perfume
+                    {useTranslations("common.nav")("lps")}
                 </h1>
                 <p className="text-white/60 text-xl font-sans font-light max-w-xl mx-auto mb-10">
-                    Premium B2B Wholesale fragrances for distributors.
+                    {t("subtitle")}
                 </p>
                 <Link
-                    href="/catalog"
+                    href={`/${locale}/catalog`}
                     className="px-8 py-3 bg-[#D4AF37] text-white rounded-full text-sm uppercase tracking-widest hover:bg-[#B8860B] transition-all"
                 >
-                    Explore Shop
+                    {t("browse_collections")}
                 </Link>
             </div>
             {/* Ambient background */}
@@ -54,6 +52,17 @@ function StaticHeroFallback() {
 
 /* ── Main Component ────────────────────────────────────────── */
 export default function FragranceScroll() {
+    const t = useTranslations("home.hero");
+    const tNav = useTranslations("common.nav");
+    const locale = useLocale();
+
+    const storyBeats = [
+        { start: 0.0, end: 0.2, heading: t("beats.0.heading"), sub: t("beats.0.sub") },
+        { start: 0.23, end: 0.45, heading: t("beats.1.heading"), sub: t("beats.1.sub") },
+        { start: 0.55, end: 0.75, heading: t("beats.2.heading"), sub: t("beats.2.sub") },
+        { start: 0.85, end: 1.0, heading: t("beats.3.heading"), sub: t("beats.3.sub"), cta: true },
+    ];
+
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const imagesRef = useRef<HTMLImageElement[]>([]);
@@ -171,7 +180,7 @@ export default function FragranceScroll() {
                                 className="absolute -inset-4 bg-primary/20 blur-xl rounded-full"
                             />
                             <p className="relative text-[#D4AF37] font-serif text-2xl tracking-[0.4em] uppercase">
-                                LPS PERFUME
+                                {tNav("lps")} {tNav("perfume")}
                             </p>
                         </div>
                         <div className="w-72 h-[1px] bg-white/10 relative overflow-hidden">
@@ -182,7 +191,7 @@ export default function FragranceScroll() {
                             />
                         </div>
                         <p className="text-white/30 text-[10px] tracking-widest font-sans uppercase">
-                            Crafting Scent {loadProgress}%
+                            {t("crafting_scent")} {loadProgress}%
                         </p>
                     </div>
                 )}
@@ -217,10 +226,10 @@ export default function FragranceScroll() {
                             </p>
                             {beat.cta && (
                                 <Link
-                                    href="/catalog"
+                                    href={`/${locale}/catalog`}
                                     className="pointer-events-auto mt-12 px-10 py-4 bg-[#D4AF37]/10 border border-[#D4AF37]/40 text-[#D4AF37] rounded-full text-xs uppercase tracking-[0.3em] font-medium hover:bg-[#D4AF37] hover:text-white transition-all duration-500 backdrop-blur-sm"
                                 >
-                                    Experience Now
+                                    {t("experience_now")}
                                 </Link>
                             )}
                         </motion.div>
@@ -240,7 +249,7 @@ export default function FragranceScroll() {
                             />
                         </div>
                         <span className="text-white/20 text-[9px] tracking-[0.5em] uppercase font-sans">
-                            Scroll Down
+                            {t("scroll_down")}
                         </span>
                     </motion.div>
                 )}

@@ -1,9 +1,12 @@
-import prisma from "@/lib/db";
 import CollectionClientView from "@/components/admin/CollectionClientView";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminCollectionsPage() {
+export default async function AdminCollectionsPage({ params }: { params: { locale: string } }) {
+    const { locale } = params;
+    const t = await getTranslations({ locale, namespace: "admin.collections" });
+
     const collections = await prisma.collection.findMany({
         include: { products: { select: { id: true } } },
         orderBy: { name: "asc" },
@@ -12,8 +15,8 @@ export default async function AdminCollectionsPage() {
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div>
-                <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">Collections</h1>
-                <p className="text-gray-500 mt-1 tracking-wide">Organize products into curated collections for the storefront.</p>
+                <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">{t("title")}</h1>
+                <p className="text-gray-500 mt-1 tracking-wide">{t("subtitle")}</p>
             </div>
             <CollectionClientView collections={collections} />
         </div>

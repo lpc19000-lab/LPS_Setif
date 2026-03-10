@@ -1,9 +1,12 @@
-import prisma from "@/lib/db";
 import CategoryClientView from "@/components/admin/CategoryClientView";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminCategoriesPage() {
+export default async function AdminCategoriesPage({ params }: { params: { locale: string } }) {
+    const { locale } = params;
+    const t = await getTranslations({ locale, namespace: "admin.categories" });
+
     const categories = await prisma.category.findMany({
         include: {
             _count: {
@@ -17,8 +20,8 @@ export default async function AdminCategoriesPage() {
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">Categories</h1>
-                    <p className="text-gray-500 mt-1 tracking-wide">Manage fragrance collections and lines.</p>
+                    <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">{t("title")}</h1>
+                    <p className="text-gray-500 mt-1 tracking-wide">{t("subtitle")}</p>
                 </div>
             </div>
 

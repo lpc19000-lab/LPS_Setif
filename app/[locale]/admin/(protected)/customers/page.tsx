@@ -1,9 +1,12 @@
-import prisma from "@/lib/db";
 import { Search, Store, ShieldBan, ShieldAlert } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminCustomersPage() {
+export default async function AdminCustomersPage({ params }: { params: { locale: string } }) {
+    const { locale } = params;
+    const t = await getTranslations({ locale, namespace: "admin.customers" });
+
     const customers = await prisma.customer.findMany({
         include: {
             _count: {
@@ -14,22 +17,22 @@ export default async function AdminCustomersPage() {
     });
 
     const formatDate = (date: Date) => {
-        return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(date);
+        return new Intl.DateTimeFormat(locale === "ar" ? "ar-DZ" : "fr-FR", { dateStyle: "medium" }).format(date);
     };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">Customers</h1>
-                    <p className="text-gray-500 mt-1 tracking-wide">Manage registered B2B store owners and affiliates.</p>
+                    <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">{t("title")}</h1>
+                    <p className="text-gray-500 mt-1 tracking-wide">{t("subtitle")}</p>
                 </div>
                 <div className="relative w-full sm:w-72">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 rtl:left-auto rtl:right-3" />
                     <input
                         type="text"
-                        placeholder="Search by shop or name..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+                        placeholder={t("search_placeholder")}
+                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 rtl:pl-4 rtl:pr-10"
                     />
                 </div>
             </div>
@@ -39,12 +42,12 @@ export default async function AdminCustomersPage() {
                     <table className="w-full text-sm text-left">
                         <thead className="text-xs text-gray-500 uppercase tracking-wider bg-gray-50/50 border-b border-gray-100">
                             <tr>
-                                <th className="px-6 py-4 font-medium">Business / Shop</th>
-                                <th className="px-6 py-4 font-medium">Owner Contact</th>
-                                <th className="px-6 py-4 font-medium">Location</th>
-                                <th className="px-6 py-4 font-medium">Joined</th>
-                                <th className="px-6 py-4 font-medium">Total Orders</th>
-                                <th className="px-6 py-4 font-medium text-right">Access</th>
+                                <th className="px-6 py-4 font-medium">{t("table.business_shop")}</th>
+                                <th className="px-6 py-4 font-medium">{t("table.owner_contact")}</th>
+                                <th className="px-6 py-4 font-medium">{t("table.location")}</th>
+                                <th className="px-6 py-4 font-medium">{t("table.joined")}</th>
+                                <th className="px-6 py-4 font-medium">{t("table.total_orders")}</th>
+                                <th className="px-6 py-4 font-medium text-right rtl:text-left">{t("table.access")}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -71,15 +74,15 @@ export default async function AdminCustomersPage() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${customer._count.orders > 0 ? 'bg-primary/10 text-primary-dark' : 'bg-gray-100 text-gray-500'}`}>
-                                            {customer._count.orders} orders
+                                            {t("orders_count", { count: customer._count.orders })}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
+                                    <td className="px-6 py-4 text-right rtl:text-left">
                                         <button
-                                            className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors inline-flex items-center gap-1.5"
-                                            title="Disable this account"
+                                            className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors inline-flex items-center gap-1.5 rtl:flex-row-reverse"
+                                            title={t("suspend_title")}
                                         >
-                                            <ShieldAlert className="w-3.5 h-3.5" /> Suspend
+                                            <ShieldAlert className="w-3.5 h-3.5" /> {t("suspend")}
                                         </button>
                                     </td>
                                 </tr>
@@ -87,7 +90,7 @@ export default async function AdminCustomersPage() {
                             {customers.length === 0 && (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
-                                        No registered customers found.
+                                        {t("no_customers")}
                                     </td>
                                 </tr>
                             )}

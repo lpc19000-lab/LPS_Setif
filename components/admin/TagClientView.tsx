@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { Plus, Edit2, Trash2, X, Tag as TagIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { createTagAction, updateTagAction, deleteTagAction } from "@/app/admin/actions/tag";
 
 export default function TagClientView({ tags }: { tags: any[] }) {
+    const t = useTranslations("admin.tags");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editing, setEditing] = useState<any>(null);
     const [loading, setLoading] = useState(false);
@@ -24,7 +26,7 @@ export default function TagClientView({ tags }: { tags: any[] }) {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Delete this tag?")) return;
+        if (!confirm(t("delete_confirm", { defaultValue: "Delete this tag?" }))) return;
         setLoading(true);
         await deleteTagAction(id);
         setLoading(false);
@@ -37,7 +39,7 @@ export default function TagClientView({ tags }: { tags: any[] }) {
                     onClick={() => { setEditing(null); setIsModalOpen(true); }}
                     className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-primary-dark shadow-sm transition-all"
                 >
-                    <Plus className="w-4 h-4" /> Add Tag
+                    <Plus className="w-4 h-4" /> {t("add_tag")}
                 </button>
             </div>
 
@@ -54,7 +56,7 @@ export default function TagClientView({ tags }: { tags: any[] }) {
                     </div>
                 ))}
                 {tags.length === 0 && (
-                    <p className="text-gray-400 w-full text-center py-10">No tags yet. Create your first one.</p>
+                    <p className="text-gray-400 w-full text-center py-10">{t("no_tags")}</p>
                 )}
             </div>
 
@@ -62,17 +64,17 @@ export default function TagClientView({ tags }: { tags: any[] }) {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
                     <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
                         <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-gray-50/50">
-                            <h2 className="text-lg font-bold text-primary-dark font-serif">{editing ? "Edit" : "New"} Tag</h2>
+                            <h2 className="text-lg font-bold text-primary-dark font-serif">{editing ? t("modal.edit") : t("modal.create")}</h2>
                             <button onClick={() => { setIsModalOpen(false); setEditing(null); }} className="p-2 text-gray-400 hover:text-gray-600 rounded-full"><X className="w-5 h-5" /></button>
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             <div className="space-y-1.5">
-                                <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Name</label>
+                                <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">{t("modal.name_label")}</label>
                                 <input name="name" defaultValue={editing?.name} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="e.g. best-seller" />
                             </div>
                             <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                                <button type="button" onClick={() => { setIsModalOpen(false); setEditing(null); }} className="px-5 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-gray-100 transition-colors">Cancel</button>
-                                <button type="submit" disabled={loading} className="px-6 py-2.5 rounded-xl text-sm text-white bg-primary hover:bg-primary-dark shadow-md transition-all disabled:opacity-50">{loading ? "Saving..." : "Save"}</button>
+                                <button type="button" onClick={() => { setIsModalOpen(false); setEditing(null); }} className="px-5 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-gray-100 transition-colors">{t("modal.cancel")}</button>
+                                <button type="submit" disabled={loading} className="px-6 py-2.5 rounded-xl text-sm text-white bg-primary hover:bg-primary-dark shadow-md transition-all disabled:opacity-50">{loading ? t("admin.products.modal.saving", { defaultValue: "Saving..." }) : t("modal.save")}</button>
                             </div>
                         </form>
                     </div>

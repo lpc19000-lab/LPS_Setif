@@ -2,20 +2,25 @@ import prisma from "@/lib/db";
 import { History, Package, ArrowLeft, Filter, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function InventoryHistoryPage({
+    params,
     searchParams
 }: {
+    params: { locale: string },
     searchParams: Promise<{ productId?: string; changeType?: string; source?: string }>
 }) {
-    const params = await searchParams;
+    const { locale } = params;
+    const t = await getTranslations({ locale, namespace: "admin.inventory_history" });
+    const sParams = await searchParams;
 
     const filters: any = {};
-    if (params.productId) filters.productId = params.productId;
-    if (params.changeType) filters.changeType = params.changeType;
-    if (params.source) filters.source = params.source;
+    if (sParams.productId) filters.productId = sParams.productId;
+    if (sParams.changeType) filters.changeType = sParams.changeType;
+    if (sParams.source) filters.source = sParams.source;
 
     const logs = await prisma.inventoryLog.findMany({
         where: filters,
@@ -29,7 +34,7 @@ export default async function InventoryHistoryPage({
     });
 
     const formatDate = (date: Date) => {
-        return new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+        return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-DZ' : 'fr-FR', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
     };
 
     const getChangeTypeColor = (type: string) => {
@@ -47,17 +52,17 @@ export default async function InventoryHistoryPage({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
                 <div className="flex items-center gap-4">
                     <Link
-                        href="/admin/inventory"
+                        href={`/${locale}/admin/inventory`}
                         className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
                     >
-                        <ArrowLeft className="w-5 h-5 text-gray-400" />
+                        <ArrowLeft className={`w-5 h-5 text-gray-400 ${locale === 'ar' ? 'rotate-180' : ''}`} />
                     </Link>
                     <div>
                         <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight flex items-center gap-3">
                             <History className="w-8 h-8 text-[#D4AF37]" />
-                            Inventory History
+                            {t("title")}
                         </h1>
-                        <p className="text-sm text-gray-500 mt-2 font-medium">Tracking all stock movements across sales, cancellations, and manual adjustments.</p>
+                        <p className="text-sm text-gray-500 mt-2 font-medium">{t("subtitle")}</p>
                     </div>
                 </div>
             </div>
@@ -65,52 +70,52 @@ export default async function InventoryHistoryPage({
             {/* Simple Server-Side Filter Form */}
             <form className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-end">
                 <div className="flex-1 w-full space-y-1.5">
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Product</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">{t("filter_product")}</label>
                     <select
                         name="productId"
-                        defaultValue={params.productId || ""}
+                        defaultValue={sParams.productId || ""}
                         className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 appearance-none font-medium text-gray-700"
                     >
-                        <option value="">All Products</option>
+                        <option value="">{t("filter_all_products")}</option>
                         {products.map(p => (
                             <option key={p.id} value={p.id}>{p.name}</option>
                         ))}
                     </select>
                 </div>
                 <div className="flex-1 w-full space-y-1.5">
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Change Type</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">{t("filter_type")}</label>
                     <select
                         name="changeType"
-                        defaultValue={params.changeType || ""}
+                        defaultValue={sParams.changeType || ""}
                         className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 appearance-none font-medium text-gray-700"
                     >
-                        <option value="">All Types</option>
-                        <option value="SALE">Sale</option>
-                        <option value="CANCEL">Cancel</option>
-                        <option value="RESTOCK">Restock</option>
-                        <option value="MANUAL_ADJUSTMENT">Manual Adjustment</option>
+                        <option value="">{t("filter_all_types")}</option>
+                        <option value="SALE">{t("types.SALE")}</option>
+                        <option value="CANCEL">{t("types.CANCEL")}</option>
+                        <option value="RESTOCK">{t("types.RESTOCK")}</option>
+                        <option value="MANUAL_ADJUSTMENT">{t("types.MANUAL_ADJUSTMENT")}</option>
                     </select>
                 </div>
                 <div className="flex-1 w-full space-y-1.5">
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Source</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">{t("filter_source")}</label>
                     <select
                         name="source"
-                        defaultValue={params.source || ""}
+                        defaultValue={sParams.source || ""}
                         className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 appearance-none font-medium text-gray-700"
                     >
-                        <option value="">All Sources</option>
-                        <option value="ORDER">Order</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="SYSTEM">System</option>
+                        <option value="">{t("filter_all_sources")}</option>
+                        <option value="ORDER">{t("sources.ORDER")}</option>
+                        <option value="ADMIN">{t("sources.ADMIN")}</option>
+                        <option value="SYSTEM">{t("sources.SYSTEM")}</option>
                     </select>
                 </div>
                 <div className="flex gap-2 w-full md:w-auto mt-4 md:mt-0">
                     <button type="submit" className="flex-1 px-8 py-3 bg-primary text-white font-bold rounded-xl shadow-md shadow-primary/20 hover:bg-primary-dark transition-all">
-                        Filter
+                        {t("filter_button")}
                     </button>
-                    {(params.productId || params.changeType || params.source) && (
-                        <Link href="/admin/inventory/history" className="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all text-center">
-                            Reset
+                    {(sParams.productId || sParams.changeType || sParams.source) && (
+                        <Link href={`/${locale}/admin/inventory/history`} className="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all text-center">
+                            {t("filter_reset")}
                         </Link>
                     )}
                 </div>
@@ -121,11 +126,11 @@ export default async function InventoryHistoryPage({
                     <table className="w-full text-sm text-left">
                         <thead className="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-widest">
                             <tr>
-                                <th className="px-6 py-4 font-bold">Date & Time</th>
-                                <th className="px-6 py-4 font-bold">Product</th>
-                                <th className="px-6 py-4 font-bold">Type</th>
-                                <th className="px-6 py-4 font-bold text-center">Change</th>
-                                <th className="px-6 py-4 font-bold">Source & Reason</th>
+                                <th className={`px-6 py-4 font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t("table_date")}</th>
+                                <th className={`px-6 py-4 font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t("table_product")}</th>
+                                <th className={`px-6 py-4 font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t("table_type")}</th>
+                                <th className="px-6 py-4 font-bold text-center">{t("table_change")}</th>
+                                <th className={`px-6 py-4 font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t("table_source_reason")}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -144,13 +149,13 @@ export default async function InventoryHistoryPage({
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${getChangeTypeColor(log.changeType)}`}>
-                                            {log.changeType.replace('_', ' ')}
+                                            {t(`types.${log.changeType}`)}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <span className={`font-serif text-lg font-bold ${log.quantity > 0 ? "text-emerald-500" :
-                                                log.quantity < 0 ? "text-red-500" :
-                                                    "text-gray-400"
+                                            log.quantity < 0 ? "text-red-500" :
+                                                "text-gray-400"
                                             }`}>
                                             {log.quantity > 0 ? `+${log.quantity}` : log.quantity}
                                         </span>
@@ -168,7 +173,7 @@ export default async function InventoryHistoryPage({
                             {logs.length === 0 && (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-12 text-center text-gray-400 font-medium">
-                                        No inventory history found matching the filters.
+                                        {t("no_history")}
                                     </td>
                                 </tr>
                             )}

@@ -1,10 +1,18 @@
 import prisma from "@/lib/db";
-import { Bell, Package, ShoppingCart, UserPlus, CheckCheck } from "lucide-react";
+import { Bell, Package, ShoppingCart, UserPlus } from "lucide-react";
 import MarkAllReadButton from "@/components/admin/MarkAllReadButton";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminNotificationsPage() {
+export default async function AdminNotificationsPage({
+    params
+}: {
+    params: { locale: string }
+}) {
+    const { locale } = params;
+    const t = await getTranslations({ locale, namespace: "admin.notifications" });
+
     const notifications = await prisma.notification.findMany({
         orderBy: { createdAt: "desc" },
         take: 50,
@@ -31,19 +39,21 @@ export default async function AdminNotificationsPage() {
     };
 
     const formatDate = (date: Date) => {
-        return new Intl.DateTimeFormat("en-GB", {
+        return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-DZ' : 'fr-FR', {
             dateStyle: "medium",
             timeStyle: "short",
         }).format(date);
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className={`space-y-8 animate-in fade-in duration-500 ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">Notifications</h1>
+                <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
+                    <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">{t("title")}</h1>
                     <p className="text-gray-500 mt-1 tracking-wide">
-                        {unreadCount > 0 ? `${unreadCount} unread alert${unreadCount > 1 ? 's' : ''}` : 'All caught up!'}
+                        {unreadCount > 0
+                            ? t("unread_count", { count: unreadCount })
+                            : t("no_unread")}
                     </p>
                 </div>
                 {unreadCount > 0 && <MarkAllReadButton />}
@@ -59,7 +69,7 @@ export default async function AdminNotificationsPage() {
                         <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${getIconColor(notif.type)}`}>
                             {getIcon(notif.type)}
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className={`flex-1 min-w-0 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                             <div className="flex items-center gap-2">
                                 <h3 className="font-semibold text-sm text-gray-900">{notif.title}</h3>
                                 {!notif.isRead && (
@@ -74,7 +84,7 @@ export default async function AdminNotificationsPage() {
                 {notifications.length === 0 && (
                     <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                         <Bell className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500">No notifications yet.</p>
+                        <p className="text-gray-500">{t("no_notifications_desc")}</p>
                     </div>
                 )}
             </div>
