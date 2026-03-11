@@ -35,7 +35,9 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
     const order = await getOrderById(id);
 
     if (!order) notFound();
-    if (order.customerId !== customer.id) redirect(`/${locale}/account/orders`);
+    if (!order.customer || order.customer.id !== customer.id) {
+        redirect(`/${locale}/account/orders`);
+    }
 
     const currentStepIndex = STATUS_STEPS.indexOf(order.status);
     const isCancelled = order.status === "CANCELLED";
