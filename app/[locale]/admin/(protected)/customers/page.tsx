@@ -1,10 +1,11 @@
 import { Search, Store, ShieldBan, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import prisma from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminCustomersPage({ params }: { params: { locale: string } }) {
-    const { locale } = params;
+export default async function AdminCustomersPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.customers" });
 
     const customers = await prisma.customer.findMany({

@@ -1,18 +1,11 @@
 import { FileText, Download, TrendingUp, Users, PackageSearch } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useParams } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
-import { FileText, Download, TrendingUp, Users, PackageSearch } from "lucide-react";
+export default async function ReportsPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: "admin.reports" });
 
-export default function ReportsPage() {
-    const t = useTranslations("admin.reports");
-    const params = useParams();
-    const locale = params.locale as string;
 
-    const handleExport = (type: string) => {
-        // Just navigate to the API route which will trigger the download
-        window.location.href = `/${locale}/api/admin/reports/export?type=${type}`;
-    };
 
     return (
         <div className="p-8 max-w-7xl mx-auto animate-in fade-in duration-500">
@@ -35,13 +28,13 @@ export default function ReportsPage() {
                     <p className="text-sm text-gray-500 mb-6 flex-1">
                         {t("inventory.subtitle")}
                     </p>
-                    <button
-                        onClick={() => handleExport("inventory")}
+                    <a
+                        href={`/${locale}/api/admin/reports/export?type=inventory`}
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-primary-dark hover:text-white text-gray-700 text-sm font-bold uppercase tracking-widest rounded-xl transition-colors border border-gray-100 group"
                     >
                         <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
                         {t("export_csv")}
-                    </button>
+                    </a>
                 </div>
 
                 {/* Sales Report Card */}
@@ -53,13 +46,13 @@ export default function ReportsPage() {
                     <p className="text-sm text-gray-500 mb-6 flex-1">
                         {t("sales.subtitle")}
                     </p>
-                    <button
-                        onClick={() => handleExport("sales")}
+                    <a
+                        href={`/${locale}/api/admin/reports/export?type=sales`}
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-primary-dark hover:text-white text-gray-700 text-sm font-bold uppercase tracking-widest rounded-xl transition-colors border border-gray-100 group"
                     >
                         <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
                         {t("export_csv")}
-                    </button>
+                    </a>
                 </div>
 
                 {/* Customers Report Card */}
@@ -71,13 +64,13 @@ export default function ReportsPage() {
                     <p className="text-sm text-gray-500 mb-6 flex-1">
                         {t("customers.subtitle")}
                     </p>
-                    <button
-                        onClick={() => handleExport("customers")}
+                    <a
+                        href={`/${locale}/api/admin/reports/export?type=customers`}
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-primary-dark hover:text-white text-gray-700 text-sm font-bold uppercase tracking-widest rounded-xl transition-colors border border-gray-100 group"
                     >
                         <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
                         {t("export_csv")}
-                    </button>
+                    </a>
                 </div>
 
             </div>

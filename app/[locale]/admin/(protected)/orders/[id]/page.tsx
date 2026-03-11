@@ -21,8 +21,8 @@ import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminOrderDetailPage({ params }: { params: { id: string, locale: string } }) {
-    const { id } = params;
+export default async function AdminOrderDetailPage({ params }: { params: Promise<{ id: string, locale: string }> }) {
+    const { id } = await params;
     const order = await prisma.order.findUnique({
         where: { id },
         include: {

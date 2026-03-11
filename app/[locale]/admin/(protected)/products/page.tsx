@@ -4,8 +4,8 @@ import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminProductsPage({ params }: { params: { locale: string } }) {
-    const { locale } = params;
+export default async function AdminProductsPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.products" });
     const [products, categories, collections, tags] = await Promise.all([
         prisma.product.findMany({

@@ -4,8 +4,8 @@ import prisma from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminInvoicesPage({ params }: { params: { locale: string } }) {
-    const { locale } = params;
+export default async function AdminInvoicesPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.invoices" });
 
     const invoices = await prisma.invoice.findMany({

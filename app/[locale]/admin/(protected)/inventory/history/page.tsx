@@ -10,10 +10,10 @@ export default async function InventoryHistoryPage({
     params,
     searchParams
 }: {
-    params: { locale: string },
+    params: Promise<{ locale: string }>,
     searchParams: Promise<{ productId?: string; changeType?: string; source?: string }>
 }) {
-    const { locale } = params;
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.inventory_history" });
     const sParams = await searchParams;
 

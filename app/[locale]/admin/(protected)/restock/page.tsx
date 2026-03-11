@@ -1,10 +1,11 @@
 import RestockDashboardClient from "@/components/admin/RestockDashboardClient";
 import { getTranslations } from "next-intl/server";
+import { getRestockSuggestions, getDeadStock } from "@/services/intelligence-service";
 
 export const dynamic = "force-dynamic";
 
-export default async function RestockPage({ params }: { params: { locale: string } }) {
-    const { locale } = params;
+export default async function RestockPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.restock" });
 
     const [suggestions, deadStock] = await Promise.all([

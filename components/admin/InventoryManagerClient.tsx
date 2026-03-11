@@ -1,3 +1,5 @@
+"use client";
+
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -5,7 +7,6 @@ import { useState } from "react";
 import { Package, AlertTriangle, XCircle, Search, Edit2, ArrowRightLeft, History } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 type ProductWithStock = {
     id: string;

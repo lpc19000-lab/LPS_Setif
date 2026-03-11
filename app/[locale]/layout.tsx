@@ -32,14 +32,12 @@ export const metadata: Metadata = {
         "Premium B2B wholesale platform for perfume distributors in Algeria. Luxury fragrances at wholesale prices.",
 };
 
-export default async function RootLayout({
-    children,
-    params
-}: {
+export default async function RootLayout(props: {
     children: React.ReactNode;
-    params: { locale: string };
+    params: Promise<{ locale: string }>;
 }) {
-    const { locale } = params;
+    const { children } = props;
+    const { locale } = await props.params;
 
     // Validate that the incoming `locale` is supported
     if (!routing.locales.includes(locale as any)) {

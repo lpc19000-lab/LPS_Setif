@@ -26,8 +26,8 @@ export const dynamic = "force-dynamic";
 
 const STATUS_STEPS = ["PENDING", "CONFIRMED", "PACKED", "SHIPPED", "DELIVERED"];
 
-export default async function OrderDetailsPage({ params }: { params: { id: string, locale: string } }) {
-    const { id, locale } = params;
+export default async function OrderDetailsPage({ params }: { params: Promise<{ id: string, locale: string }> }) {
+    const { id, locale } = await params;
     const t = await getTranslations({ locale, namespace: "account" });
     const com = await getTranslations({ locale, namespace: "common" });
     const ch = await getTranslations({ locale, namespace: "checkout" });
@@ -213,15 +213,15 @@ export default async function OrderDetailsPage({ params }: { params: { id: strin
                             <div className={`flex gap-3 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
                                 <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
                                 <div>
-                                    <p className="font-bold text-gray-900 mb-1">{order.shippingData?.name || customer.shopName}</p>
-                                    <p className="text-gray-500 leading-relaxed">{order.shippingData?.address || customer.address}, {order.shippingData?.wilaya || customer.wilaya}</p>
+                                    <p className="font-bold text-gray-900 mb-1">{customer.shopName}</p>
+                                    <p className="text-gray-500 leading-relaxed">{customer.address}, {order.wilayaName || customer.wilaya}</p>
                                 </div>
                             </div>
                             {order.trackingNumber && (
                                 <div className={`p-3 bg-blue-50 rounded-xl border border-blue-100 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                                     <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">{t("tracking_number_label")}</p>
                                     <p className="text-sm font-bold text-blue-900">{order.trackingNumber}</p>
-                                    <p className="text-[10px] text-blue-400 mt-1">{t("ship_with_label", { company: order.shippingCompany })}</p>
+                                    <p className="text-[10px] text-blue-400 mt-1">{t("ship_with_label", { company: order.shippingCompany || "" })}</p>
                                 </div>
                             )}
                         </div>

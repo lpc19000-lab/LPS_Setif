@@ -47,16 +47,16 @@ const getStatusIcon = (status: string) => {
 };
 
 interface PageProps {
-    params: { locale: string };
-    searchParams: { page?: string };
+    params: Promise<{ locale: string }>;
+    searchParams: Promise<{ page?: string }>;
 }
 
 export default async function OrderHistoryPage({ params, searchParams }: PageProps) {
-    const { locale } = params;
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "account" });
     const com = await getTranslations({ locale, namespace: "common" });
     const customer = await requireCustomerSession();
-    const resolvedSearchParams = searchParams;
+    const resolvedSearchParams = await searchParams;
     const page = parseInt(resolvedSearchParams.page || "1");
     const limit = 10;
     const skip = (page - 1) * limit;

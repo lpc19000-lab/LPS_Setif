@@ -17,9 +17,9 @@ export const dynamic = "force-dynamic";
 export default async function SystemHealthPage({
     params
 }: {
-    params: { locale: string }
+    params: Promise<{ locale: string }>
 }) {
-    const { locale } = params;
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.system" });
     const health = await getSystemHealth();
 

@@ -5,8 +5,8 @@ import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AnalyticsPage({ params }: { params: { locale: string } }) {
-    const { locale } = params;
+export default async function AnalyticsPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.analytics" });
 
     const [productAnalytics, revenueMetrics, topCustomers, profitSnapshot] = await Promise.all([

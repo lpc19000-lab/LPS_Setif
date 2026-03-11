@@ -145,9 +145,9 @@ export default function AnalyticsDashboardClient({ productAnalytics, revenueMetr
                                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af' }} tickFormatter={(val) => val.slice(5)} />
                                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af' }} tickFormatter={(val) => `${val / 1000}k`} />
                                 <RechartsTooltip
-                                    formatter={(value: any, name: string | undefined) => [
+                                    formatter={(value: any, name: any) => [
                                         formatCurrency(Number(value) || 0),
-                                        name === "profit" ? t("charts.profit") : name === "cost" ? t("charts.cost") : name
+                                        name === "profit" ? t("charts.profit") : name === "cost" ? t("charts.cost") : String(name)
                                     ]}
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                 />

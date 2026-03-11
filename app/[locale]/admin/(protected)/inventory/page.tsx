@@ -1,11 +1,13 @@
 import { PackageSearch, History } from "lucide-react";
 import Link from "next/link";
+import InventoryManagerClient from "@/components/admin/InventoryManagerClient";
 import { getTranslations } from "next-intl/server";
+import prisma from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminInventoryPage({ params }: { params: { locale: string } }) {
-    const { locale } = params;
+export default async function AdminInventoryPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.inventory" });
 
     const products = await prisma.product.findMany({

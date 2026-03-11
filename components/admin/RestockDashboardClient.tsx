@@ -2,9 +2,6 @@ import { AlertTriangle, TrendingDown, PackageOpen, AlertCircle, Ghost } from "lu
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 
-import { AlertTriangle, TrendingDown, PackageOpen, AlertCircle, Ghost } from "lucide-react";
-import Image from "next/image";
-
 type Suggestion = {
     id: string;
     name: string;

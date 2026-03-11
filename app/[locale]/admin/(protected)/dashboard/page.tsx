@@ -8,8 +8,8 @@ import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminDashboard({ params }: { params: { locale: string } }) {
-    const { locale } = params;
+export default async function AdminDashboard({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.dashboard" });
     const tc = await getTranslations({ locale, namespace: "common" });
     const ts = await getTranslations({ locale, namespace: "common.status" });

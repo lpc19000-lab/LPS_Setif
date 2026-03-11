@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
+import { AlertCircle, AlertTriangle, Info, ChevronRight, Bell, Activity } from "lucide-react";
 
 type Alert = {
     type: "CRITICAL" | "WARNING" | "INFO";

@@ -39,8 +39,8 @@ async function ProductSections({ locale }: { locale: string }) {
     );
 }
 
-export default async function HomePage({ params }: { params: { locale: string } }) {
-    const { locale } = params;
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "home" });
     const tc = await getTranslations({ locale, namespace: "common" });
 
