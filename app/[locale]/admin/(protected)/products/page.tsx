@@ -1,5 +1,6 @@
 import prisma from "@/lib/db";
 import ProductClientView from "@/components/admin/ProductClientView";
+import RealtimeReloader from "@/components/admin/RealtimeReloader";
 import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
@@ -42,6 +43,7 @@ export default async function AdminProductsPage({ params }: { params: Promise<{ 
                 collections={collections}
                 tags={tags}
             />
+            <RealtimeReloader />
         </div>
     );
 }

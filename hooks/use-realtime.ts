@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/client";
 import type { RealtimeChannel, RealtimePostgresChangesFilter } from "@supabase/supabase-js";
 
 /**
@@ -15,6 +15,7 @@ export function useRealtime(
     event: "INSERT" | "UPDATE" | "DELETE" | "*" = "*",
     filter?: string
 ) {
+    const supabase = createClient();
     const callbackRef = useRef(callback);
 
     // Keep the callback ref up to date without re-subscribing

@@ -5,6 +5,7 @@ import { Plus, Search, Edit2, Trash2, X, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { createProduct, updateProduct, deleteProduct } from "@/app/admin/actions/product";
 import { useTranslations, useLocale } from "next-intl";
+import { createClient } from "@/utils/supabase/client";
 
 type ProductWithCategory = any;
 
@@ -58,6 +59,28 @@ export default function ProductClientView({
         e.preventDefault();
         setIsLoading(true);
         const formData = new FormData(e.currentTarget);
+
+        const imageFile = formData.get("imageFile") as File;
+        if (imageFile && imageFile.size > 0) {
+            const supabase = createClient();
+            const fileExt = imageFile.name.split('.').pop() || 'png';
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+            const filePath = `images/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('products')
+                .upload(filePath, imageFile);
+
+            if (uploadError) {
+                alert("Image upload failed: " + uploadError.message);
+                setIsLoading(false);
+                return;
+            }
+
+            const { data } = supabase.storage.from('products').getPublicUrl(filePath);
+            formData.set("imageUrl", data.publicUrl);
+        }
+
         let res;
         if (editingProduct) {
             res = await updateProduct(editingProduct.id, formData);
@@ -251,10 +274,14 @@ export default function ProductClientView({
                                     </select>
                                 </div>
 
-                                {/* Image URL */}
+                                {/* Image Upload & URL */}
                                 <div className="space-y-1.5 md:col-span-2">
-                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.image_label")}</label>
-                                    <input name="imageUrl" defaultValue={editingProduct?.imageUrl} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="https://..." />
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">Upload Image (Optional)</label>
+                                    <input type="file" name="imageFile" accept="image/*" className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-2 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
+                                </div>
+                                <div className="space-y-1.5 md:col-span-2">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.image_label")} (Or provide URL)</label>
+                                    <input name="imageUrl" defaultValue={editingProduct?.imageUrl} className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="https://..." />
                                 </div>
 
                                 {/* Pricing & Stock */}

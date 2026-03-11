@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/client";
 
 type RealtimeEvent = "INSERT" | "UPDATE" | "DELETE" | "*";
 
@@ -39,6 +39,7 @@ export function useRealtime<T = any>({
     onDelete,
     onChange,
 }: UseRealtimeOptions<T>) {
+    const supabase = createClient();
     const [isSubscribed, setIsSubscribed] = useState(false);
 
     useEffect(() => {
@@ -91,6 +92,7 @@ export function useRealtime<T = any>({
  * Simply triggers a router.refresh() when any change occurs.
  */
 export function useRealtimeRefresh(tables: string[]) {
+    const supabase = createClient();
     const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
 
     useEffect(() => {

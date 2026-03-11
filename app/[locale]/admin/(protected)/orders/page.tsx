@@ -1,5 +1,6 @@
 import { getOrders } from "@/services/order-service";
 import OrderClientView from "@/components/admin/OrderClientView";
+import RealtimeReloader from "@/components/admin/RealtimeReloader";
 import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
@@ -37,6 +38,7 @@ export default async function AdminOrdersPage({ params }: { params: Promise<{ lo
             </div>
 
             <OrderClientView orders={serializedOrders} />
+            <RealtimeReloader />
         </div>
     );
 }
