@@ -1,6 +1,6 @@
 import TagClientView from "@/components/admin/TagClientView";
 import { getTranslations } from "next-intl/server";
-import prisma from "@/lib/db";
+import { getTags } from "@/services/tag-service";
 
 export const dynamic = "force-dynamic";
 
@@ -8,10 +8,7 @@ export default async function AdminTagsPage({ params }: { params: Promise<{ loca
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.tags" });
 
-    const tags = await prisma.tag.findMany({
-        include: { products: { select: { id: true } } },
-        orderBy: { name: "asc" },
-    });
+    const tags = await getTags();
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">

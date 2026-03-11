@@ -1,9 +1,9 @@
 "use server";
 
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { updateOrderStatus } from "@/services/order-service";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/lib/constants";
 import { requireCustomerSession } from "@/lib/customer-auth";
 
 export async function cancelOrderAction(orderId: string) {
@@ -12,14 +12,13 @@ export async function cancelOrderAction(orderId: string) {
         const customer = await requireCustomerSession();
         
         // Fetch order to verify ownership and status
-        const order = await prisma.order.findUnique({
-            where: { id: orderId },
-            select: { customerId: true, status: true }
-        });
+        const orderDoc = await adminDb.collection("orders").doc(orderId).get();
 
-        if (!order) {
+        if (!orderDoc.exists) {
             return { success: false, error: "Order not found" };
         }
+
+        const order = orderDoc.data()!;
 
         if (order.customerId !== customer.id) {
             return { success: false, error: "Unauthorized" };
@@ -35,7 +34,7 @@ export async function cancelOrderAction(orderId: string) {
 
         revalidatePath(`/account/orders/${orderId}`);
         revalidatePath("/account/orders");
-        revalidateTag("products", "max");
+        revalidateTag("products");
         
         return { success: true };
     } catch (error) {
@@ -44,14 +43,14 @@ export async function cancelOrderAction(orderId: string) {
     }
 }
 
-export async function adminUpdateOrderStatus(orderId: string, status: OrderStatus) {
+export async function adminUpdateOrderStatus(orderId: string, status: string) {
     try {
         await updateOrderStatus(orderId, status, "ADMIN", `Status updated manually by admin to ${status}.`);
         
         revalidatePath("/admin/orders");
         revalidatePath(`/account/orders/${orderId}`);
         revalidatePath("/account/orders");
-        revalidateTag("products", "max");
+        revalidateTag("products");
         
         return { success: true };
     } catch (error) {

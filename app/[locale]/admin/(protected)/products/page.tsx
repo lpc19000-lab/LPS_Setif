@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 import ProductClientView from "@/components/admin/ProductClientView";
 import RealtimeReloader from "@/components/admin/RealtimeReloader";
 import { getTranslations } from "next-intl/server";
@@ -8,19 +8,28 @@ export const dynamic = "force-dynamic";
 export default async function AdminProductsPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.products" });
-    const [products, categories, collections, tags] = await Promise.all([
-        prisma.product.findMany({
-            include: {
-                category: true,
-                collections: { include: { collection: true } },
-                tags: { include: { tag: true } },
-            },
-            orderBy: { createdAt: "desc" },
-        }),
-        prisma.category.findMany({ orderBy: { name: "asc" } }),
-        prisma.collection.findMany({ orderBy: { name: "asc" } }),
-        prisma.tag.findMany({ orderBy: { name: "asc" } }),
+    const [productsSnap, categoriesSnap, collectionsSnap, tagsSnap] = await Promise.all([
+        adminDb.collection("products").orderBy("createdAt", "desc").get(),
+        adminDb.collection("categories").orderBy("name", "asc").get(),
+        adminDb.collection("collections").orderBy("name", "asc").get(),
+        adminDb.collection("tags").orderBy("name", "asc").get(),
     ]);
+
+    const products = productsSnap.docs.map(doc => {
+        const d: any = doc.data();
+        return {
+            id: doc.id,
+            ...d,
+            category: d.categoryId ? { id: d.categoryId, name: d.categoryName || '' } : null,
+            collections: (d.collectionIds || []).map((cid: string) => ({ collection: { id: cid } })),
+            tags: (d.tagIds || []).map((tid: string) => ({ tag: { id: tid } })),
+            volumes: d.volumes || [],
+            images: d.images || [],
+        };
+    });
+    const categories = categoriesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+    const collections = collectionsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+    const tags = tagsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
 
     const serializedProducts = products.map((p: any) => ({
         ...p,

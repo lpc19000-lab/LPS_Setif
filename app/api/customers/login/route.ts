@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 import { signJwtToken } from "@/lib/auth";
 import { customerLoginSchema, formatZodErrors } from "@/lib/validation";
 import { Errors } from "@/lib/errors";
@@ -21,9 +21,8 @@ export async function POST(request: Request) {
 
         const { phone } = parsed.data;
 
-        const customer = await prisma.customer.findUnique({
-            where: { phone },
-        });
+        const customerQuery = await adminDb.collection("customers").where("phone", "==", phone).limit(1).get();
+        const customer = customerQuery.empty ? null : { id: customerQuery.docs[0].id, ...customerQuery.docs[0].data() as any };
 
         if (!customer) {
             return NextResponse.json(

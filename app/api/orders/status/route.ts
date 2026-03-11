@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { updateOrderStatus } from "@/services/order-service";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/lib/constants";
 
 const validStatuses = Object.values(OrderStatus);
 

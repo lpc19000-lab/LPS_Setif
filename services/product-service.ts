@@ -1,6 +1,5 @@
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 import { unstable_cache, revalidateTag } from "next/cache";
-import { ProductStatus } from "@prisma/client";
 
 // ── Utility ───────────────────────────────────────────────────────────────
 function generateSlug(name: string): string {
@@ -19,79 +18,81 @@ export const getActiveProducts = (filters?: {
     skip?: number;
 }) => {
     const fetchFunc = async () => {
-        const where: Record<string, any> = { status: "ACTIVE" };
+        let queryRef: any = adminDb.collection("products").where("status", "==", "ACTIVE");
 
-        if (filters?.categoryId) where.categoryId = filters.categoryId;
-        if (filters?.brand) where.brand = filters.brand;
+        if (filters?.categoryId) queryRef = queryRef.where("categoryId", "==", filters.categoryId);
+        if (filters?.brand) queryRef = queryRef.where("brand", "==", filters.brand);
+        if (filters?.inStock) queryRef = queryRef.where("stockWeight", ">", 0);
+
+        const snapshot = await queryRef.get();
+        let products = snapshot.docs.map((doc: any) => {
+            const data = doc.data();
+            const images = (data.images || [])
+                .sort((a: any, b: any) => (a.position || 0) - (b.position || 0))
+                .slice(0, 1);
+            return {
+                id: doc.id,
+                name: data.name,
+                slug: data.slug,
+                brand: data.brand,
+                imageUrl: data.imageUrl,
+                basePrice: data.basePrice,
+                stockWeight: data.stockWeight,
+                category: data.categoryId ? { id: data.categoryId } : null,
+                images,
+                volumes: data.volumes || []
+            };
+        });
+
+        // Client-side filtering for search (Firestore doesn't support LIKE/contains)
         if (filters?.search) {
-            where.OR = [
-                { name: { contains: filters.search, mode: "insensitive" } },
-                { brand: { contains: filters.search, mode: "insensitive" } },
-            ];
+            const s = filters.search.toLowerCase();
+            products = products.filter((p: any) =>
+                p.name?.toLowerCase().includes(s) || p.brand?.toLowerCase().includes(s)
+            );
         }
+
+        // Collection filtering
         if (filters?.collectionSlug) {
-            where.collections = { some: { collection: { slug: filters.collectionSlug } } };
+            const collQuery = await adminDb.collection("collections")
+                .where("slug", "==", filters.collectionSlug).limit(1).get();
+            if (!collQuery.empty) {
+                const collId = collQuery.docs[0].id;
+                products = products.filter((p: any) =>
+                    p.collectionIds && p.collectionIds.includes(collId)
+                );
+            } else {
+                products = [];
+            }
         }
+
+        // Tag filtering
         if (filters?.tagSlug) {
-            where.tags = { some: { tag: { slug: filters.tagSlug } } };
-        }
-        if (filters?.inStock) {
-            where.stockWeight = { gt: 0 };
+            const tagQuery = await adminDb.collection("tags")
+                .where("slug", "==", filters.tagSlug).limit(1).get();
+            if (!tagQuery.empty) {
+                const tagId = tagQuery.docs[0].id;
+                products = products.filter((p: any) =>
+                    p.tagIds && p.tagIds.includes(tagId)
+                );
+            } else {
+                products = [];
+            }
         }
 
-        const [products, total] = await Promise.all([
-            prisma.product.findMany({
-                where,
-                take: filters?.limit || 50,
-                skip: filters?.skip || 0,
-                select: {
-                    id: true,
-                    name: true,
-                    slug: true,
-                    brand: true,
-                    imageUrl: true,
-                    basePrice: true,
-                    stockWeight: true,
-                    category: {
-                        select: {
-                            id: true,
-                            name: true,
-                            slug: true
-                        }
-                    },
-                    images: {
-                        select: {
-                            imageUrl: true,
-                            position: true
-                        },
-                        orderBy: { position: "asc" },
-                        take: 1
-                    },
-                    volumes: {
-                        select: {
-                            weight: true,
-                            price: true
-                        }
-                    }
-                },
-                orderBy: { createdAt: "desc" },
-            }),
-            prisma.product.count({ where })
-        ]);
+        const total = products.length;
+        const skip = filters?.skip || 0;
+        const limit = filters?.limit || 50;
+        const paged = products.slice(skip, skip + limit);
 
-        return { products, total };
+        return { products: paged, total };
     };
 
-    // Cache key for the specific filter set
     const cacheKey = JSON.stringify(filters || {});
-
     return unstable_cache(
         fetchFunc,
         ['products', cacheKey],
-        {
-            revalidate: 300, // 5 minutes fallback
-            tags: ['products']
-        }
+        { revalidate: 300, tags: ['products'] }
     )();
 };
 
@@ -105,50 +106,34 @@ export const getProducts = (filters?: {
     limit?: number;
 }) => {
     const fetchFunc = async () => {
-        const where: Record<string, any> = {};
+        let queryRef: any = adminDb.collection("products");
 
-        if (filters?.categoryId) where.categoryId = filters.categoryId;
-        if (filters?.brand) where.brand = filters.brand;
-        if (filters?.status) where.status = filters.status as ProductStatus;
-        if (filters?.search) {
-            where.OR = [
-                { name: { contains: filters.search, mode: "insensitive" } },
-                { brand: { contains: filters.search, mode: "insensitive" } },
-            ];
-        }
-        if (filters?.collectionSlug) {
-            where.collections = { some: { collection: { slug: filters.collectionSlug } } };
-        }
-        if (filters?.tagSlug) {
-            where.tags = { some: { tag: { slug: filters.tagSlug } } };
-        }
+        if (filters?.categoryId) queryRef = queryRef.where("categoryId", "==", filters.categoryId);
+        if (filters?.brand) queryRef = queryRef.where("brand", "==", filters.brand);
+        if (filters?.status) queryRef = queryRef.where("status", "==", filters.status);
 
-        return await prisma.product.findMany({
-            where,
-            take: filters?.limit || 100,
-            select: {
-                id: true,
-                name: true,
-                slug: true,
-                brand: true,
-                imageUrl: true,
-                basePrice: true,
-                stockWeight: true,
-                status: true,
-                category: {
-                    select: {
-                        id: true,
-                        name: true,
-                        slug: true
-                    }
-                },
-                images: { orderBy: { position: "asc" } },
-                tags: { select: { tag: true } },
-                collections: { select: { collection: true } },
-                volumes: true,
-            },
-            orderBy: { createdAt: "desc" },
+        const snapshot = await queryRef.get();
+        let products = snapshot.docs.map((doc: any) => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                images: (data.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)),
+                tags: (data.tagIds || []).map((tid: string) => ({ tag: { id: tid } })),
+                collections: (data.collectionIds || []).map((cid: string) => ({ collection: { id: cid } })),
+                volumes: data.volumes || [],
+                category: data.categoryId ? { id: data.categoryId } : null,
+            };
         });
+
+        if (filters?.search) {
+            const s = filters.search.toLowerCase();
+            products = products.filter((p: any) =>
+                p.name?.toLowerCase().includes(s) || p.brand?.toLowerCase().includes(s)
+            );
+        }
+
+        return products.slice(0, filters?.limit || 100);
     };
 
     const cacheKey = JSON.stringify(filters || {});
@@ -162,16 +147,38 @@ export const getProducts = (filters?: {
 export const getProductById = (id: string) => {
     return unstable_cache(
         async () => {
-            return await prisma.product.findUnique({
-                where: { id },
-                include: {
-                    category: true,
-                    images: { orderBy: { position: "asc" } },
-                    tags: { include: { tag: true } },
-                    collections: { include: { collection: true } },
-                    volumes: true,
-                },
-            });
+            const doc = await adminDb.collection("products").doc(id).get();
+            if (!doc.exists) return null;
+            const data = doc.data();
+            
+            // Fetch category
+            let category = null;
+            if (data?.categoryId) {
+                const catDoc = await adminDb.collection("categories").doc(data.categoryId).get();
+                if (catDoc.exists) category = { id: catDoc.id, ...catDoc.data() };
+            }
+
+            // Fetch tag details
+            const tags = await Promise.all((data?.tagIds || []).map(async (tid: string) => {
+                const tagDoc = await adminDb.collection("tags").doc(tid).get();
+                return { tag: tagDoc.exists ? { id: tagDoc.id, ...tagDoc.data() } : { id: tid } };
+            }));
+
+            // Fetch collection details
+            const collections = await Promise.all((data?.collectionIds || []).map(async (cid: string) => {
+                const colDoc = await adminDb.collection("collections").doc(cid).get();
+                return { collection: colDoc.exists ? { id: colDoc.id, ...colDoc.data() } : { id: cid } };
+            }));
+
+            return {
+                id: doc.id,
+                ...data,
+                category,
+                images: (data?.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)),
+                tags,
+                collections,
+                volumes: data?.volumes || [],
+            };
         },
         ['product-id', id],
         { tags: ['products', `product-${id}`] }
@@ -181,16 +188,38 @@ export const getProductById = (id: string) => {
 export const getProductBySlug = (slug: string) => {
     return unstable_cache(
         async () => {
-            return await prisma.product.findUnique({
-                where: { slug },
-                include: {
-                    category: true,
-                    images: { orderBy: { position: "asc" } },
-                    tags: { include: { tag: true } },
-                    collections: { include: { collection: true } },
-                    volumes: true,
-                },
-            });
+            const query = await adminDb.collection("products")
+                .where("slug", "==", slug).limit(1).get();
+            if (query.empty) return null;
+            
+            const doc = query.docs[0];
+            const data = doc.data();
+
+            let category = null;
+            if (data?.categoryId) {
+                const catDoc = await adminDb.collection("categories").doc(data.categoryId).get();
+                if (catDoc.exists) category = { id: catDoc.id, ...catDoc.data() };
+            }
+
+            const tags = await Promise.all((data?.tagIds || []).map(async (tid: string) => {
+                const tagDoc = await adminDb.collection("tags").doc(tid).get();
+                return { tag: tagDoc.exists ? { id: tagDoc.id, ...tagDoc.data() } : { id: tid } };
+            }));
+
+            const collections = await Promise.all((data?.collectionIds || []).map(async (cid: string) => {
+                const colDoc = await adminDb.collection("collections").doc(cid).get();
+                return { collection: colDoc.exists ? { id: colDoc.id, ...colDoc.data() } : { id: cid } };
+            }));
+
+            return {
+                id: doc.id,
+                ...data,
+                category,
+                images: (data?.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)),
+                tags,
+                collections,
+                volumes: data?.volumes || [],
+            };
         },
         ['product-slug', slug],
         { tags: ['products', `product-slug-${slug}`] }
@@ -201,23 +230,33 @@ export const getProductBySlug = (slug: string) => {
 export const getFeaturedProducts = (limit = 8) => {
     return unstable_cache(
         async () => {
-            return await prisma.product.findMany({
-                where: {
-                    status: "ACTIVE",
-                    tags: { some: { tag: { slug: "featured" } } },
-                },
-                select: {
-                    id: true,
-                    name: true,
-                    slug: true,
-                    brand: true,
-                    imageUrl: true,
-                    basePrice: true,
-                    volumes: true,
-                    category: { select: { name: true } },
-                    images: { select: { imageUrl: true }, orderBy: { position: "asc" }, take: 1 }
-                },
-                take: limit,
+            // Featured products have tag "featured". 
+            // First find the featured tag ID
+            const tagQuery = await adminDb.collection("tags")
+                .where("slug", "==", "featured").limit(1).get();
+            
+            if (tagQuery.empty) return [];
+            const featuredTagId = tagQuery.docs[0].id;
+
+            const query = await adminDb.collection("products")
+                .where("status", "==", "ACTIVE")
+                .where("tagIds", "array-contains", featuredTagId)
+                .limit(limit)
+                .get();
+
+            return query.docs.map(doc => {
+                const d = doc.data();
+                return {
+                    id: doc.id,
+                    name: d.name,
+                    slug: d.slug,
+                    brand: d.brand,
+                    imageUrl: d.imageUrl,
+                    basePrice: d.basePrice,
+                    volumes: d.volumes || [],
+                    category: d.categoryId ? { name: d.categoryName || "" } : null,
+                    images: (d.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1)
+                };
             });
         },
         ['featured-products', String(limit)],
@@ -228,21 +267,24 @@ export const getFeaturedProducts = (limit = 8) => {
 export const getNewArrivals = (limit = 8) => {
     return unstable_cache(
         async () => {
-            return await prisma.product.findMany({
-                where: { status: "ACTIVE" },
-                select: {
-                    id: true,
-                    name: true,
-                    slug: true,
-                    brand: true,
-                    imageUrl: true,
-                    basePrice: true,
-                    volumes: true,
-                    category: { select: { name: true } },
-                    images: { select: { imageUrl: true }, orderBy: { position: "asc" }, take: 1 }
-                },
-                orderBy: { createdAt: "desc" },
-                take: limit,
+            const query = await adminDb.collection("products")
+                .where("status", "==", "ACTIVE")
+                .orderBy("createdAt", "desc")
+                .limit(limit)
+                .get();
+            return query.docs.map(doc => {
+                const d = doc.data();
+                return {
+                    id: doc.id,
+                    name: d.name,
+                    slug: d.slug,
+                    brand: d.brand,
+                    imageUrl: d.imageUrl,
+                    basePrice: d.basePrice,
+                    volumes: d.volumes || [],
+                    category: d.categoryId ? { name: d.categoryName || "" } : null,
+                    images: (d.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1)
+                };
             });
         },
         ['new-arrivals', String(limit)],
@@ -253,27 +295,31 @@ export const getNewArrivals = (limit = 8) => {
 export const getBestSellers = (limit = 8) => {
     return unstable_cache(
         async () => {
-            const salesData = await prisma.productSales.findMany({
-                where: { product: { status: "ACTIVE" } },
-                include: {
-                    product: {
-                        select: {
-                            id: true,
-                            name: true,
-                            slug: true,
-                            brand: true,
-                            imageUrl: true,
-                            basePrice: true,
-                            volumes: true,
-                            category: { select: { name: true } },
-                            images: { select: { imageUrl: true }, orderBy: { position: "asc" }, take: 1 }
-                        },
-                    },
-                },
-                orderBy: { unitsSold: "desc" },
-                take: limit,
+            // Products with embedded sales data, sorted by unitsSold
+            const query = await adminDb.collection("products")
+                .where("status", "==", "ACTIVE")
+                .get();
+            
+            const products = query.docs.map(doc => {
+                const d = doc.data();
+                return {
+                    id: doc.id,
+                    name: d.name,
+                    slug: d.slug,
+                    brand: d.brand,
+                    imageUrl: d.imageUrl,
+                    basePrice: d.basePrice,
+                    volumes: d.volumes || [],
+                    category: d.categoryId ? { name: d.categoryName || "" } : null,
+                    images: (d.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1),
+                    unitsSold: d.sales?.unitsSold || 0
+                };
             });
-            return salesData.map((s) => s.product);
+
+            return products
+                .sort((a, b) => b.unitsSold - a.unitsSold)
+                .slice(0, limit)
+                .map(({ unitsSold, ...rest }) => rest);
         },
         ['best-sellers', String(limit)],
         { tags: ['products', 'best-sellers'] }
@@ -299,68 +345,42 @@ export const createProduct = async (data: {
     const slug = generateSlug(data.name) + "-" + Date.now().toString(36);
     const { collectionIds, tagIds, additionalImages, volumes, ...productData } = data;
 
-    return await prisma.$transaction(async (tx) => {
-        const product = await tx.product.create({
-            data: {
-                ...productData,
-                slug,
-                status: (data.status as ProductStatus) || "ACTIVE",
-                volumes: volumes ? {
-                    create: volumes.map(v => ({
-                        weight: v.weight,
-                        price: v.price
-                    }))
-                } : undefined
-            },
+    const productDoc: any = {
+        ...productData,
+        slug,
+        status: data.status || "ACTIVE",
+        collectionIds: collectionIds || [],
+        tagIds: tagIds || [],
+        volumes: (volumes || []).map((v, i) => ({
+            id: `vol-${Date.now()}-${i}`,
+            weight: v.weight,
+            price: v.price
+        })),
+        images: (additionalImages || []).map((url, i) => ({
+            imageUrl: url,
+            isPrimary: i === 0 && !data.imageUrl,
+            position: i
+        })),
+        sales: { unitsSold: 0, revenue: 0 },
+        createdAt: new Date(),
+    };
+
+    const docRef = await adminDb.collection("products").add(productDoc);
+
+    // Log initial stock
+    if (data.stockWeight > 0) {
+        await adminDb.collection("inventory_logs").add({
+            productId: docRef.id,
+            changeType: "INITIAL_STOCK",
+            quantity: data.stockWeight,
+            source: "ADMIN",
+            reason: "Initial stock on product creation",
+            createdAt: new Date(),
         });
+    }
 
-        // Create initial stock log
-        if (data.stockWeight > 0) {
-            await tx.inventoryLog.create({
-                data: {
-                    productId: product.id,
-                    changeType: "INITIAL_STOCK",
-                    quantity: data.stockWeight,
-                    source: "ADMIN",
-                    reason: "Initial stock on product creation",
-                },
-            });
-        }
-
-        // Link collections
-        if (collectionIds && collectionIds.length > 0) {
-            await tx.productCollection.createMany({
-                data: collectionIds.map((cid) => ({
-                    productId: product.id,
-                    collectionId: cid,
-                })),
-            });
-        }
-
-        // Link tags
-        if (tagIds && tagIds.length > 0) {
-            await tx.productTag.createMany({
-                data: tagIds.map((tid) => ({
-                    productId: product.id,
-                    tagId: tid,
-                })),
-            });
-        }
-
-        // Additional images
-        if (additionalImages && additionalImages.length > 0) {
-            await tx.productImage.createMany({
-                data: additionalImages.map((url, i) => ({
-                    productId: product.id,
-                    imageUrl: url,
-                    isPrimary: i === 0 && !data.imageUrl,
-                    position: i,
-                })),
-            });
-        }
-
-        return product;
-    });
+    revalidateTag('products');
+    return { id: docRef.id, ...productDoc };
 };
 
 // ── UPDATE ────────────────────────────────────────────────────────────────
@@ -383,79 +403,35 @@ export const updateProduct = async (
 ) => {
     const { collectionIds, tagIds, volumes, ...productData } = data;
 
-    return await prisma.$transaction(async (tx) => {
-        const updateData: any = { ...productData };
-        if (productData.status) updateData.status = productData.status as ProductStatus;
+    const updateObj: any = { ...productData };
 
-        const product = await tx.product.update({
-            where: { id },
-            data: updateData
-        });
+    if (collectionIds !== undefined) updateObj.collectionIds = collectionIds;
+    if (tagIds !== undefined) updateObj.tagIds = tagIds;
+    if (volumes !== undefined) {
+        updateObj.volumes = volumes.map((v, i) => ({
+            id: `vol-${Date.now()}-${i}`,
+            weight: v.weight,
+            price: v.price
+        }));
+    }
 
-        // Sync volumes if provided
-        if (volumes !== undefined) {
-            await tx.productVolume.deleteMany({ where: { productId: id } });
-            if (volumes.length > 0) {
-                await tx.productVolume.createMany({
-                    data: volumes.map(v => ({
-                        productId: id,
-                        weight: v.weight,
-                        price: v.price
-                    }))
-                });
-            }
-        }
-
-        // Sync collections
-        if (collectionIds !== undefined) {
-            await tx.productCollection.deleteMany({ where: { productId: id } });
-            if (collectionIds.length > 0) {
-                await tx.productCollection.createMany({
-                    data: collectionIds.map((cid) => ({
-                        productId: id,
-                        collectionId: cid,
-                    })),
-                });
-            }
-        }
-
-        // Sync tags
-        if (tagIds !== undefined) {
-            await tx.productTag.deleteMany({ where: { productId: id } });
-            if (tagIds.length > 0) {
-                await tx.productTag.createMany({
-                    data: tagIds.map((tid) => ({
-                        productId: id,
-                        tagId: tid,
-                    })),
-                });
-            }
-        }
-
-        return product;
-    });
+    await adminDb.collection("products").doc(id).update(updateObj);
+    revalidateTag('products');
+    return { id, ...updateObj };
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteProduct = async (id: string) => {
-    const result = await prisma.product.delete({ where: { id } });
-    revalidateTag('products', "max");
-    return result;
+    await adminDb.collection("products").doc(id).delete();
+    revalidateTag('products');
+    return { id };
 };
 
 // ── LOW STOCK ─────────────────────────────────────────────────────────────
 export const getLowStockProducts = async () => {
-    // Current approach: products where stockWeight is less than their individual lowStockThreshold
-    return await prisma.product.findMany({
-        where: {
-            OR: [
-                { stockWeight: { lte: 500 } }, // default if not specified
-                // Prisma doesn't support comparing two columns directly in findMany easily without raw query
-                // but we can use a reasonable default or fetch and filter
-            ]
-        },
-        include: { category: true },
-        orderBy: { stockWeight: "asc" },
-    });
+    const query = await adminDb.collection("products")
+        .where("stockWeight", "<=", 500)
+        .orderBy("stockWeight", "asc")
+        .get();
+    return query.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
-

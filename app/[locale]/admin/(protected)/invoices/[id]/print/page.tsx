@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 import { ArrowLeft, Printer } from "lucide-react";
 import Link from "next/link";
 
@@ -6,19 +6,31 @@ export const dynamic = "force-dynamic";
 
 export default async function InvoicePrintPage({ params }: { params: Promise<{ id: string, locale: string }> }) {
     const { id } = await params;
-    const invoice = await prisma.invoice.findUnique({
-        where: { id },
-        include: {
-            order: {
-                include: {
-                    customer: true,
-                    items: { include: { product: true } },
-                }
-            }
-        },
-    });
+    // Invoice is embedded in the order document
+    const orderDoc = await adminDb.collection("orders").doc(id).get();
+    if (!orderDoc.exists || !orderDoc.data()?.invoice) return <div className="p-8">Invoice not found.</div>;
 
-    if (!invoice) return <div className="p-8">Invoice not found.</div>;
+    const orderData = orderDoc.data()!;
+    let customer = { shopName: "Unknown", name: "", address: "", wilaya: "", phone: "" };
+    if (orderData.customerId) {
+        const custDoc = await adminDb.collection("customers").doc(orderData.customerId).get();
+        if (custDoc.exists) customer = custDoc.data() as any;
+    }
+
+    const items: any[] = (orderData.items || []).map((item: any) => ({
+        id: item.productId,
+        quantity: item.quantity,
+        price: item.price,
+        product: { name: item.productName || "Product", brand: item.productBrand || "" }
+    }));
+
+    const invoice = {
+        invoiceNumber: orderData.invoice.invoiceNumber,
+        issueDate: orderData.invoice.issueDate?.toDate ? orderData.invoice.issueDate.toDate() : new Date(orderData.invoice.issueDate),
+        totalAmount: orderData.invoice.totalAmount || orderData.totalPrice,
+        orderId: id,
+        order: { customer, items },
+    };
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat("en-US", { style: "currency", currency: "DZD" }).format(amount);

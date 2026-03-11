@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 import { revalidatePath } from "next/cache";
 import { createCategorySchema, formatZodErrors } from "@/lib/validation";
 import { logEvent } from "@/lib/logger";
@@ -18,10 +18,14 @@ export async function createCategory(formData: FormData) {
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
     try {
-        const category = await prisma.category.create({
-            data: { name, slug, description },
+        const docRef = await adminDb.collection("categories").add({
+            name,
+            slug,
+            description,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         });
-        await logEvent("CATEGORY_CREATED", category.id, `Category "${name}" created`);
+        await logEvent("CATEGORY_CREATED", docRef.id, `Category "${name}" created`);
         revalidatePath("/admin/categories");
         return { success: true };
     } catch (error) {
@@ -39,7 +43,11 @@ export async function updateCategory(id: string, formData: FormData) {
     }
 
     try {
-        await prisma.category.update({ where: { id }, data: { name, description } });
+        await adminDb.collection("categories").doc(id).update({
+            name,
+            description,
+            updatedAt: new Date(),
+        });
         revalidatePath("/admin/categories");
         return { success: true };
     } catch (error) {
@@ -49,7 +57,7 @@ export async function updateCategory(id: string, formData: FormData) {
 
 export async function deleteCategory(id: string) {
     try {
-        await prisma.category.delete({ where: { id } });
+        await adminDb.collection("categories").doc(id).delete();
         revalidatePath("/admin/categories");
         return { success: true };
     } catch (error) {

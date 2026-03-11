@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 
 // ── LOGGING ─────────────────────────────────────────────────────────────────
 export const logAdminAction = async (data: {
@@ -9,14 +9,13 @@ export const logAdminAction = async (data: {
     metadata?: Record<string, unknown>;
 }) => {
     try {
-        await prisma.adminLog.create({
-            data: {
-                adminId: data.adminId,
-                action: data.action,
-                targetType: data.targetType,
-                targetId: data.targetId,
-                metadata: data.metadata ? JSON.stringify(data.metadata) : null,
-            },
+        await adminDb.collection("admin_logs").add({
+            adminId: data.adminId,
+            action: data.action,
+            targetType: data.targetType,
+            targetId: data.targetId || null,
+            metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+            createdAt: new Date(),
         });
     } catch (e) {
         console.error("Failed to log admin action:", e);
@@ -31,14 +30,13 @@ export const logSystemError = async (data: {
     metadata?: Record<string, unknown>;
 }) => {
     try {
-        await prisma.systemError.create({
-            data: {
-                message: data.message,
-                path: data.path,
-                method: data.method,
-                stackTrace: data.stackTrace,
-                metadata: data.metadata ? JSON.stringify(data.metadata) : null,
-            },
+        await adminDb.collection("system_errors").add({
+            message: data.message,
+            path: data.path || null,
+            method: data.method || null,
+            stackTrace: data.stackTrace || null,
+            metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+            createdAt: new Date(),
         });
     } catch (e) {
         console.error("Failed to log system error:", e);
@@ -47,18 +45,44 @@ export const logSystemError = async (data: {
 
 // ── READ LOGS ─────────────────────────────────────────────────────────────
 export const getAdminLogs = async (limit = 100) => {
-    return await prisma.adminLog.findMany({
-        orderBy: { createdAt: "desc" },
-        take: limit,
-        include: { admin: { select: { name: true, email: true } } },
-    });
+    const logsQuery = await adminDb.collection("admin_logs")
+        .orderBy("createdAt", "desc")
+        .limit(limit)
+        .get();
+
+    const logs = [];
+    for (const doc of logsQuery.docs) {
+        const logData = doc.data();
+        // Fetch admin info for include
+        let adminInfo = null;
+        if (logData.adminId) {
+            const adminDoc = await adminDb.collection("admins").doc(logData.adminId).get();
+            if (adminDoc.exists) {
+                const aData = adminDoc.data();
+                adminInfo = { name: aData?.name, email: aData?.email };
+            }
+        }
+        logs.push({
+            id: doc.id,
+            ...logData,
+            createdAt: logData.createdAt?.toDate(),
+            admin: adminInfo
+        });
+    }
+    return logs;
 };
 
 export const getSystemErrors = async (limit = 100) => {
-    return await prisma.systemError.findMany({
-        orderBy: { createdAt: "desc" },
-        take: limit,
-    });
+    const errsQuery = await adminDb.collection("system_errors")
+        .orderBy("createdAt", "desc")
+        .limit(limit)
+        .get();
+
+    return errsQuery.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate()
+    }));
 };
 
 // ── SYSTEM HEALTH DASHBOARD ───────────────────────────────────────────────
@@ -66,61 +90,65 @@ export const getSystemHealth = async () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const [
-        totalProducts,
-        totalCustomers,
-        totalOrders,
-        ordersToday,
-        lowStockProducts,
-        deadProductsQuery,
-        recentErrors
-    ] = await Promise.all([
-        // System metrics
-        prisma.product.count(),
-        prisma.customer.count(),
-        prisma.order.count(),
-        prisma.order.count({
-            where: { createdAt: { gte: today } }
-        }),
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-        // Inventory Health
-        prisma.$queryRaw<[{ count: bigint }]>`SELECT COUNT(*) as count FROM products WHERE stock_weight <= low_stock_threshold AND stock_weight > 0`.then(
-            (r: any) => Number(r[0]?.count ?? 0)
-        ).catch(() => 0),
+    try {
+        const [
+            productsCount,
+            customersCount,
+            ordersCount,
+            ordersTodayQuery,
+            recentErrorsQuery
+        ] = await Promise.all([
+            adminDb.collection("products").count().get(),
+            adminDb.collection("customers").count().get(),
+            adminDb.collection("orders").count().get(),
+            adminDb.collection("orders").where("createdAt", ">=", today).count().get(),
+            adminDb.collection("system_errors").where("createdAt", ">=", yesterday).count().get()
+        ]);
 
-        // Dead Products (no active sales array OR no sales at all)
-        prisma.product.count({
-            where: {
-                OR: [
-                    { sales: null },
-                    { sales: { unitsSold: 0 } }
-                ],
-                stockWeight: { gt: 0 }
+        // Inventory Health (approximation for NoSQL, normally we'd query where stock_weight > 0 and <= threshold)
+        // This requires a composite index
+        let lowStockProducts = 0;
+        let deadProducts = 0;
+        
+        try {
+            const lowStockQuery = await adminDb.collection("products").where("stockWeight", ">", 0).get();
+            lowStockQuery.docs.forEach(doc => {
+                const data = doc.data();
+                if (data.stockWeight <= (data.lowStockThreshold || 500)) {
+                    lowStockProducts++;
+                }
+                if (!data.sales || (data.sales && data.sales.unitsSold === 0)) {
+                    deadProducts++;
+                }
+            });
+        } catch(e) { console.error("Could not fetch inventory health", e); }
+
+        const recentErrors = recentErrorsQuery.data().count;
+
+        return {
+            metrics: {
+                totalProducts: productsCount.data().count,
+                totalCustomers: customersCount.data().count,
+                totalOrders: ordersCount.data().count,
+                ordersToday: ordersTodayQuery.data().count,
+            },
+            inventory: {
+                lowStockProducts,
+                deadProducts,
+            },
+            stability: {
+                recentErrors24h: recentErrors,
+                status: recentErrors > 10 ? "DEGRADED" : recentErrors > 0 ? "WARNING" : "HEALTHY",
             }
-        }),
-
-        // System Stability (Errors in last 24h)
-        prisma.systemError.count({
-            where: { createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } }
-        })
-    ]);
-
-    // Construct response
-    return {
-        metrics: {
-            totalProducts,
-            totalCustomers,
-            totalOrders,
-            ordersToday,
-        },
-        inventory: {
-            lowStockProducts,
-            deadProducts: deadProductsQuery,
-        },
-        stability: {
-            recentErrors24h: recentErrors,
-            status: recentErrors > 10 ? "DEGRADED" : recentErrors > 0 ? "WARNING" : "HEALTHY",
-        }
-    };
+        };
+    } catch (e) {
+        console.error("System health check failed", e);
+        return {
+            metrics: { totalProducts: 0, totalCustomers: 0, totalOrders: 0, ordersToday: 0 },
+            inventory: { lowStockProducts: 0, deadProducts: 0 },
+            stability: { recentErrors24h: 0, status: "UNKNOWN" }
+        };
+    }
 };
-

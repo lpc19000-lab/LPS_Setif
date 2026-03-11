@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 
 function generateSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -6,25 +6,34 @@ function generateSlug(name: string): string {
 
 // ── READ ──────────────────────────────────────────────────────────────────
 export const getTags = async () => {
-    return await prisma.tag.findMany({
-        include: { products: { select: { id: true } } },
-        orderBy: { name: "asc" },
-    });
+    const query = await adminDb.collection("tags").orderBy("name", "asc").get();
+    return Promise.all(query.docs.map(async (doc) => {
+        const data = doc.data();
+        // Find products that reference this tag
+        const productsQuery = await adminDb.collection("products")
+            .where("tagIds", "array-contains", doc.id)
+            .get();
+        const products = productsQuery.docs.map(p => ({ id: p.id }));
+        return { id: doc.id, ...data, products };
+    }));
 };
 
 // ── CREATE ────────────────────────────────────────────────────────────────
 export const createTag = async (data: { name: string }) => {
     const slug = generateSlug(data.name);
-    return await prisma.tag.create({ data: { name: data.name, slug } });
+    const docRef = await adminDb.collection("tags").add({ name: data.name, slug, createdAt: new Date() });
+    return { id: docRef.id, name: data.name, slug };
 };
 
 // ── UPDATE ────────────────────────────────────────────────────────────────
 export const updateTag = async (id: string, data: { name: string }) => {
     const slug = generateSlug(data.name);
-    return await prisma.tag.update({ where: { id }, data: { name: data.name, slug } });
+    await adminDb.collection("tags").doc(id).update({ name: data.name, slug });
+    return { id, name: data.name, slug };
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteTag = async (id: string) => {
-    return await prisma.tag.delete({ where: { id } });
+    await adminDb.collection("tags").doc(id).delete();
+    return { id };
 };

@@ -1,6 +1,6 @@
 import { Search, FileText, Download, ExternalLink } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -8,14 +8,27 @@ export default async function AdminInvoicesPage({ params }: { params: Promise<{ 
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.invoices" });
 
-    const invoices = await prisma.invoice.findMany({
-        include: {
-            order: {
-                include: { customer: true }
+    // Invoices are embedded in orders
+    const ordersQuery = await adminDb.collection("orders").orderBy("createdAt", "desc").get();
+    const invoices: any[] = [];
+    for (const doc of ordersQuery.docs) {
+        const orderData = doc.data();
+        if (orderData.invoice) {
+            let customer = { shopName: "Unknown" };
+            if (orderData.customerId) {
+                const custDoc = await adminDb.collection("customers").doc(orderData.customerId).get();
+                if (custDoc.exists) customer = custDoc.data() as any;
             }
-        },
-        orderBy: { issueDate: "desc" },
-    });
+            invoices.push({
+                id: doc.id,
+                invoiceNumber: orderData.invoice.invoiceNumber,
+                issueDate: orderData.invoice.issueDate?.toDate ? orderData.invoice.issueDate.toDate() : new Date(orderData.invoice.issueDate),
+                totalAmount: orderData.invoice.totalAmount || orderData.totalPrice,
+                orderId: doc.id,
+                order: { customer },
+            });
+        }
+    }
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat(locale === "ar" ? "ar-DZ" : "fr-FR", { style: "currency", currency: "DZD" }).format(amount);

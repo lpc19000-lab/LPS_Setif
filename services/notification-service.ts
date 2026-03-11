@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 
 // ── CREATE NOTIFICATION ───────────────────────────────────────────────────
 export const createNotification = async (
@@ -7,45 +7,54 @@ export const createNotification = async (
     message: string,
     metadata?: Record<string, any>
 ) => {
-    return await prisma.notification.create({
-        data: {
-            type,
-            title,
-            message,
-            metadata: metadata ? JSON.stringify(metadata) : null,
-        },
+    const docRef = await adminDb.collection("notifications").add({
+        type,
+        title,
+        message,
+        metadata: metadata || null,
+        isRead: false,
+        createdAt: new Date(),
     });
+    return { id: docRef.id, type, title, message, metadata, isRead: false };
 };
 
 // ── GET ALL NOTIFICATIONS ────────────────────────────────────────────────
 export const getNotifications = async (limit = 30) => {
-    return await prisma.notification.findMany({
-        orderBy: { createdAt: "desc" },
-        take: limit,
-    });
+    const query = await adminDb.collection("notifications")
+        .orderBy("createdAt", "desc")
+        .limit(limit)
+        .get();
+    return query.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate()
+    }));
 };
 
 // ── GET UNREAD COUNT ─────────────────────────────────────────────────────
 export const getUnreadCount = async () => {
-    return await prisma.notification.count({
-        where: { isRead: false },
-    });
+    const result = await adminDb.collection("notifications")
+        .where("isRead", "==", false)
+        .count()
+        .get();
+    return result.data().count;
 };
 
 // ── MARK AS READ ─────────────────────────────────────────────────────────
 export const markAsRead = async (id: string) => {
-    return await prisma.notification.update({
-        where: { id },
-        data: { isRead: true },
-    });
+    await adminDb.collection("notifications").doc(id).update({ isRead: true });
+    return { id, isRead: true };
 };
 
 // ── MARK ALL AS READ ─────────────────────────────────────────────────────
 export const markAllAsRead = async () => {
-    return await prisma.notification.updateMany({
-        where: { isRead: false },
-        data: { isRead: true },
-    });
+    const unread = await adminDb.collection("notifications")
+        .where("isRead", "==", false)
+        .get();
+    const batch = adminDb.batch();
+    unread.docs.forEach(doc => batch.update(doc.ref, { isRead: true }));
+    await batch.commit();
+    return { count: unread.size };
 };
 
 // ── TRIGGER HELPERS ──────────────────────────────────────────────────────

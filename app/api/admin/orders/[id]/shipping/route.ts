@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { updateOrderShipping, updateOrderStatus } from "@/services/order-service";
 import { logAdminAction, logSystemError } from "@/services/audit-service";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/lib/constants";
 import { cookies } from "next/headers";
 import { verifyJwtToken } from "@/lib/auth";
 

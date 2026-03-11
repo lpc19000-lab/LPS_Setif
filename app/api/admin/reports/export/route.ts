@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/db";
-import { OrderStatus } from "@prisma/client";
+import { adminDb } from "@/lib/firebase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -17,42 +16,57 @@ export async function GET(request: Request) {
         let filename = "report.csv";
 
         if (type === "inventory") {
-            const products = await prisma.product.findMany({
-                include: { category: true },
-                orderBy: { name: "asc" }
-            });
-
+            const productsQuery = await adminDb.collection("products").orderBy("name", "asc").get();
             csvData = "ID,Name,Brand,Category,BasePrice,StockWeight,LowStockThreshold\n";
-            products.forEach(p => {
-                csvData += `${p.id},"${p.name}","${p.brand}","${p.category.name}",${p.basePrice},${p.stockWeight},${p.lowStockThreshold}\n`;
+            productsQuery.docs.forEach(doc => {
+                const p = doc.data();
+                csvData += `${doc.id},"${p.name}","${p.brand}","${p.categoryName || ''}",${p.basePrice},${p.stockWeight},${p.lowStockThreshold || 500}\n`;
             });
             filename = `inventory_report_${new Date().toISOString().split('T')[0]}.csv`;
         }
 
         else if (type === "sales") {
-            const orders = await prisma.order.findMany({
-                where: { status: { not: OrderStatus.CANCELLED } },
-                include: { customer: true, items: true },
-                orderBy: { createdAt: "desc" }
-            });
+            const ordersQuery = await adminDb.collection("orders")
+                .where("status", "!=", "CANCELLED")
+                .orderBy("createdAt", "desc")
+                .get();
 
             csvData = "OrderID,Date,Customer,TotalItems,TotalRevenue,Status\n";
-            orders.forEach(o => {
-                const totalItems = o.items.reduce((sum, item) => sum + item.quantity, 0);
-                csvData += `${o.id},${o.createdAt.toISOString().split('T')[0]},"${o.customer.shopName}",${totalItems},${o.totalPrice},${o.status}\n`;
-            });
+            for (const doc of ordersQuery.docs) {
+                const o = doc.data();
+                const createdAt = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+                const totalItems = (o.items || []).reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
+                
+                let shopName = "";
+                if (o.customerId) {
+                    const custDoc = await adminDb.collection("customers").doc(o.customerId).get();
+                    shopName = custDoc.data()?.shopName || "";
+                }
+                
+                csvData += `${doc.id},${createdAt.toISOString().split('T')[0]},"${shopName}",${totalItems},${o.totalPrice},${o.status}\n`;
+            }
             filename = `sales_report_${new Date().toISOString().split('T')[0]}.csv`;
         }
         else if (type === "customers") {
-            const customers = await prisma.customer.findMany({
-                include: { orders: { where: { status: { not: OrderStatus.CANCELLED } } } },
-                orderBy: { name: "asc" }
+            const customersQuery = await adminDb.collection("customers").orderBy("name", "asc").get();
+            const ordersQuery = await adminDb.collection("orders").where("status", "!=", "CANCELLED").get();
+
+            const customerOrdersMap = new Map<string, { count: number; totalSpent: number }>();
+            ordersQuery.docs.forEach(doc => {
+                const o = doc.data();
+                if (o.customerId) {
+                    const curr = customerOrdersMap.get(o.customerId) || { count: 0, totalSpent: 0 };
+                    curr.count++;
+                    curr.totalSpent += Number(o.totalPrice || 0);
+                    customerOrdersMap.set(o.customerId, curr);
+                }
             });
 
             csvData = "CustomerID,ShopName,ContactName,Phone,Wilaya,TotalOrders,TotalSpent\n";
-            customers.forEach(c => {
-                const totalSpent = c.orders.reduce((sum, order) => sum + Number(order.totalPrice), 0);
-                csvData += `${c.id},"${c.shopName}","${c.name}","${c.phone}","${c.wilaya}",${c.orders.length},${totalSpent}\n`;
+            customersQuery.docs.forEach(doc => {
+                const c = doc.data();
+                const stats = customerOrdersMap.get(doc.id) || { count: 0, totalSpent: 0 };
+                csvData += `${doc.id},"${c.shopName}","${c.name}","${c.phone}","${c.wilaya}",${stats.count},${stats.totalSpent}\n`;
             });
             filename = `customers_report_${new Date().toISOString().split('T')[0]}.csv`;
         } else {

@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 import { unstable_cache, revalidateTag } from "next/cache";
 
 function generateSlug(name: string): string {
@@ -9,10 +9,14 @@ function generateSlug(name: string): string {
 export const getCategories = () => {
     return unstable_cache(
         async () => {
-            return await prisma.category.findMany({
-                include: { products: { select: { id: true } } },
-                orderBy: { name: "asc" },
-            });
+            const categoriesQuery = await adminDb.collection("categories").orderBy("name", "asc").get();
+            return Promise.all(categoriesQuery.docs.map(async (doc) => {
+                const cat = doc.data();
+                // Fetch products count/ids for the category
+                const productsQuery = await adminDb.collection("products").where("categoryId", "==", doc.id).get();
+                const products = productsQuery.docs.map(p => ({ id: p.id }));
+                return { id: doc.id, ...cat, products };
+            }));
         },
         ['categories-list'],
         { revalidate: 300, tags: ['categories'] }
@@ -20,29 +24,56 @@ export const getCategories = () => {
 };
 
 export const getCategoryById = async (id: string) => {
-    return await prisma.category.findUnique({
-        where: { id },
-        include: {
-            products: {
-                where: { status: "ACTIVE" },
-                include: { category: true, images: { orderBy: { position: "asc" }, take: 1 } },
-                orderBy: { createdAt: "desc" },
-            },
-        },
+    const doc = await adminDb.collection("categories").doc(id).get();
+    if (!doc.exists) return null;
+    
+    const productsQuery = await adminDb.collection("products")
+        .where("categoryId", "==", id)
+        .where("status", "==", "ACTIVE")
+        .orderBy("createdAt", "desc")
+        .get();
+
+    const products = productsQuery.docs.map(p => {
+        const pData = p.data();
+        let images = [];
+        if (pData.images && Array.isArray(pData.images)) {
+            images = pData.images.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1);
+        }
+        return { id: p.id, ...pData, images, category: { id: doc.id, ...doc.data() } };
     });
+
+    return { id: doc.id, ...doc.data(), products };
 };
 
 export const getCategoryBySlug = async (slug: string) => {
-    return await prisma.category.findUnique({
-        where: { slug },
-        include: {
-            products: {
-                where: { status: "ACTIVE" },
-                include: { category: true, images: { orderBy: { position: "asc" }, take: 1 } },
-                orderBy: { createdAt: "desc" },
-            },
-        },
-    });
+    const query = await adminDb.collection("categories").where("slug", "==", slug).limit(1).get();
+    if (query.empty) return null;
+    
+    const doc = query.docs[0];
+    const category = { id: doc.id, ...doc.data() };
+    
+    // Fallback if querying doesn't work out due to lacking composite index in FB immediately
+    const productsQuery = await adminDb.collection("products")
+        .where("categoryId", "==", doc.id)
+        .where("status", "==", "ACTIVE")
+        .get(); // Sorting happens in JS to avoid immediate index requirement for migration
+
+    const products = productsQuery.docs.map(p => {
+        const pData = p.data();
+        let images = [];
+        if (pData.images && Array.isArray(pData.images)) {
+            images = pData.images.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1);
+        }
+        return { 
+            id: p.id, 
+            ...pData, 
+            createdAt: pData.createdAt?.toDate() || new Date(),
+            images, 
+            category 
+        };
+    }).sort((a: any, b: any) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    return { ...category, products };
 };
 
 // ── CREATE ────────────────────────────────────────────────────────────────
@@ -51,8 +82,9 @@ export const createCategory = async (data: {
     description?: string;
 }) => {
     const slug = generateSlug(data.name);
-    const result = await prisma.category.create({ data: { ...data, slug } });
-    revalidateTag('categories', "max");
+    const docRef = await adminDb.collection("categories").add({ ...data, slug, createdAt: new Date() });
+    const result = { id: docRef.id, ...data, slug };
+    revalidateTag('categories');
     return result;
 };
 
@@ -65,14 +97,14 @@ export const updateCategory = async (
     if (data.name) {
         updateData.slug = generateSlug(data.name);
     }
-    const result = await prisma.category.update({ where: { id }, data: updateData });
-    revalidateTag('categories', "max");
-    return result;
+    await adminDb.collection("categories").doc(id).update(updateData);
+    revalidateTag('categories');
+    return { id, ...updateData };
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteCategory = async (id: string) => {
-    const result = await prisma.category.delete({ where: { id } });
-    revalidateTag('categories', "max");
-    return result;
+    await adminDb.collection("categories").doc(id).delete();
+    revalidateTag('categories');
+    return { id };
 };

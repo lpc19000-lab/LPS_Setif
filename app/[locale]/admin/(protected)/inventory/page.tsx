@@ -2,7 +2,7 @@ import { PackageSearch, History } from "lucide-react";
 import Link from "next/link";
 import InventoryManagerClient from "@/components/admin/InventoryManagerClient";
 import { getTranslations } from "next-intl/server";
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -10,9 +10,8 @@ export default async function AdminInventoryPage({ params }: { params: Promise<{
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.inventory" });
 
-    const products = await prisma.product.findMany({
-        orderBy: { name: 'asc' },
-    });
+    const productsSnap = await adminDb.collection("products").orderBy("name", "asc").get();
+    const products = productsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
 
     return (
         <div className="p-8 max-w-7xl mx-auto animate-in fade-in duration-500">

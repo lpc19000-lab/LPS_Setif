@@ -1,6 +1,6 @@
 import CollectionClientView from "@/components/admin/CollectionClientView";
 import { getTranslations } from "next-intl/server";
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -8,10 +8,11 @@ export default async function AdminCollectionsPage({ params }: { params: Promise
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.collections" });
 
-    const collections = await prisma.collection.findMany({
-        include: { products: { select: { id: true } } },
-        orderBy: { name: "asc" },
-    });
+    const collectionsSnap = await adminDb.collection("collections").orderBy("name", "asc").get();
+    const collections = await Promise.all(collectionsSnap.docs.map(async (doc) => {
+        const productsCount = await adminDb.collection("products").where("collectionIds", "array-contains", doc.id).count().get();
+        return { id: doc.id, ...doc.data() as any, products: Array(productsCount.data().count).fill({ id: '' }) };
+    }));
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">

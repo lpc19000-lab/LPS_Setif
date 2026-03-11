@@ -5,7 +5,6 @@ import { Plus, Search, Edit2, Trash2, X, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { createProduct, updateProduct, deleteProduct } from "@/app/admin/actions/product";
 import { useTranslations, useLocale } from "next-intl";
-import { createClient } from "@/utils/supabase/client";
 
 type ProductWithCategory = any;
 
@@ -62,23 +61,26 @@ export default function ProductClientView({
 
         const imageFile = formData.get("imageFile") as File;
         if (imageFile && imageFile.size > 0) {
-            const supabase = createClient();
-            const fileExt = imageFile.name.split('.').pop() || 'png';
-            const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-            const filePath = `images/${fileName}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from('products')
-                .upload(filePath, imageFile);
-
-            if (uploadError) {
-                alert("Image upload failed: " + uploadError.message);
+            // Upload via API endpoint for Firebase Storage
+            const uploadFormData = new FormData();
+            uploadFormData.append("file", imageFile);
+            try {
+                const uploadRes = await fetch("/api/upload", {
+                    method: "POST",
+                    body: uploadFormData,
+                });
+                if (!uploadRes.ok) {
+                    alert("Image upload failed");
+                    setIsLoading(false);
+                    return;
+                }
+                const uploadData = await uploadRes.json();
+                formData.set("imageUrl", uploadData.url);
+            } catch {
+                alert("Image upload failed");
                 setIsLoading(false);
                 return;
             }
-
-            const { data } = supabase.storage.from('products').getPublicUrl(filePath);
-            formData.set("imageUrl", data.publicUrl);
         }
 
         let res;

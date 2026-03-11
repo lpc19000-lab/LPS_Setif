@@ -1,5 +1,4 @@
-import prisma from "@/lib/db";
-import { OrderStatus, Prisma } from "@prisma/client";
+import { adminDb } from "@/lib/firebase-admin";
 import { notifyNewOrder, notifyLowStock } from "./notification-service";
 import { Errors } from "@/lib/errors";
 import { unstable_cache, revalidateTag } from "next/cache";
@@ -20,170 +19,160 @@ interface CreateOrderInput {
     wilayaName?: string;
 }
 
-// ── CONSTANTS ─────────────────────────────────────────────────────────────
-
 // ── ATOMIC ORDER CREATION (with Tiered Pricing + Notifications + Logs) ─────
 export const createOrder = async (input: CreateOrderInput) => {
-    const order = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-        // Step 0: Validate items
-        if (!input.items || input.items.length === 0) {
-            throw Errors.invalidInput("Cannot create an order without items.");
+    // Step 0: Validate items
+    if (!input.items || input.items.length === 0) {
+        throw Errors.invalidInput("Cannot create an order without items.");
+    }
+
+    // Step 1: Validate products and volumes
+    const productIds = [...new Set(input.items.map(i => i.productId))];
+    const productDocs = await Promise.all(
+        productIds.map(id => adminDb.collection("products").doc(id).get())
+    );
+
+    const productsMap = new Map<string, any>();
+    productDocs.forEach(doc => {
+        if (!doc.exists) throw Errors.invalidInput(`Product not found: ${doc.id}`);
+        productsMap.set(doc.id, { id: doc.id, ...doc.data() });
+    });
+
+    // Step 2: Validate stock and calculate prices
+    let totalPrice = 0;
+    const orderItemsData: any[] = [];
+
+    for (const item of input.items) {
+        const product = productsMap.get(item.productId)!;
+        const volume = (product.volumes || []).find((v: any) => v.id === item.volumeId);
+
+        if (!volume && item.volumeId) {
+            throw Errors.invalidInput(`Volume not found for product: ${product.name}`);
         }
 
-        // Step 1: Validate products exist and fetch prices
-        const productIds = input.items.map((i) => i.productId);
-        const uniqueProductIds = Array.from(new Set(productIds));
-        const products = await tx.product.findMany({
-            where: { id: { in: uniqueProductIds } },
-            include: { volumes: true }
-        });
+        const itemWeight = volume?.weight || 0;
+        const requiredWeight = item.quantity * itemWeight;
 
-        if (products.length !== uniqueProductIds.length) {
-            const foundIds = products.map((p) => p.id);
-            const missingIds = uniqueProductIds.filter((id) => !foundIds.includes(id));
-            throw Errors.invalidInput(`Products not found: ${missingIds.join(", ")}`);
+        if ((product.stockWeight || 0) < requiredWeight) {
+            throw Errors.outOfStock(product.name, product.stockWeight || 0, requiredWeight);
         }
 
-        // Step 1.5: Validate volumes
-        const volumeIds = input.items.map(i => i.volumeId);
-        const volumes = await tx.productVolume.findMany({
-            where: { id: { in: volumeIds } }
-        });
+        const unitPrice = volume?.price
+            ? Number(volume.price)
+            : (Number(product.basePrice) / 100) * itemWeight;
 
-        // Step 4: Validate and update stock (weight-based)
-        for (const item of input.items) {
-            const product = products.find((p) => p.id === item.productId)!;
-            const volume = volumes.find(v => v.id === item.volumeId)!;
-            const itemWeight = volume.weight || 0;
+        const lineTotal = unitPrice * item.quantity;
+        totalPrice += lineTotal;
+
+        orderItemsData.push({
+            productId: item.productId,
+            quantity: item.quantity,
+            volumeId: item.volumeId,
+            price: unitPrice,
+            volume: volume || null,
+        });
+    }
+
+    // Step 3: Create order in a transaction
+    const order = await adminDb.runTransaction(async (t) => {
+        // Decrement stock for each item
+        for (const item of orderItemsData) {
+            const productRef = adminDb.collection("products").doc(item.productId);
+            const productDoc = await t.get(productRef);
+            const productData = productDoc.data();
+            const currentStock = productData?.stockWeight || 0;
+            const itemWeight = item.volume?.weight || 0;
             const requiredWeight = item.quantity * itemWeight;
 
-            if (product.stockWeight < requiredWeight) {
-                throw Errors.outOfStock(product.name, product.stockWeight, requiredWeight);
+            if (currentStock < requiredWeight) {
+                throw new Error(`Stock changed for ${productData?.name}. Please retry.`);
             }
 
-            await tx.product.update({
-                where: { id: item.productId },
-                data: { stockWeight: { decrement: requiredWeight } },
+            t.update(productRef, { stockWeight: currentStock - requiredWeight });
+
+            // Update sales data on product
+            const currentSales = productData?.sales || { unitsSold: 0, revenue: 0 };
+            t.update(productRef, {
+                sales: {
+                    unitsSold: currentSales.unitsSold + item.quantity,
+                    revenue: currentSales.revenue + (item.price * item.quantity),
+                }
             });
         }
 
-        // Step 5: Calculate total with weight prices
-        let totalPrice = 0;
-        const orderItemsData = input.items.map((item) => {
-            const product = products.find((p) => p.id === item.productId)!;
-            const volume = volumes.find(v => v.id === item.volumeId)!;
+        // Create the order document
+        const orderRef = adminDb.collection("orders").doc();
+        const orderData = {
+            customerId: input.customerId,
+            totalPrice,
+            status: "PENDING",
+            wilayaNumber: input.wilayaNumber || null,
+            wilayaName: input.wilayaName || null,
+            items: orderItemsData.map(i => ({
+                productId: i.productId,
+                quantity: i.quantity,
+                volumeId: i.volumeId,
+                price: i.price,
+                volume: i.volume,
+            })),
+            logs: [{
+                status: "PENDING",
+                changedBy: input.createdBy || "CUSTOMER",
+                message: input.notes || "Order placed successfully.",
+                createdAt: new Date(),
+            }],
+            createdAt: new Date(),
+        };
+        t.set(orderRef, orderData);
 
-            // Use volume price OR calculate from basePrice (per 100g)
-            const unitPrice = volume.price
-                ? Number(volume.price)
-                : (Number(product.basePrice) / 100) * (volume.weight || 0);
-
-            const lineTotal = unitPrice * item.quantity;
-            totalPrice += lineTotal;
-            return {
-                productId: item.productId,
-                quantity: item.quantity,
-                volumeId: item.volumeId,
-                price: unitPrice,
-            };
-        });
-
-        // Step 6: Create order with items
-        const order = await tx.order.create({
-            data: {
-                customerId: input.customerId,
-                totalPrice,
-                status: OrderStatus.PENDING,
-                wilayaNumber: input.wilayaNumber,
-                wilayaName: input.wilayaName,
-                items: {
-                    create: orderItemsData,
-                },
-                logs: {
-                    create: {
-                        status: OrderStatus.PENDING,
-                        changedBy: input.createdBy || "CUSTOMER",
-                        message: input.notes || "Order placed successfully.",
-                    },
-                },
-            } as any,
-            include: { items: { include: { product: true, volume: true } }, customer: true },
-        });
-
-        // Step 7: Clear customer cart
-        const cart = await tx.cart.findUnique({
-            where: { customerId: input.customerId },
-        });
-        if (cart) {
-            await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
-        }
-
-        // Step 8: Create invoice
-        const invoiceCount = await tx.invoice.count();
-        const invoiceNumber = `INV-${new Date().getFullYear()}-${(invoiceCount + 1).toString().padStart(4, "0")}-${Math.floor(Math.random() * 1000)}`;
-
-        await tx.invoice.create({
-            data: {
-                orderId: order.id,
+        // Create invoice
+        const invoiceNumber = `INV-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}-${Math.floor(Math.random() * 1000)}`;
+        t.update(orderRef, {
+            invoice: {
                 invoiceNumber,
+                issueDate: new Date(),
                 totalAmount: totalPrice,
-            },
+            }
         });
 
-        // Step 9: Update ProductSales and InventoryLog
+        // Inventory logs
         for (const item of orderItemsData) {
-            const volume = volumes.find(v => v.id === item.volumeId)!;
-            const itemWeight = (volume.weight || 0);
-
-            await tx.productSales.upsert({
-                where: { productId: item.productId },
-                update: {
-                    unitsSold: { increment: item.quantity },
-                    revenue: { increment: Number(item.price) * item.quantity },
-                },
-                create: {
-                    productId: item.productId,
-                    unitsSold: item.quantity,
-                    revenue: Number(item.price) * item.quantity,
-                },
-            });
-
-            await tx.inventoryLog.create({
-                data: {
-                    productId: item.productId,
-                    changeType: "SALE",
-                    quantity: -(item.quantity * itemWeight),
-                    source: "ORDER",
-                    reason: `Sale from order ${order.id}`,
-                },
+            const logRef = adminDb.collection("inventory_logs").doc();
+            t.set(logRef, {
+                productId: item.productId,
+                changeType: "SALE",
+                quantity: -(item.quantity * (item.volume?.weight || 0)),
+                source: "ORDER",
+                reason: `Sale from order ${orderRef.id}`,
+                createdAt: new Date(),
             });
         }
 
-        return order;
+        // Clear customer cart
+        const cartRef = adminDb.collection("carts").doc(input.customerId);
+        const cartDoc = await t.get(cartRef);
+        if (cartDoc.exists) {
+            t.update(cartRef, { items: [] });
+        }
+
+        return { id: orderRef.id, ...orderData };
     });
 
     // Post-transaction: Clear cache
-    revalidateTag(`orders:${input.customerId}`, "max");
-    revalidateTag("orders", "max");
+    revalidateTag(`orders:${input.customerId}`);
+    revalidateTag("orders");
 
     // Post-transaction: Trigger notifications
     try {
-        const fullOrder = await prisma.order.findUnique({
-            where: { id: order.id },
-            include: {
-                customer: true,
-                items: { include: { product: true } }
-            }
-        });
+        const customerDoc = await adminDb.collection("customers").doc(input.customerId).get();
+        const customerName = customerDoc.data()?.shopName || "Customer";
+        await notifyNewOrder(order.id, customerName, totalPrice);
 
-        if (fullOrder) {
-            await notifyNewOrder(fullOrder.id, fullOrder.customer.shopName, Number(fullOrder.totalPrice));
-
-            for (const item of fullOrder.items) {
-                const product = item.product;
-                if (product && product.stockWeight <= product.lowStockThreshold) {
-                    await notifyLowStock(product.id, product.name, product.stockWeight);
-                }
+        for (const item of orderItemsData) {
+            const product = productsMap.get(item.productId)!;
+            const newStock = (product.stockWeight || 0) - (item.quantity * (item.volume?.weight || 0));
+            if (newStock <= (product.lowStockThreshold || 500)) {
+                await notifyLowStock(product.id, product.name, newStock);
             }
         }
     } catch (e) {
@@ -196,76 +185,69 @@ export const createOrder = async (input: CreateOrderInput) => {
 // ── UPDATE ORDER STATUS (with Logging + Stock Management) ─────────────────
 export const updateOrderStatus = async (
     orderId: string,
-    status: OrderStatus,
+    status: string,
     changedBy: "ADMIN" | "CUSTOMER" | "SYSTEM" = "ADMIN",
     message?: string
 ) => {
-    return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-        const order = await tx.order.findUnique({
-            where: { id: orderId },
-            include: { items: { include: { volume: true } } },
-        });
+    return await adminDb.runTransaction(async (t) => {
+        const orderRef = adminDb.collection("orders").doc(orderId);
+        const orderDoc = await t.get(orderRef);
 
-        if (!order) throw new Error("Order not found");
+        if (!orderDoc.exists) throw new Error("Order not found");
 
+        const order = orderDoc.data()!;
         const oldStatus = order.status;
 
         // Stock automation: restore stock if cancelling a non-cancelled order
-        if (status === OrderStatus.CANCELLED && oldStatus !== OrderStatus.CANCELLED) {
-            for (const item of order.items) {
+        if (status === "CANCELLED" && oldStatus !== "CANCELLED") {
+            for (const item of (order.items || [])) {
+                const productRef = adminDb.collection("products").doc(item.productId);
+                const productDoc = await t.get(productRef);
+                const productData = productDoc.data();
+
                 const totalWeight = item.quantity * (item.volume?.weight || 0);
-                await tx.product.update({
-                    where: { id: item.productId },
-                    data: { stockWeight: { increment: totalWeight } },
+                const currentStock = productData?.stockWeight || 0;
+                t.update(productRef, { stockWeight: currentStock + totalWeight });
+
+                // Reverse the sales aggregation
+                const currentSales = productData?.sales || { unitsSold: 0, revenue: 0 };
+                t.update(productRef, {
+                    sales: {
+                        unitsSold: Math.max(0, currentSales.unitsSold - item.quantity),
+                        revenue: Math.max(0, currentSales.revenue - (Number(item.price) * item.quantity)),
+                    }
                 });
 
-                await tx.inventoryLog.create({
-                    data: {
-                        productId: item.productId,
-                        changeType: "CANCEL",
-                        quantity: totalWeight,
-                        source: changedBy === "CUSTOMER" ? "ORDER" : "ADMIN",
-                        reason: `Restock from cancelled order ${orderId}`,
-                    },
-                });
-            }
-            // Reverse the sales aggregation
-            for (const item of order.items) {
-                await tx.productSales.updateMany({
-                    where: { productId: item.productId },
-                    data: {
-                        unitsSold: { decrement: item.quantity },
-                        revenue: { decrement: Number(item.price) * item.quantity },
-                    },
+                const logRef = adminDb.collection("inventory_logs").doc();
+                t.set(logRef, {
+                    productId: item.productId,
+                    changeType: "CANCEL",
+                    quantity: totalWeight,
+                    source: changedBy === "CUSTOMER" ? "ORDER" : "ADMIN",
+                    reason: `Restock from cancelled order ${orderId}`,
+                    createdAt: new Date(),
                 });
             }
         }
 
         // Create log entry
         const logMessage = message || `Status changed from ${oldStatus} to ${status}.`;
-
-        await tx.orderLog.create({
-            data: {
-                orderId,
-                status,
-                changedBy,
-                message: logMessage,
-            },
+        const logs = order.logs || [];
+        logs.push({
+            status,
+            changedBy,
+            message: logMessage,
+            createdAt: new Date(),
         });
 
-        // After status update
-        revalidateTag(`orders:${order.customerId}`, "max");
-        revalidateTag("orders", "max");
+        t.update(orderRef, { status, logs });
 
-        return await tx.order.update({
-            where: { id: orderId },
-            data: { status },
-            include: {
-                items: { include: { product: true, volume: true } },
-                customer: true,
-                logs: { orderBy: { createdAt: "desc" } }
-            },
-        });
+        revalidateTag(`orders:${order.customerId}`);
+        revalidateTag("orders");
+
+        // Return updated order
+        const updatedOrder = { id: orderId, ...order, status, logs };
+        return updatedOrder;
     });
 };
 
@@ -274,66 +256,103 @@ export const updateOrderShipping = async (
     orderId: string,
     data: { shippingCompany?: string; trackingNumber?: string; shippingDate?: Date }
 ) => {
-    const order = await prisma.order.update({
-        where: { id: orderId },
-        data: {
-            ...data,
-        },
-    });
+    const orderRef = adminDb.collection("orders").doc(orderId);
+    const doc = await orderRef.get();
+    if (!doc.exists) throw new Error("Order not found");
+
+    const orderData = doc.data()!;
+    await orderRef.update(data);
 
     // Log the change
-    await prisma.orderLog.create({
-        data: {
-            orderId,
-            status: order.status,
-            changedBy: "ADMIN",
-            message: `Shipping information updated: ${data.shippingCompany || ''} ${data.trackingNumber || ''}`,
-        },
+    const logs = orderData.logs || [];
+    logs.push({
+        status: orderData.status,
+        changedBy: "ADMIN",
+        message: `Shipping information updated: ${data.shippingCompany || ''} ${data.trackingNumber || ''}`,
+        createdAt: new Date(),
     });
+    await orderRef.update({ logs });
 
-    return order;
+    return { id: orderId, ...orderData, ...data, logs };
 };
 
 // ── READ ──────────────────────────────────────────────────────────────────
 export const getOrders = async (limit = 50) => {
-    return await prisma.order.findMany({
-        take: limit,
-        include: {
-            customer: true,
-            items: { include: { product: true } },
-            invoice: true,
-            logs: { orderBy: { createdAt: "desc" } }
-        },
-        orderBy: { createdAt: "desc" },
-    });
+    const query = await adminDb.collection("orders")
+        .orderBy("createdAt", "desc")
+        .limit(limit)
+        .get();
+
+    return Promise.all(query.docs.map(async (doc) => {
+        const data = doc.data();
+
+        let customer = null;
+        if (data.customerId) {
+            const custDoc = await adminDb.collection("customers").doc(data.customerId).get();
+            if (custDoc.exists) customer = { id: custDoc.id, ...custDoc.data() };
+        }
+
+        // Sort logs desc
+        const logs = (data.logs || []).sort((a: any, b: any) => {
+            const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+            const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+            return bTime - aTime;
+        });
+
+        return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate(),
+            customer,
+            logs,
+        };
+    }));
 };
 
 export const getOrderById = async (id: string) => {
-    return await prisma.order.findUnique({
-        where: { id },
-        include: {
-            customer: true,
-            items: { include: { product: true } },
-            invoice: true,
-            logs: { orderBy: { createdAt: "desc" } }
-        },
+    const doc = await adminDb.collection("orders").doc(id).get();
+    if (!doc.exists) return null;
+
+    const data = doc.data()!;
+    let customer = null;
+    if (data.customerId) {
+        const custDoc = await adminDb.collection("customers").doc(data.customerId).get();
+        if (custDoc.exists) customer = { id: custDoc.id, ...custDoc.data() };
+    }
+
+    const logs = (data.logs || []).sort((a: any, b: any) => {
+        const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+        const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+        return bTime - aTime;
     });
+
+    return { id: doc.id, ...data, createdAt: data.createdAt?.toDate(), customer, logs };
 };
 
 export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0) => {
     return unstable_cache(
         async () => {
-            return await prisma.order.findMany({
-                where: { customerId },
-                take: limit,
-                skip: skip,
-                include: {
-                    items: { include: { product: true, volume: true } },
-                    invoice: true,
-                    logs: { orderBy: { createdAt: "desc" } }
-                },
-                orderBy: { createdAt: "desc" },
+            const query = await adminDb.collection("orders")
+                .where("customerId", "==", customerId)
+                .orderBy("createdAt", "desc")
+                .get();
+
+            const allOrders = query.docs.map(doc => {
+                const data = doc.data();
+                const logs = (data.logs || []).sort((a: any, b: any) => {
+                    const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+                    const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+                    return bTime - aTime;
+                });
+                return {
+                    id: doc.id,
+                    ...data,
+                    createdAt: data.createdAt?.toDate(),
+                    logs,
+                };
             });
+
+            return allOrders.slice(skip, skip + limit);
         },
         [`orders-${customerId}-${limit}-${skip}`],
         { tags: [`orders:${customerId}`, "orders"], revalidate: 3600 }
@@ -341,32 +360,46 @@ export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0) =>
 };
 
 export const countOrdersByCustomer = async (customerId: string) => {
-    return await prisma.order.count({
-        where: { customerId },
-    });
+    const result = await adminDb.collection("orders")
+        .where("customerId", "==", customerId)
+        .count()
+        .get();
+    return result.data().count;
 };
 
 // ── BEST SELLERS ──────────────────────────────────────────────────────────
 export const getBestSellers = async (limit = 10) => {
-    return await prisma.productSales.findMany({
-        orderBy: { unitsSold: "desc" },
-        take: limit,
-        include: { product: { include: { category: true } } },
+    const query = await adminDb.collection("products").get();
+    const products = query.docs.map(doc => {
+        const d = doc.data();
+        return {
+            id: doc.id,
+            ...d,
+            unitsSold: d.sales?.unitsSold || 0,
+        };
     });
+
+    return products
+        .sort((a, b) => b.unitsSold - a.unitsSold)
+        .slice(0, limit)
+        .map(p => ({
+            productId: p.id,
+            unitsSold: p.unitsSold,
+            product: p,
+        }));
 };
 
 // ── REORDER ───────────────────────────────────────────────────────────────
 export const getReorderItems = async (orderId: string) => {
-    const order = await prisma.order.findUnique({
-        where: { id: orderId },
-        include: { items: { include: { product: true, volume: true } } },
-    });
-    if (!order) throw new Error("Order not found");
-    return order.items.map((item) => ({
+    const doc = await adminDb.collection("orders").doc(orderId).get();
+    if (!doc.exists) throw new Error("Order not found");
+
+    const order = doc.data()!;
+    return (order.items || []).map((item: any) => ({
         productId: item.productId,
-        name: (item.product as any).name,
+        name: item.productName || "Product",
         quantity: item.quantity,
         volumeId: item.volumeId,
-        currentPrice: Number(item.volume?.price || 0),
+        currentPrice: Number(item.volume?.price || item.price || 0),
     }));
 };

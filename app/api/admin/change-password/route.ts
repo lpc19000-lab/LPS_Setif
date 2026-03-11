@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyJwtToken } from "@/lib/auth";
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
@@ -27,12 +27,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: "Current and new password are required" }, { status: 400 });
         }
 
-        const admin = await prisma.admin.findUnique({ where: { id: adminId } });
+        const adminDoc = await adminDb.collection("admins").doc(adminId).get();
 
-        if (!admin) {
+        if (!adminDoc.exists) {
             return NextResponse.json({ success: false, error: "Admin not found" }, { status: 404 });
         }
 
+        const admin = adminDoc.data()!;
         const isPasswordValid = await bcrypt.compare(currentPassword, admin.passwordHash);
 
         if (!isPasswordValid) {
@@ -41,10 +42,7 @@ export async function POST(request: Request) {
 
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
-        await prisma.admin.update({
-            where: { id: adminId },
-            data: { passwordHash: hashedNewPassword }
-        });
+        await adminDb.collection("admins").doc(adminId).update({ passwordHash: hashedNewPassword });
 
         return NextResponse.json({ success: true, message: "Password updated successfully" }, { status: 200 });
 

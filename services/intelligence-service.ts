@@ -1,61 +1,54 @@
-import prisma from "@/lib/db";
-import { OrderStatus } from "@prisma/client";
+import { adminDb } from "@/lib/firebase-admin";
 
 // ── SMART RESTOCK SYSTEM ──────────────────────────────────────────────────
 export const getRestockSuggestions = async () => {
-    const products = await prisma.product.findMany({
-        select: {
-            id: true,
-            name: true,
-            brand: true,
-            imageUrl: true,
-            stockWeight: true,
-            lowStockThreshold: true,
-        }
-    });
+    const productsQuery = await adminDb.collection("products").get();
+    const products = productsQuery.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const recentItems = await prisma.orderItem.findMany({
-        where: {
-            order: {
-                createdAt: { gte: thirtyDaysAgo },
-                status: { not: OrderStatus.CANCELLED }
-            }
-        },
-        include: {
-            volume: { select: { weight: true } }
+    const recentOrdersQuery = await adminDb.collection("orders")
+        .where("createdAt", ">=", thirtyDaysAgo)
+        .where("status", "!=", "CANCELLED")
+        .get();
+
+    const recentDemandMap = new Map<string, number>();
+    recentOrdersQuery.docs.forEach(doc => {
+        const order = doc.data();
+        if (order.items && Array.isArray(order.items)) {
+            order.items.forEach((item: any) => {
+                // Approximate weight since we don't eager load volume here
+                // We could derive weight from quantity * 100 for now if volume is missing
+                const weight = item.volume?.weight || 100; // default 100g 
+                const totalWeight = (item.quantity || 0) * weight;
+                recentDemandMap.set(item.productId, (recentDemandMap.get(item.productId) || 0) + totalWeight);
+            });
         }
     });
 
-    const recentDemandMap = new Map<string, number>();
-    recentItems.forEach(item => {
-        const weight = item.volume?.weight || 0;
-        const totalWeight = (item.quantity || 0) * weight;
-        recentDemandMap.set(item.productId, (recentDemandMap.get(item.productId) || 0) + totalWeight);
-    });
-
-    return products.map(product => {
+    return products.map((product: any) => {
         const weightSold30d = recentDemandMap.get(product.id) || 0;
         const avgDailyWeightSales = weightSold30d / 30;
 
-        // Handle infinity if avgDailyWeightSales is 0
-        const estimatedDaysLeft = avgDailyWeightSales > 0 ? Math.floor(product.stockWeight / avgDailyWeightSales) : 999;
+        const currentStock = product.stockWeight || 0;
+        const estimatedDaysLeft = avgDailyWeightSales > 0 ? Math.floor(currentStock / avgDailyWeightSales) : 999;
+
+        const lowStockThreshold = product.lowStockThreshold || 500;
 
         let recommendation = "Healthy";
         let status = "NORMAL";
-        if (product.stockWeight <= product.lowStockThreshold || estimatedDaysLeft < 7) {
+        if (currentStock <= lowStockThreshold || estimatedDaysLeft < 7) {
             recommendation = "Restock Soon";
             status = "WARNING";
-            if (product.stockWeight === 0) {
+            if (currentStock === 0) {
                 recommendation = "Restock Immediately (OOS)";
                 status = "CRITICAL";
             }
-        } else if (estimatedDaysLeft > 60 && product.stockWeight > 5000) { // 5kg overstock
+        } else if (estimatedDaysLeft > 60 && currentStock > 5000) { 
             recommendation = "Overstock";
             status = "INFO";
-        } else if (avgDailyWeightSales === 0 && product.stockWeight > 0) {
+        } else if (avgDailyWeightSales === 0 && currentStock > 0) {
             recommendation = "No Recent Sales";
             status = "INFO";
         }
@@ -65,7 +58,7 @@ export const getRestockSuggestions = async () => {
             name: product.name,
             brand: product.brand,
             imageUrl: product.imageUrl,
-            currentStockWeight: product.stockWeight,
+            currentStockWeight: currentStock,
             weightSold30d,
             avgDailyWeightSales: Number(avgDailyWeightSales.toFixed(2)),
             estimatedDaysLeft,
@@ -80,44 +73,37 @@ export const getDeadStock = async () => {
     const sixtyDaysAgo = new Date();
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
 
-    // Get all products that have NO order items in the last 60 days
-    const activeProductIdsList = await prisma.orderItem.findMany({
-        where: {
-            order: {
-                createdAt: { gte: sixtyDaysAgo },
-                status: { not: OrderStatus.CANCELLED }
-            }
-        },
-        select: { productId: true },
-        distinct: ['productId']
-    });
+    const recentOrdersQuery = await adminDb.collection("orders")
+        .where("createdAt", ">=", sixtyDaysAgo)
+        .where("status", "!=", "CANCELLED")
+        .get();
 
-    const activeProductIds = new Set(activeProductIdsList.map(p => p.productId));
-
-    const deadProducts = await prisma.product.findMany({
-        where: {
-            id: { notIn: Array.from(activeProductIds) },
-            stockWeight: { gt: 0 } // Only care if we actually have it in stock
-        },
-        select: {
-            id: true,
-            name: true,
-            brand: true,
-            imageUrl: true,
-            stockWeight: true,
-            basePrice: true,
-            createdAt: true
+    const activeProductIds = new Set<string>();
+    recentOrdersQuery.docs.forEach(doc => {
+        const order = doc.data();
+        if (order.items && Array.isArray(order.items)) {
+            order.items.forEach((item: any) => activeProductIds.add(item.productId));
         }
     });
 
-    return deadProducts.map(p => {
-        const valueTieUp = Number(p.basePrice) * (p.stockWeight / 100); // Rough estimate based on base price per 100g
+    const productsQuery = await adminDb.collection("products").where("stockWeight", ">", 0).get();
+    
+    const deadProducts = productsQuery.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .filter(p => !activeProductIds.has(p.id));
+
+    return deadProducts.map((p: any) => {
+        const basePrice = Number(p.basePrice || 0);
+        const stockWeight = p.stockWeight || 0;
+        const createdAt = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || Date.now());
+        
+        const valueTieUp = basePrice * (stockWeight / 100); 
         return {
             ...p,
             valueTieUp,
-            daysSinceAdded: Math.floor((new Date().getTime() - p.createdAt.getTime()) / (1000 * 3600 * 24))
+            daysSinceAdded: Math.floor((new Date().getTime() - createdAt.getTime()) / (1000 * 3600 * 24))
         };
-    }).filter(p => p.daysSinceAdded > 60) // Ensure it's actually old, not just a newly added product with no sales yet
+    }).filter(p => p.daysSinceAdded > 60) 
         .sort((a, b) => b.valueTieUp - a.valueTieUp);
 };
 
@@ -126,20 +112,12 @@ export const getProfitAnalytics = async () => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const validOrders = await prisma.order.findMany({
-        where: { status: { not: OrderStatus.CANCELLED } },
-        include: {
-            items: {
-                include: { product: { select: { basePrice: true } } }
-            }
-        },
-        orderBy: { createdAt: "asc" }
-    });
+    const validOrdersQuery = await adminDb.collection("orders")
+        .where("status", "!=", "CANCELLED")
+        .get();
 
-    // Daily Profit (last 30 days)
     const dailyMap = new Map<string, { revenue: number, cost: number, profit: number }>();
 
-    // Initialize last 30 days
     for (let i = 29; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
@@ -148,26 +126,29 @@ export const getProfitAnalytics = async () => {
     }
 
     let overallRevenue = 0;
-    let overallCost = 0; // Since costPrice is missing, we'll estimate cost as 70% of basePrice for analytics purposes if needed, or just track revenue
+    let overallCost = 0; 
 
-    validOrders.forEach(order => {
-        const dStr = order.createdAt.toISOString().split('T')[0];
+    // Compute on all orders for global margin
+    validOrdersQuery.docs.forEach(doc => {
+        const order = doc.data();
+        const createdAt = order.createdAt?.toDate ? order.createdAt.toDate() : new Date(order.createdAt);
+        const dStr = createdAt.toISOString().split('T')[0];
 
-        let orderRevenue = Number(order.totalPrice);
+        let orderRevenue = Number(order.totalPrice || 0);
         let orderCost = 0;
 
-        order.items.forEach(item => {
-            // Placeholder: Estimate cost as 70% of price if costPrice is missing from schema
-            orderCost += (Number(item.price) * 0.7) * item.quantity;
-        });
+        if (order.items && Array.isArray(order.items)) {
+            order.items.forEach((item: any) => {
+                orderCost += (Number(item.price || 0) * 0.7) * (item.quantity || 0);
+            });
+        }
 
         const orderProfit = orderRevenue - orderCost;
 
         overallRevenue += orderRevenue;
         overallCost += orderCost;
 
-        // Daily
-        if (order.createdAt >= thirtyDaysAgo) {
+        if (createdAt >= thirtyDaysAgo) {
             if (dailyMap.has(dStr)) {
                 const current = dailyMap.get(dStr)!;
                 dailyMap.set(dStr, {
@@ -190,23 +171,24 @@ export const getProfitAnalytics = async () => {
     const globalMarginPercent = overallRevenue > 0 ? ((overallRevenue - overallCost) / overallRevenue) * 100 : 0;
 
     // Top Profitable Products
-    const sales = await prisma.productSales.findMany({
-        include: { product: { select: { id: true, name: true, imageUrl: true, basePrice: true } } }
-    });
-
-    const productsProfit = sales.map(s => {
-        const avgSellPrice = s.unitsSold > 0 ? Number(s.revenue) / s.unitsSold : Number(s.product.basePrice);
-        const unitProfit = avgSellPrice * 0.3; // Estimating 30% margin
-        const totalProfit = unitProfit * s.unitsSold;
+    const productsQuery = await adminDb.collection("products").get();
+    
+    const productsProfit = productsQuery.docs.map(doc => {
+        const p = doc.data();
+        const sales = p.sales || { unitsSold: 0, revenue: 0 };
+        
+        const avgSellPrice = sales.unitsSold > 0 ? Number(sales.revenue) / sales.unitsSold : Number(p.basePrice || 0);
+        const unitProfit = avgSellPrice * 0.3; 
+        const totalProfit = unitProfit * sales.unitsSold;
         const marginPercent = 30;
 
         return {
-            id: s.product.id,
-            name: s.product.name,
-            imageUrl: s.product.imageUrl,
+            id: doc.id,
+            name: p.name,
+            imageUrl: p.imageUrl,
             totalProfit,
             marginPercent,
-            unitsSold: s.unitsSold
+            unitsSold: sales.unitsSold
         };
     }).sort((a, b) => b.totalProfit - a.totalProfit).slice(0, 10);
 
@@ -222,23 +204,19 @@ export const getProfitAnalytics = async () => {
 export const getInventoryHealthScore = async () => {
     let score = 100;
 
-    // Low stock penalty
-    const products = await prisma.product.findMany({
-        select: { stockWeight: true, lowStockThreshold: true }
-    });
+    const productsQuery = await adminDb.collection("products").get();
+    const products = productsQuery.docs.map(doc => doc.data());
 
-    const lowStockCount = products.filter(p => p.stockWeight <= p.lowStockThreshold).length;
-    score -= (lowStockCount * 2); // 2 points per low stock item
+    const lowStockCount = products.filter(p => (p.stockWeight || 0) <= (p.lowStockThreshold || 500)).length;
+    score -= (lowStockCount * 2); 
 
-    // Dead stock penalty
     const deadStock = await getDeadStock();
-    score -= (deadStock.length * 5); // 5 points per dead stock item
+    score -= (deadStock.length * 5); 
 
-    // OOS penalty
-    const oosCount = products.filter(p => p.stockWeight === 0).length;
-    score -= (oosCount * 5); // 5 points per OOS item
+    const oosCount = products.filter(p => (p.stockWeight || 0) === 0).length;
+    score -= (oosCount * 5); 
 
-    return Math.max(0, score); // clamp to 0
+    return Math.max(0, score);
 };
 
 // ── SMART ALERTS ──────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 import { History, Package, ArrowLeft, Filter, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -22,16 +22,32 @@ export default async function InventoryHistoryPage({
     if (sParams.changeType) filters.changeType = sParams.changeType;
     if (sParams.source) filters.source = sParams.source;
 
-    const logs = await prisma.inventoryLog.findMany({
-        where: filters,
-        include: { product: true },
-        orderBy: { createdAt: 'desc' },
-        take: 100 // Limit for performance, in a real app add pagination
+    let logsQuery = adminDb.collection("inventory_logs").orderBy("createdAt", "desc").limit(100) as any;
+    if (sParams.productId) logsQuery = logsQuery.where("productId", "==", sParams.productId);
+    if (sParams.changeType) logsQuery = logsQuery.where("changeType", "==", sParams.changeType);
+    if (sParams.source) logsQuery = logsQuery.where("source", "==", sParams.source);
+    const logsSnap = await logsQuery.get();
+
+    // Get product data for each log
+    const productIds = [...new Set(logsSnap.docs.map((d: any) => d.data().productId))];
+    const productDocsMap = new Map();
+    await Promise.all(productIds.map(async (pid: string) => {
+        const pDoc = await adminDb.collection("products").doc(pid).get();
+        if (pDoc.exists) productDocsMap.set(pid, { id: pDoc.id, ...pDoc.data() as any });
+    }));
+
+    const logs = logsSnap.docs.map((doc: any) => {
+        const d = doc.data();
+        return {
+            id: doc.id,
+            ...d,
+            createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
+            product: productDocsMap.get(d.productId) || { name: "Unknown", imageUrl: "" },
+        };
     });
 
-    const products = await prisma.product.findMany({
-        select: { id: true, name: true }
-    });
+    const productsSnap = await adminDb.collection("products").get();
+    const products = productsSnap.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
 
     const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-DZ' : 'fr-FR', { dateStyle: 'medium', timeStyle: 'short' }).format(date);

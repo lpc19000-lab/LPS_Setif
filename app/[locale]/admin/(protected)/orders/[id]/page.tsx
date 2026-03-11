@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { getOrderById } from "@/services/order-service";
 import {
     Clock,
     Package,
@@ -23,15 +23,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminOrderDetailPage({ params }: { params: Promise<{ id: string, locale: string }> }) {
     const { id } = await params;
-    const order = await prisma.order.findUnique({
-        where: { id },
-        include: {
-            customer: true,
-            items: { include: { product: true } },
-            invoice: true,
-            logs: { orderBy: { createdAt: "desc" } }
-        },
-    });
+    const order: any = await getOrderById(id);
 
     if (!order) {
         return (

@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { getNotifications } from "@/services/notification-service";
 import { Bell, Package, ShoppingCart, UserPlus } from "lucide-react";
 import MarkAllReadButton from "@/components/admin/MarkAllReadButton";
 import { getTranslations } from "next-intl/server";
@@ -13,10 +13,7 @@ export default async function AdminNotificationsPage({
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.notifications" });
 
-    const notifications = await prisma.notification.findMany({
-        orderBy: { createdAt: "desc" },
-        take: 50,
-    });
+    const notifications: any[] = await getNotifications(50);
 
     const unreadCount = notifications.filter(n => !n.isRead).length;
 

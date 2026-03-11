@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 
 // ── Event Types ────────────────────────────────────────────────────────────
 
@@ -23,12 +23,11 @@ export async function logEvent(
   description: string
 ) {
   try {
-    await prisma.systemLog.create({
-      data: {
-        eventType,
-        entityId: entityId || undefined,
-        description,
-      },
+    await adminDb.collection("system_logs").add({
+      eventType,
+      entityId: entityId || null,
+      description,
+      createdAt: new Date(),
     });
   } catch (err) {
     // Non-blocking: never let logging break the main flow

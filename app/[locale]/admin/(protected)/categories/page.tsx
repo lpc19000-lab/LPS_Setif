@@ -1,6 +1,6 @@
 import CategoryClientView from "@/components/admin/CategoryClientView";
 import { getTranslations } from "next-intl/server";
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -8,14 +8,11 @@ export default async function AdminCategoriesPage({ params }: { params: Promise<
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.categories" });
 
-    const categories = await prisma.category.findMany({
-        include: {
-            _count: {
-                select: { products: true }
-            }
-        },
-        orderBy: { name: "asc" },
-    });
+    const categoriesSnap = await adminDb.collection("categories").orderBy("name", "asc").get();
+    const categories = await Promise.all(categoriesSnap.docs.map(async (doc) => {
+        const productsCount = await adminDb.collection("products").where("categoryId", "==", doc.id).count().get();
+        return { id: doc.id, ...doc.data() as any, _count: { products: productsCount.data().count } };
+    }));
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">

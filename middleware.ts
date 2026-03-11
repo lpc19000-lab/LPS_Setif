@@ -30,6 +30,8 @@ export async function middleware(request: NextRequest) {
                 );
             }
         }
+        // Bypass next-intl for API routes
+        return NextResponse.next();
     }
 
     // Locale handling

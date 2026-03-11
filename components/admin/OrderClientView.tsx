@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, ChevronDown, CheckCircle2, Clock, Truck, PackageCheck, XCircle, FileText, X } from "lucide-react";
 import { adminUpdateOrderStatus } from "@/app/admin/actions/order";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/lib/constants";
 import SafeImage from "@/components/SafeImage";
 import { useTranslations, useLocale } from "next-intl";
 

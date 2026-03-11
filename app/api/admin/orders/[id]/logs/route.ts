@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 
 export async function GET(
     request: Request,
@@ -7,9 +7,17 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
-        const logs = await prisma.orderLog.findMany({
-            where: { orderId: id },
-            orderBy: { createdAt: "desc" },
+        const orderDoc = await adminDb.collection("orders").doc(id).get();
+
+        if (!orderDoc.exists) {
+            return NextResponse.json({ error: "Order not found" }, { status: 404 });
+        }
+
+        const orderData = orderDoc.data();
+        const logs = (orderData?.logs || []).sort((a: any, b: any) => {
+            const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+            const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+            return bTime - aTime;
         });
 
         return NextResponse.json(logs);

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 import bcrypt from "bcryptjs";
 import { signJwtToken } from "@/lib/auth";
 
@@ -15,9 +15,8 @@ export async function POST(request: Request) {
             );
         }
 
-        const admin = await prisma.admin.findUnique({
-            where: { email },
-        });
+        const adminQuery = await adminDb.collection("admins").where("email", "==", email).limit(1).get();
+        const admin = adminQuery.empty ? null : { id: adminQuery.docs[0].id, ...adminQuery.docs[0].data() as any };
 
         if (!admin) {
             return NextResponse.json(

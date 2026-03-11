@@ -96,7 +96,7 @@ export default async function SystemHealthPage({
                         <div className="space-y-4">
                             <div className="flex items-center justify-between text-sm">
                                 <span className="text-gray-500">{t("infrastructure.db_engine")}</span>
-                                <span className="font-bold text-gray-900">PostgreSQL (Supabase)</span>
+                                <span className="font-bold text-gray-900">Cloud Firestore (Firebase)</span>
                             </div>
                             <div className="flex items-center justify-between text-sm">
                                 <span className="text-gray-500">{t("infrastructure.app_server")}</span>
@@ -104,7 +104,7 @@ export default async function SystemHealthPage({
                             </div>
                             <div className="flex items-center justify-between text-sm">
                                 <span className="text-gray-500">{t("infrastructure.orm_layer")}</span>
-                                <span className="font-bold text-gray-900">Prisma Client</span>
+                                <span className="font-bold text-gray-900">Firebase Admin SDK</span>
                             </div>
                         </div>
                     </div>

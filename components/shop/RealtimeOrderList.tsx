@@ -19,7 +19,7 @@ interface RealtimeOrderListProps {
     customerId: string;
 }
 
-// Map Supabase snake_case fields to camelCase
+// Map Firebase/realtime fields to camelCase
 function mapRealtimeOrder(raw: Record<string, any>): Partial<Order> {
     return {
         id: raw.id,

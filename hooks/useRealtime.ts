@@ -1,9 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { getFirestore, collection, onSnapshot } from "firebase/firestore";
+import { getApp, getApps, initializeApp } from "firebase/app";
 
 type RealtimeEvent = "INSERT" | "UPDATE" | "DELETE" | "*";
+
+function getFirebaseApp() {
+    if (getApps().length > 0) return getApp();
+    return initializeApp({
+        apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+        authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+        appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    });
+}
 
 interface UseRealtimeOptions<T> {
     table: string;
@@ -16,8 +29,8 @@ interface UseRealtimeOptions<T> {
 }
 
 /**
- * Supabase Realtime Hook
- * Subscribes to real-time changes on a specific table.
+ * Firebase Firestore Realtime Hook
+ * Subscribes to real-time changes on a specific collection.
  * 
  * Usage:
  * ```
@@ -33,88 +46,81 @@ interface UseRealtimeOptions<T> {
 export function useRealtime<T = any>({
     table,
     event = "*",
-    schema = "public",
     onInsert,
     onUpdate,
     onDelete,
     onChange,
 }: UseRealtimeOptions<T>) {
-    const supabase = createClient();
     const [isSubscribed, setIsSubscribed] = useState(false);
 
     useEffect(() => {
-        const channel = supabase
-            .channel(`realtime-${table}`)
-            .on(
-                "postgres_changes" as any,
-                {
-                    event,
-                    schema,
-                    table,
-                },
-                (payload: any) => {
-                    const eventType = payload.eventType;
-                    const newRecord = payload.new as T;
-                    const oldRecord = payload.old as T;
+        const app = getFirebaseApp();
+        const db = getFirestore(app);
+        const col = collection(db, table);
 
-                    // Call specific handlers
-                    if (eventType === "INSERT" && onInsert) {
-                        onInsert(newRecord);
-                    }
-                    if (eventType === "UPDATE" && onUpdate) {
-                        onUpdate(newRecord);
-                    }
-                    if (eventType === "DELETE" && onDelete) {
-                        onDelete(oldRecord);
-                    }
+        let isFirstSnapshot = true;
 
-                    // Call generic handler
-                    if (onChange) {
-                        onChange({ eventType, new: newRecord, old: oldRecord });
-                    }
+        const unsubscribe = onSnapshot(col, (snapshot) => {
+            if (!isSubscribed) setIsSubscribed(true);
+
+            if (isFirstSnapshot) {
+                isFirstSnapshot = false;
+                return; // Skip initial load
+            }
+
+            snapshot.docChanges().forEach((change) => {
+                const newRecord = { id: change.doc.id, ...change.doc.data() } as T;
+                const oldRecord = change.type === "removed" ? newRecord : ({} as T);
+                const eventType = change.type === "added" ? "INSERT" :
+                    change.type === "modified" ? "UPDATE" :
+                        change.type === "removed" ? "DELETE" : "*";
+
+                if (event !== "*" && event !== eventType) return;
+
+                if (eventType === "INSERT" && onInsert) onInsert(newRecord);
+                if (eventType === "UPDATE" && onUpdate) onUpdate(newRecord);
+                if (eventType === "DELETE" && onDelete) onDelete(oldRecord);
+
+                if (onChange) {
+                    onChange({ eventType, new: newRecord, old: oldRecord });
                 }
-            )
-            .subscribe((status: string) => {
-                setIsSubscribed(status === "SUBSCRIBED");
             });
+        });
 
         return () => {
-            supabase.removeChannel(channel);
+            unsubscribe();
             setIsSubscribed(false);
         };
-    }, [table, event, schema]);
+    }, [table, event]);
 
     return { isSubscribed };
 }
 
 /**
- * Hook to auto-refresh on table changes.
- * Simply triggers a router.refresh() when any change occurs.
+ * Hook to auto-refresh on collection changes.
+ * Triggers lastUpdate timestamp when any change occurs.
  */
 export function useRealtimeRefresh(tables: string[]) {
-    const supabase = createClient();
     const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
 
     useEffect(() => {
-        const channels = tables.map((table) => {
-            return supabase
-                .channel(`refresh-${table}`)
-                .on(
-                    "postgres_changes" as any,
-                    {
-                        event: "*",
-                        schema: "public",
-                        table,
-                    },
-                    () => {
-                        setLastUpdate(Date.now());
-                    }
-                )
-                .subscribe();
+        const app = getFirebaseApp();
+        const db = getFirestore(app);
+
+        let isFirstSnapshot = true;
+
+        const unsubscribers = tables.map((table) => {
+            return onSnapshot(collection(db, table), () => {
+                if (isFirstSnapshot) {
+                    isFirstSnapshot = false;
+                    return;
+                }
+                setLastUpdate(Date.now());
+            });
         });
 
         return () => {
-            channels.forEach((channel) => supabase.removeChannel(channel));
+            unsubscribers.forEach((unsub) => unsub());
         };
     }, [tables.join(",")]);
 

@@ -1,20 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+/**
+ * @deprecated This file is no longer used. The backend has been migrated to Firebase.
+ * Use `import { adminDb } from "@/lib/firebase-admin"` instead.
+ * 
+ * This file is kept as an empty stub to prevent import errors from any legacy code.
+ */
 
-const prismaClientSingleton = () => {
-    return new PrismaClient({
-        log: process.env.NODE_ENV === "development"
-            ? ["warn", "error"]
-            : ["error"],
-    });
-};
-
-declare global {
-    var prisma: undefined | ReturnType<typeof prismaClientSingleton>;
-}
-
-const prisma = globalThis.prisma ?? prismaClientSingleton();
-
-export default prisma;
-
-if (process.env.NODE_ENV !== "production") globalThis.prisma = prisma;
-
+// No-op export to prevent runtime errors if accidentally imported
+export default null;

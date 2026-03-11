@@ -2,7 +2,7 @@
 // Verifies server-side that all cart items are still valid before checkout.
 // Checks: product exists, product is active, stock is available.
 
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 
 export interface CartValidationItem {
     productId: string;
@@ -32,13 +32,16 @@ export async function validateCartItems(
     let total = 0;
 
     const productIds = items.map((i) => i.productId);
-    const products = await prisma.product.findMany({
-        where: { id: { in: productIds } },
-        include: { volumes: true },
-    });
+    const productDocs = await Promise.all(
+        productIds.map(id => adminDb.collection("products").doc(id).get())
+    );
+
+    const products = productDocs
+        .filter(doc => doc.exists)
+        .map(doc => ({ id: doc.id, ...doc.data() as any }));
 
     for (const item of items) {
-        const product = products.find((p) => p.id === item.productId);
+        const product = products.find((p: any) => p.id === item.productId);
 
         if (!product) {
             errors.push(`Product ${item.productId} no longer exists.`);
@@ -52,7 +55,7 @@ export async function validateCartItems(
 
         // Stock validation (weight-based)
         const requiredWeight = item.quantity * item.selectedVolume;
-        if (product.stockWeight < requiredWeight) {
+        if ((product.stockWeight || 0) < requiredWeight) {
             errors.push(
                 `Insufficient stock for "${product.name}". Available: ${product.stockWeight}g, Requested: ${requiredWeight}g.`
             );
@@ -60,7 +63,8 @@ export async function validateCartItems(
         }
 
         // Price calculation: find matching volume price or fallback to base price calculation
-        const volumeData = product.volumes.find((v) => v.weight === item.selectedVolume);
+        const volumes = product.volumes || [];
+        const volumeData = volumes.find((v: any) => v.weight === item.selectedVolume);
         const unitPrice = volumeData
             ? Number(volumeData.price)
             : (Number(product.basePrice) / 100) * item.selectedVolume;

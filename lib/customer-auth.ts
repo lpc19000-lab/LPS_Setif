@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { verifyJwtToken } from "./auth";
-import prisma from "./db";
+import { adminDb } from "./firebase-admin";
 
 export async function getCustomerSession() {
     const cookieStore = await cookies();
@@ -14,19 +14,18 @@ export async function getCustomerSession() {
             return null;
         }
 
-        const customer = await prisma.customer.findUnique({
-            where: { id: payload.sub as string },
-            select: {
-                id: true,
-                name: true,
-                phone: true,
-                shopName: true,
-                wilaya: true,
-                address: true,
-            },
-        });
+        const customerDoc = await adminDb.collection("customers").doc(payload.sub as string).get();
+        if (!customerDoc.exists) return null;
 
-        return customer;
+        const data = customerDoc.data()!;
+        return {
+            id: customerDoc.id,
+            name: data.name,
+            phone: data.phone,
+            shopName: data.shopName,
+            wilaya: data.wilaya,
+            address: data.address,
+        };
     } catch (error) {
         return null;
     }

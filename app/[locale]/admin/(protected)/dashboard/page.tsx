@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { adminDb } from "@/lib/firebase-admin";
 import { DollarSign, Package, Users, ShoppingCart, Clock, Trophy, AlertTriangle, Bell, Activity } from "lucide-react";
 import { getInventoryHealthScore } from "@/services/intelligence-service";
 import SafeImage from "@/components/SafeImage";
@@ -19,65 +19,87 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
 
     // ... (rest of the code)
 
-    const [
-        totalProducts,
-        totalCustomers,
-        totalOrders,
-        pendingOrders,
-        revenueResult,
-        unpaidBalanceResult,
-        partiallyPaidOrders,
-        dailyRevenueResult,
-        monthlyRevenueResult,
-        lowStockProducts,
-        unreadNotifications,
-        bestSellers,
-        inventoryHealthScore,
-    ] = await Promise.all([
-        prisma.product.count(),
-        prisma.customer.count(),
-        prisma.order.count(),
-        prisma.order.count({ where: { status: "PENDING" } }),
-        prisma.order.aggregate({
-            _sum: { totalPrice: true },
-            where: { status: { not: "CANCELLED" } }
-        }),
-        prisma.order.aggregate({
-            _sum: { totalPrice: true, amountPaid: true },
-            where: { paymentStatus: { in: ["UNPAID", "PARTIALLY_PAID"] }, status: { not: "CANCELLED" } }
-        }),
-        prisma.order.count({ where: { paymentStatus: "PARTIALLY_PAID" } }),
-        prisma.order.aggregate({
-            _sum: { totalPrice: true },
-            where: { createdAt: { gte: startOfDay }, status: { not: "CANCELLED" } }
-        }),
-        prisma.order.aggregate({
-            _sum: { totalPrice: true },
-            where: { createdAt: { gte: startOfMonth }, status: { not: "CANCELLED" } }
-        }),
-        prisma.$queryRaw<[{ count: bigint }]>`SELECT COUNT(*) as count FROM products WHERE stock_weight <= low_stock_threshold AND stock_weight > 0`.then(
-            (r) => Number(r[0]?.count ?? 0)
-        ).catch(() => 0),
-        prisma.notification.count({ where: { isRead: false } }),
-        prisma.productSales.findMany({
-            take: 5,
-            orderBy: { unitsSold: "desc" },
-            include: { product: { include: { category: true } } }
-        }),
+    // Fetch all data from Firebase
+    const [productsSnap, customersSnap, ordersSnap, notificationsSnap, inventoryHealthScore] = await Promise.all([
+        adminDb.collection("products").get(),
+        adminDb.collection("customers").count().get(),
+        adminDb.collection("orders").get(),
+        adminDb.collection("notifications").where("isRead", "==", false).count().get(),
         getInventoryHealthScore(),
     ]);
 
-    const revenue = revenueResult._sum.totalPrice ? Number(revenueResult._sum.totalPrice) : 0;
-    const unpaidBalance = (unpaidBalanceResult._sum.totalPrice ? Number(unpaidBalanceResult._sum.totalPrice) : 0) -
-        (unpaidBalanceResult._sum.amountPaid ? Number(unpaidBalanceResult._sum.amountPaid) : 0);
-    const dailyRevenue = dailyRevenueResult._sum.totalPrice ? Number(dailyRevenueResult._sum.totalPrice) : 0;
-    const monthlyRevenue = monthlyRevenueResult._sum.totalPrice ? Number(monthlyRevenueResult._sum.totalPrice) : 0;
+    const totalProducts = productsSnap.size;
+    const totalCustomers = customersSnap.data().count;
+    const unreadNotifications = notificationsSnap.data().count;
 
-    const recentOrders = await prisma.order.findMany({
-        take: 5,
-        orderBy: { createdAt: "desc" },
-        include: { customer: true }
-    });
+    // Process orders data
+    const allOrders = ordersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+    const totalOrders = allOrders.length;
+    const pendingOrders = allOrders.filter(o => o.status === "PENDING").length;
+    const nonCancelled = allOrders.filter(o => o.status !== "CANCELLED");
+
+    const revenue = nonCancelled.reduce((sum, o) => sum + Number(o.totalPrice || 0), 0);
+
+    const unpaidOrders = nonCancelled.filter(o => o.paymentStatus === "UNPAID" || o.paymentStatus === "PARTIALLY_PAID");
+    const unpaidBalance = unpaidOrders.reduce((sum, o) => sum + Number(o.totalPrice || 0) - Number(o.amountPaid || 0), 0);
+    const partiallyPaidOrders = allOrders.filter(o => o.paymentStatus === "PARTIALLY_PAID").length;
+
+    const dailyRevenue = nonCancelled
+        .filter(o => {
+            const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+            return d >= startOfDay;
+        })
+        .reduce((sum, o) => sum + Number(o.totalPrice || 0), 0);
+
+    const monthlyRevenue = nonCancelled
+        .filter(o => {
+            const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+            return d >= startOfMonth;
+        })
+        .reduce((sum, o) => sum + Number(o.totalPrice || 0), 0);
+
+    const lowStockProducts = productsSnap.docs.filter(doc => {
+        const d = doc.data();
+        return (d.stockWeight || 0) <= (d.lowStockThreshold || 500) && (d.stockWeight || 0) > 0;
+    }).length;
+
+    // Best sellers from product sales data
+    const bestSellers = productsSnap.docs
+        .map(doc => {
+            const d = doc.data();
+            return {
+                id: doc.id,
+                unitsSold: d.sales?.unitsSold || 0,
+                revenue: d.sales?.revenue || 0,
+                product: { id: doc.id, name: d.name, imageUrl: d.imageUrl, category: d.categoryId ? { name: d.categoryName || '' } : null }
+            };
+        })
+        .filter(p => p.unitsSold > 0)
+        .sort((a, b) => b.unitsSold - a.unitsSold)
+        .slice(0, 5);
+
+    // Recent orders
+    const recentOrders = await Promise.all(
+        allOrders
+            .sort((a, b) => {
+                const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.createdAt).getTime();
+                const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.createdAt).getTime();
+                return bTime - aTime;
+            })
+            .slice(0, 5)
+            .map(async (order) => {
+                let customer = { shopName: "Unknown", name: "" };
+                if (order.customerId) {
+                    const custDoc = await adminDb.collection("customers").doc(order.customerId).get();
+                    if (custDoc.exists) customer = custDoc.data() as any;
+                }
+                return {
+                    ...order,
+                    createdAt: order.createdAt?.toDate ? order.createdAt.toDate() : new Date(order.createdAt),
+                    customer,
+                };
+            })
+    );
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat(locale === "ar" ? "ar-DZ" : "fr-FR", {
