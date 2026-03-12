@@ -64,7 +64,7 @@ export async function createProduct(formData: FormData) {
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         revalidatePath("/");
-        revalidateTag("products");
+        (revalidateTag as any)("products");
         return { success: true };
     } catch (error) {
         console.error("Create product error:", error);
@@ -105,7 +105,7 @@ export async function updateProduct(id: string, formData: FormData) {
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         revalidatePath("/");
-        revalidateTag("products");
+        (revalidateTag as any)("products");
         return { success: true };
     } catch (error) {
         console.error("Update product error:", error);
@@ -119,7 +119,7 @@ export async function deleteProduct(id: string) {
         await logEvent("PRODUCT_DELETED", id, `Product ${id} deleted`);
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
-        revalidateTag("products");
+        (revalidateTag as any)("products");
         return { success: true };
     } catch (error) {
         return { success: false, error: "Failed to delete product (might be referenced in orders)" };

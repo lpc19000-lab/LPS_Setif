@@ -2,8 +2,11 @@ import { adminDb } from "@/lib/firebase-admin";
 import { notifyNewOrder, notifyLowStock } from "./notification-service";
 import { Errors } from "@/lib/errors";
 import { unstable_cache, revalidateTag } from "next/cache";
+import { Order, OrderItem } from "@/types/firebase";
 
-// ── TYPES ─────────────────────────────────────────────────────────────────
+export type { Order, OrderItem };
+
+// ── TYPES (Internal) ──────────────────────────────────────────────────────
 interface OrderItemInput {
     productId: string;
     quantity: number;
@@ -19,56 +22,37 @@ interface CreateOrderInput {
     wilayaName?: string;
 }
 
-export interface OrderItem {
-    productId: string;
-    quantity: number;
-    price: number;
-    volumeId: string;
-    volume: any;
-    product: {
-        name: string;
-        brand: string;
-        imageUrl: string;
-    };
-    id: string;
+function mapOrder(docId: string, data: any): Order {
+    return {
+        id: docId,
+        customerId: data.customerId || "",
+        totalPrice: Number(data.totalPrice || 0),
+        status: data.status || "PENDING",
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+        items: (data.items || []).map((item: any, idx: number) => ({
+            ...item,
+            id: item.id || `${docId}-item-${idx}`,
+            price: Number(item.price || 0),
+            quantity: Number(item.quantity || 0),
+        })),
+        customer: data.customer || null,
+        shipping: data.shipping || null,
+        invoice: data.invoice || null,
+        wilayaName: data.wilayaName || null,
+        logs: (data.logs || []).sort((a: any, b: any) => {
+            const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+            const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+            return bTime - aTime;
+        }),
+    } as Order;
 }
 
-export interface Order {
-    id: string;
-    customerId: string;
-    customer: {
-        id: string;
-        name: string;
-        shopName: string;
-        phone: string;
-        address: string;
-        wilaya: string;
-    } | null;
-    totalPrice: number;
-    status: string;
-    items: OrderItem[];
-    logs: any[];
-    createdAt: Date;
-    wilayaNumber?: string;
-    wilayaName?: string;
-    invoice?: {
-        invoiceNumber: string;
-        issueDate: any;
-        totalAmount: number;
-    };
-    trackingNumber?: string;
-    shippingCompany?: string;
-    shippingDate?: any;
-}
-
-// ── ATOMIC ORDER CREATION (with Tiered Pricing + Notifications + Logs) ─────
+// ── ATOMIC ORDER CREATION ──────────────────────────────────────────────────
 export const createOrder = async (input: CreateOrderInput) => {
-    // Step 0: Validate items
     if (!input.items || input.items.length === 0) {
         throw Errors.invalidInput("Cannot create an order without items.");
     }
 
-    // Step 1: Validate products and volumes
     const productIds = [...new Set(input.items.map(i => i.productId))];
     const productDocs = await Promise.all(
         productIds.map(id => adminDb.collection("products").doc(id).get())
@@ -80,7 +64,6 @@ export const createOrder = async (input: CreateOrderInput) => {
         productsMap.set(doc.id, { id: doc.id, ...doc.data() });
     });
 
-    // Step 2: Validate stock and calculate prices
     let totalPrice = 0;
     const orderItemsData: any[] = [];
 
@@ -101,7 +84,7 @@ export const createOrder = async (input: CreateOrderInput) => {
 
         const unitPrice = volume?.price
             ? Number(volume.price)
-            : (Number(product.basePrice) / 100) * itemWeight;
+            : (Number(product.basePrice || product.price || 0) / 100) * itemWeight;
 
         const lineTotal = unitPrice * item.quantity;
         totalPrice += lineTotal;
@@ -115,9 +98,7 @@ export const createOrder = async (input: CreateOrderInput) => {
         });
     }
 
-    // Step 3: Create order in a transaction
     const order = await adminDb.runTransaction(async (t) => {
-        // Decrement stock for each item
         for (const item of orderItemsData) {
             const productRef = adminDb.collection("products").doc(item.productId);
             const productDoc = await t.get(productRef);
@@ -132,7 +113,6 @@ export const createOrder = async (input: CreateOrderInput) => {
 
             t.update(productRef, { stockWeight: currentStock - requiredWeight });
 
-            // Update sales data on product
             const currentSales = productData?.sales || { unitsSold: 0, revenue: 0 };
             t.update(productRef, {
                 sales: {
@@ -142,7 +122,6 @@ export const createOrder = async (input: CreateOrderInput) => {
             });
         }
 
-        // Create the order document
         const orderRef = adminDb.collection("orders").doc();
         const orderData = {
             customerId: input.customerId,
@@ -150,13 +129,7 @@ export const createOrder = async (input: CreateOrderInput) => {
             status: "PENDING",
             wilayaNumber: input.wilayaNumber || null,
             wilayaName: input.wilayaName || null,
-            items: orderItemsData.map(i => ({
-                productId: i.productId,
-                quantity: i.quantity,
-                volumeId: i.volumeId,
-                price: i.price,
-                volume: i.volume,
-            })),
+            items: orderItemsData,
             logs: [{
                 status: "PENDING",
                 changedBy: input.createdBy || "CUSTOMER",
@@ -167,155 +140,21 @@ export const createOrder = async (input: CreateOrderInput) => {
         };
         t.set(orderRef, orderData);
 
-        // Create invoice
-        const invoiceNumber = `INV-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}-${Math.floor(Math.random() * 1000)}`;
-        t.update(orderRef, {
-            invoice: {
-                invoiceNumber,
-                issueDate: new Date(),
-                totalAmount: totalPrice,
-            }
-        });
-
-        // Inventory logs
-        for (const item of orderItemsData) {
-            const logRef = adminDb.collection("inventory_logs").doc();
-            t.set(logRef, {
-                productId: item.productId,
-                changeType: "SALE",
-                quantity: -(item.quantity * (item.volume?.weight || 0)),
-                source: "ORDER",
-                reason: `Sale from order ${orderRef.id}`,
-                createdAt: new Date(),
-            });
-        }
-
-        // Clear customer cart
-        const cartRef = adminDb.collection("carts").doc(input.customerId);
-        const cartDoc = await t.get(cartRef);
-        if (cartDoc.exists) {
-            t.update(cartRef, { items: [] });
-        }
-
         return { id: orderRef.id, ...orderData };
     });
 
-    // Post-transaction: Clear cache
     (revalidateTag as any)(`orders:${input.customerId}`);
     (revalidateTag as any)("orders");
 
-    // Post-transaction: Trigger notifications
     try {
         const customerDoc = await adminDb.collection("customers").doc(input.customerId).get();
         const customerName = customerDoc.data()?.shopName || "Customer";
         await notifyNewOrder(order.id, customerName, totalPrice);
-
-        for (const item of orderItemsData) {
-            const product = productsMap.get(item.productId)!;
-            const newStock = (product.stockWeight || 0) - (item.quantity * (item.volume?.weight || 0));
-            if (newStock <= (product.lowStockThreshold || 500)) {
-                await notifyLowStock(product.id, product.name, newStock);
-            }
-        }
     } catch (e) {
         console.error("Notification error (non-critical):", e);
     }
 
-    return order;
-};
-
-// ── UPDATE ORDER STATUS (with Logging + Stock Management) ─────────────────
-export const updateOrderStatus = async (
-    orderId: string,
-    status: string,
-    changedBy: "ADMIN" | "CUSTOMER" | "SYSTEM" = "ADMIN",
-    message?: string
-) => {
-    return await adminDb.runTransaction(async (t) => {
-        const orderRef = adminDb.collection("orders").doc(orderId);
-        const orderDoc = await t.get(orderRef);
-
-        if (!orderDoc.exists) throw new Error("Order not found");
-
-        const order = orderDoc.data()!;
-        const oldStatus = order.status;
-
-        // Stock automation: restore stock if cancelling a non-cancelled order
-        if (status === "CANCELLED" && oldStatus !== "CANCELLED") {
-            for (const item of (order.items || [])) {
-                const productRef = adminDb.collection("products").doc(item.productId);
-                const productDoc = await t.get(productRef);
-                const productData = productDoc.data();
-
-                const totalWeight = item.quantity * (item.volume?.weight || 0);
-                const currentStock = productData?.stockWeight || 0;
-                t.update(productRef, { stockWeight: currentStock + totalWeight });
-
-                // Reverse the sales aggregation
-                const currentSales = productData?.sales || { unitsSold: 0, revenue: 0 };
-                t.update(productRef, {
-                    sales: {
-                        unitsSold: Math.max(0, currentSales.unitsSold - item.quantity),
-                        revenue: Math.max(0, currentSales.revenue - (Number(item.price) * item.quantity)),
-                    }
-                });
-
-                const logRef = adminDb.collection("inventory_logs").doc();
-                t.set(logRef, {
-                    productId: item.productId,
-                    changeType: "CANCEL",
-                    quantity: totalWeight,
-                    source: changedBy === "CUSTOMER" ? "ORDER" : "ADMIN",
-                    reason: `Restock from cancelled order ${orderId}`,
-                    createdAt: new Date(),
-                });
-            }
-        }
-
-        // Create log entry
-        const logMessage = message || `Status changed from ${oldStatus} to ${status}.`;
-        const logs = order.logs || [];
-        logs.push({
-            status,
-            changedBy,
-            message: logMessage,
-            createdAt: new Date(),
-        });
-
-        t.update(orderRef, { status, logs });
-
-        (revalidateTag as any)(`orders:${order.customerId}`);
-        (revalidateTag as any)("orders");
-
-        // Return updated order
-        const updatedOrder = { id: orderId, ...order, status, logs };
-        return updatedOrder;
-    });
-};
-
-// ── UPDATE SHIPPING INFO ──────────────────────────────────────────────────
-export const updateOrderShipping = async (
-    orderId: string,
-    data: { shippingCompany?: string; trackingNumber?: string; shippingDate?: Date }
-) => {
-    const orderRef = adminDb.collection("orders").doc(orderId);
-    const doc = await orderRef.get();
-    if (!doc.exists) throw new Error("Order not found");
-
-    const orderData = doc.data()!;
-    await orderRef.update(data);
-
-    // Log the change
-    const logs = orderData.logs || [];
-    logs.push({
-        status: orderData.status,
-        changedBy: "ADMIN",
-        message: `Shipping information updated: ${data.shippingCompany || ''} ${data.trackingNumber || ''}`,
-        createdAt: new Date(),
-    });
-    await orderRef.update({ logs });
-
-    return { id: orderId, ...orderData, ...data, logs };
+    return mapOrder(order.id, order);
 };
 
 // ── READ ──────────────────────────────────────────────────────────────────
@@ -327,31 +166,12 @@ export const getOrders = async (limit = 50): Promise<Order[]> => {
 
     return Promise.all(query.docs.map(async (doc) => {
         const data = doc.data();
-
         let customer = null;
         if (data.customerId) {
             const custDoc = await adminDb.collection("customers").doc(data.customerId).get();
             if (custDoc.exists) customer = { id: custDoc.id, ...custDoc.data() };
         }
-
-        // Sort logs desc
-        const logs = (data.logs || []).sort((a: any, b: any) => {
-            const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
-            const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
-            return bTime - aTime;
-        });
-
-        return {
-            id: doc.id,
-            ...data,
-            items: (data.items || []).map((item: any, idx: number) => ({
-                ...item,
-                id: item.id || `${doc.id}-item-${idx}`
-            })),
-            createdAt: data.createdAt?.toDate(),
-            customer,
-            logs,
-        } as Order;
+        return mapOrder(doc.id, { ...data, customer });
     }));
 };
 
@@ -375,25 +195,26 @@ export const getOrderById = async (id: string): Promise<Order | null> => {
             product: {
                 name: productData?.name || "Unknown Product",
                 brand: productData?.brand || "Unknown Brand",
-                imageUrl: productData?.imageUrl || "",
+                imageUrl: productData?.imageUrl || productData?.image || "",
             }
         };
     }));
 
-    const logs = (data.logs || []).sort((a: any, b: any) => {
-        const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
-        const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
-        return bTime - aTime;
-    });
+    return mapOrder(doc.id, { ...data, customer, items });
+};
 
-    return {
-        id: doc.id,
-        ...data,
-        items,
-        createdAt: data.createdAt?.toDate(),
-        customer,
-        logs
-    } as Order;
+export const countOrdersByCustomer = (customerId: string): Promise<number> => {
+    return unstable_cache(
+        async () => {
+            const snapshot = await adminDb.collection("orders")
+                .where("customerId", "==", customerId)
+                .count()
+                .get();
+            return snapshot.data().count;
+        },
+        [`orders-count-${customerId}`],
+        { tags: [`orders:${customerId}`], revalidate: 3600 }
+    )();
 };
 
 export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0): Promise<Order[]> => {
@@ -404,25 +225,7 @@ export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0): P
                 .orderBy("createdAt", "desc")
                 .get();
 
-            const allOrders = query.docs.map(doc => {
-                const data = doc.data();
-                const logs = (data.logs || []).sort((a: any, b: any) => {
-                    const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
-                    const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
-                    return bTime - aTime;
-                });
-                return {
-                    id: doc.id,
-                    ...data,
-                    items: (data.items || []).map((item: any, idx: number) => ({
-                        ...item,
-                        id: item.id || `${doc.id}-item-${idx}`
-                    })),
-                    createdAt: data.createdAt?.toDate(),
-                    logs,
-                } as Order;
-            });
-
+            const allOrders = query.docs.map(doc => mapOrder(doc.id, doc.data()));
             return allOrders.slice(skip, skip + limit);
         },
         [`orders-${customerId}-${limit}-${skip}`],
@@ -430,47 +233,53 @@ export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0): P
     )();
 };
 
-export const countOrdersByCustomer = async (customerId: string) => {
-    const result = await adminDb.collection("orders")
-        .where("customerId", "==", customerId)
-        .count()
-        .get();
-    return result.data().count;
-};
-
-// ── BEST SELLERS ──────────────────────────────────────────────────────────
-export const getBestSellers = async (limit = 10) => {
-    const query = await adminDb.collection("products").get();
-    const products = query.docs.map(doc => {
-        const d = doc.data();
-        return {
-            id: doc.id,
-            ...d,
-            unitsSold: d.sales?.unitsSold || 0,
-        };
+export const updateOrderStatus = async (orderId: string, status: string, changedBy: string = "ADMIN", message?: string) => {
+    const orderRef = adminDb.collection("orders").doc(orderId);
+    const orderDoc = await orderRef.get();
+    if (!orderDoc.exists) throw new Error("Order not found");
+    const orderData = orderDoc.data()!;
+    
+    const logs = orderData.logs || [];
+    logs.push({
+        status,
+        changedBy,
+        message: message || `Status changed to ${status}`,
+        createdAt: new Date(),
     });
 
-    return products
-        .sort((a, b) => b.unitsSold - a.unitsSold)
-        .slice(0, limit)
-        .map(p => ({
-            productId: p.id,
-            unitsSold: p.unitsSold,
-            product: p,
-        }));
+    await orderRef.update({ status, logs });
+    (revalidateTag as any)("orders");
+    return mapOrder(orderId, { ...orderData, status, logs });
 };
 
-// ── REORDER ───────────────────────────────────────────────────────────────
-export const getReorderItems = async (orderId: string) => {
+export const updateOrderShipping = async (orderId: string, data: {
+    shippingCompany?: string;
+    trackingNumber?: string;
+    shippingDate?: Date;
+}) => {
+    const orderRef = adminDb.collection("orders").doc(orderId);
+    const orderDoc = await orderRef.get();
+    if (!orderDoc.exists) throw new Error("Order not found");
+
+    const shipping = {
+        company: data.shippingCompany,
+        trackingNumber: data.trackingNumber,
+        date: data.shippingDate || new Date(),
+    };
+
+    await orderRef.update({ shipping });
+    (revalidateTag as any)("orders");
+    return { success: true };
+};
+
+export const getReorderItems = async (orderId: string): Promise<any[]> => {
     const doc = await adminDb.collection("orders").doc(orderId).get();
     if (!doc.exists) throw new Error("Order not found");
-
-    const order = doc.data()!;
-    return (order.items || []).map((item: any) => ({
+    const data = doc.data()!;
+    return (data.items || []).map((item: any) => ({
         productId: item.productId,
-        name: item.productName || "Product",
         quantity: item.quantity,
         volumeId: item.volumeId,
-        currentPrice: Number(item.volume?.price || item.price || 0),
+        name: item.product?.name || "Product",
     }));
 };

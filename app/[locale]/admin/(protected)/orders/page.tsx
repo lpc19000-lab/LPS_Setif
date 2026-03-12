@@ -16,15 +16,15 @@ export default async function AdminOrdersPage({ params }: { params: Promise<{ lo
         totalPrice: Number(o.totalPrice),
         items: o.items.map(i => ({
             ...i,
-            price: Number(i.price),
-            product: {
+            price: Number(i.price || 0),
+            product: i.product ? {
                 ...i.product,
-                basePrice: Number(i.product.basePrice),
-            }
+                basePrice: Number((i.product as any).basePrice || (i.product as any).price || 0),
+            } : null
         })),
         invoice: o.invoice ? {
             ...o.invoice,
-            totalAmount: Number(o.invoice.totalAmount)
+            totalAmount: Number(o.invoice.totalAmount || 0)
         } : null
     }));
 

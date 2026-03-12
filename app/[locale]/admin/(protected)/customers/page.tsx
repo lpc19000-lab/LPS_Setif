@@ -67,8 +67,8 @@ export default async function AdminCustomersPage({ params }: { params: Promise<{
                                         {formatDate(customer.createdAt)}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${customer._count.orders > 0 ? 'bg-primary/10 text-primary-dark' : 'bg-gray-100 text-gray-500'}`}>
-                                            {t("orders_count", { count: customer._count.orders })}
+                                        <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${(customer.ordersCount || 0) > 0 ? 'bg-primary/10 text-primary-dark' : 'bg-gray-100 text-gray-500'}`}>
+                                            {t("orders_count", { count: customer.ordersCount || 0 })}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right rtl:text-left">

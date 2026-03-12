@@ -140,15 +140,15 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                                 <div key={item.id} className={`p-6 flex items-center gap-6 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
                                     <div className="w-20 h-20 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center overflow-hidden p-2 shrink-0">
                                         <SafeImage
-                                            src={item.product.imageUrl}
-                                            alt={item.product.name}
+                                            src={item.product?.imageUrl || ""}
+                                            alt={item.product?.name || ""}
                                             fill
                                             className="object-contain"
                                         />
                                     </div>
                                     <div className={`flex-1 min-w-0 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
-                                        <h4 className="font-bold text-gray-900 truncate">{item.product.name}</h4>
-                                        <p className="text-xs text-gray-500 mt-1">{item.product.brand}</p>
+                                        <h4 className="font-bold text-gray-900 truncate">{item.product?.name || "Product"}</h4>
+                                        <p className="text-xs text-gray-500 mt-1">{item.product?.brand || ""}</p>
                                         <div className={`flex items-center gap-4 mt-3 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
                                             <div className="bg-gray-100 px-3 py-1 rounded-full">
                                                 <p className="text-[10px] font-bold text-gray-500">{ch("qty")}: {item.quantity}</p>
@@ -216,14 +216,14 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                                 <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
                                 <div>
                                     <p className="font-bold text-gray-900 mb-1">{customer.shopName}</p>
-                                    <p className="text-gray-500 leading-relaxed">{customer.address}, {order.wilayaName || customer.wilaya}</p>
+                                    <p className="text-gray-500 leading-relaxed">{customer.address}, {order.wilayaName || order.customer?.wilaya || customer.wilaya}</p>
                                 </div>
                             </div>
-                            {order.trackingNumber && (
+                            {order.shipping?.trackingNumber && (
                                 <div className={`p-3 bg-blue-50 rounded-xl border border-blue-100 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                                     <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">{t("tracking_number_label")}</p>
-                                    <p className="text-sm font-bold text-blue-900">{order.trackingNumber}</p>
-                                    <p className="text-[10px] text-blue-400 mt-1">{t("ship_with_label", { company: order.shippingCompany || "" })}</p>
+                                    <p className="text-sm font-bold text-blue-900">{order.shipping.trackingNumber}</p>
+                                    <p className="text-[10px] text-blue-400 mt-1">{t("ship_with_label", { company: order.shipping.company || "" })}</p>
                                 </div>
                             )}
                         </div>

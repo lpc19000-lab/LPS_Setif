@@ -8,7 +8,9 @@ export const getProductAnalytics = async () => {
         const p = doc.data();
         return {
             id: doc.id,
-            ...p,
+            name: p.name || "Unknown",
+            brand: p.brand || "LPS",
+            imageUrl: p.imageUrl || p.image || "",
             sales: p.sales || { unitsSold: 0, revenue: 0 }
         };
     }).sort((a, b) => b.sales.revenue - a.sales.revenue);
@@ -59,15 +61,12 @@ export const getRevenueMetrics = async () => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Get all orders (without limits is a risk at scale, but ok for migration start)
     const validOrdersQuery = await adminDb.collection("orders")
         .where("status", "!=", "CANCELLED")
         .get();
 
-    // Daily Revenue (last 30 days)
     const dailyMap = new Map<string, { revenue: number, orders: number }>();
 
-    // Initialize last 30 days
     for (let i = 29; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
@@ -85,7 +84,6 @@ export const getRevenueMetrics = async () => {
         const mStr = createdAt.toISOString().slice(0, 7); // YYYY-MM
         const amount = Number(order.totalPrice || 0);
 
-        // Daily
         if (createdAt >= thirtyDaysAgo) {
             if (dailyMap.has(dStr)) {
                 const current = dailyMap.get(dStr)!;
@@ -93,7 +91,6 @@ export const getRevenueMetrics = async () => {
             }
         }
 
-        // Monthly
         monthlyMap.set(mStr, (monthlyMap.get(mStr) || 0) + amount);
     });
 
@@ -120,7 +117,6 @@ export const getRevenueMetrics = async () => {
 export const getTopCustomers = async (limit = 10) => {
     const customersQuery = await adminDb.collection("customers").get();
     
-    // We also need all valid orders to compute LTV
     const validOrdersQuery = await adminDb.collection("orders")
         .where("status", "!=", "CANCELLED")
         .get();
@@ -143,9 +139,9 @@ export const getTopCustomers = async (limit = 10) => {
         const stats = customerSpentMap.get(doc.id) || { totalSpent: 0, count: 0 };
         return {
             id: doc.id,
-            name: c.name,
-            shopName: c.shopName,
-            phone: c.phone,
+            name: c.name || "Unknown",
+            shopName: c.shopName || "Customer",
+            phone: c.phone || "",
             orderCount: stats.count,
             totalSpent: stats.totalSpent
         };

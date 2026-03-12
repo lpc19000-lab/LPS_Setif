@@ -1,20 +1,7 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { Customer } from "@/types/firebase";
 
-export interface Customer {
-    id: string;
-    name: string;
-    phone: string;
-    wilaya: string;
-    wilayaNumber?: string;
-    wilayaName?: string;
-    address: string;
-    shopName: string;
-    createdAt: Date;
-    orders?: any[];
-    _count?: {
-        orders: number;
-    };
-}
+export type { Customer };
 
 // ── REGISTER ──────────────────────────────────────────────────────────────
 export const registerCustomer = async (data: {
@@ -61,12 +48,14 @@ export const getCustomerById = async (id: string): Promise<Customer | null> => {
     return {
         id: doc.id,
         ...d,
+        email: d.email || "",
         name: d.name || "Unknown",
         phone: d.phone || "",
         wilaya: d.wilaya || "",
         address: d.address || "",
         shopName: d.shopName || "Customer",
         createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
+        ordersCount: orders.length,
         orders
     } as Customer;
 };
@@ -79,8 +68,10 @@ export const getCustomerByPhone = async (phone: string): Promise<Customer | null
     return {
         id: doc.id,
         ...d,
+        email: d.email || "",
         shopName: d.shopName || "Customer",
         createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
+        ordersCount: 0, // Simplified for byPhone read
     } as Customer;
 };
 
@@ -96,16 +87,19 @@ export const getCustomers = async (): Promise<Customer[]> => {
 
     return customersQuery.docs.map(doc => {
         const d = doc.data();
+        const ordersCount = orderCountMap.get(doc.id) || 0;
         return {
             id: doc.id,
             ...d,
+            email: d.email || "",
             name: d.name || "Unknown",
             phone: d.phone || "",
             wilaya: d.wilaya || "",
             address: d.address || "",
             shopName: d.shopName || "Customer",
             createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
-            _count: { orders: orderCountMap.get(doc.id) || 0 }
+            ordersCount,
+            _count: { orders: ordersCount } // Maintain for compatibility
         } as Customer;
     });
 };

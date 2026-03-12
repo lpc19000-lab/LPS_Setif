@@ -1,5 +1,8 @@
 import { adminDb, adminAuth } from "@/lib/firebase-admin";
 import bcrypt from "bcryptjs";
+import { Admin } from "@/types/firebase";
+
+export type { Admin };
 
 export const createAdminUser = async (data: {
     email: string;

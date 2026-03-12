@@ -1,9 +1,40 @@
 import { adminDb } from "@/lib/firebase-admin";
 import { unstable_cache, revalidateTag } from "next/cache";
+import { Product } from "@/types/firebase";
+
+export type { Product };
 
 // ── Utility ───────────────────────────────────────────────────────────────
 function generateSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function mapProduct(docId: string, data: any): Product {
+    const imageUrl = data.imageUrl || data.image || "";
+    const basePrice = Number(data.basePrice || data.price || 0);
+    const categoryId = data.categoryId || (data.category && typeof data.category === 'string' ? data.category : data.category?.id);
+
+    return {
+        id: docId,
+        name: data.name || "Unknown Product",
+        slug: data.slug || "",
+        brand: data.brand || "LPS",
+        image: imageUrl,
+        imageUrl: imageUrl, // Alias for compatibility
+        price: basePrice,
+        basePrice: basePrice, // Alias for compatibility
+        stockWeight: data.stockWeight || 0,
+        description: data.description || "",
+        status: data.status || "ACTIVE",
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || data.createdAt || Date.now()),
+        category: categoryId ? { id: categoryId, name: data.categoryName || "" } : null,
+        categoryId: categoryId,
+        images: (data.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)),
+        volumes: data.volumes || [],
+        tagIds: data.tagIds || [],
+        collectionIds: data.collectionIds || [],
+    } as Product;
 }
 
 // ── READ ──────────────────────────────────────────────────────────────────
@@ -25,29 +56,12 @@ export const getActiveProducts = (filters?: {
         if (filters?.inStock) queryRef = queryRef.where("stockWeight", ">", 0);
 
         const snapshot = await queryRef.get();
-        let products = snapshot.docs.map((doc: any) => {
-            const data = doc.data();
-            const images = (data.images || [])
-                .sort((a: any, b: any) => (a.position || 0) - (b.position || 0))
-                .slice(0, 1);
-            return {
-                id: doc.id,
-                name: data.name,
-                slug: data.slug,
-                brand: data.brand,
-                imageUrl: data.imageUrl,
-                basePrice: data.basePrice,
-                stockWeight: data.stockWeight,
-                category: data.categoryId ? { id: data.categoryId } : null,
-                images,
-                volumes: data.volumes || []
-            };
-        });
+        let products = snapshot.docs.map((doc: any) => mapProduct(doc.id, doc.data()));
 
-        // Client-side filtering for search (Firestore doesn't support LIKE/contains)
+        // Client-side filtering for search
         if (filters?.search) {
             const s = filters.search.toLowerCase();
-            products = products.filter((p: any) =>
+            products = products.filter((p: Product) =>
                 p.name?.toLowerCase().includes(s) || p.brand?.toLowerCase().includes(s)
             );
         }
@@ -113,22 +127,11 @@ export const getProducts = (filters?: {
         if (filters?.status) queryRef = queryRef.where("status", "==", filters.status);
 
         const snapshot = await queryRef.get();
-        let products = snapshot.docs.map((doc: any) => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                ...data,
-                images: (data.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)),
-                tags: (data.tagIds || []).map((tid: string) => ({ tag: { id: tid } })),
-                collections: (data.collectionIds || []).map((cid: string) => ({ collection: { id: cid } })),
-                volumes: data.volumes || [],
-                category: data.categoryId ? { id: data.categoryId } : null,
-            };
-        });
+        let products = snapshot.docs.map((doc: any) => mapProduct(doc.id, doc.data()));
 
         if (filters?.search) {
             const s = filters.search.toLowerCase();
-            products = products.filter((p: any) =>
+            products = products.filter((p: Product) =>
                 p.name?.toLowerCase().includes(s) || p.brand?.toLowerCase().includes(s)
             );
         }
@@ -149,36 +152,7 @@ export const getProductById = (id: string) => {
         async () => {
             const doc = await adminDb.collection("products").doc(id).get();
             if (!doc.exists) return null;
-            const data = doc.data();
-            
-            // Fetch category
-            let category = null;
-            if (data?.categoryId) {
-                const catDoc = await adminDb.collection("categories").doc(data.categoryId).get();
-                if (catDoc.exists) category = { id: catDoc.id, ...catDoc.data() };
-            }
-
-            // Fetch tag details
-            const tags = await Promise.all((data?.tagIds || []).map(async (tid: string) => {
-                const tagDoc = await adminDb.collection("tags").doc(tid).get();
-                return { tag: tagDoc.exists ? { id: tagDoc.id, ...tagDoc.data() } : { id: tid } };
-            }));
-
-            // Fetch collection details
-            const collections = await Promise.all((data?.collectionIds || []).map(async (cid: string) => {
-                const colDoc = await adminDb.collection("collections").doc(cid).get();
-                return { collection: colDoc.exists ? { id: colDoc.id, ...colDoc.data() } : { id: cid } };
-            }));
-
-            return {
-                id: doc.id,
-                ...data,
-                category,
-                images: (data?.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)),
-                tags,
-                collections,
-                volumes: data?.volumes || [],
-            };
+            return mapProduct(doc.id, doc.data());
         },
         ['product-id', id],
         { tags: ['products', `product-${id}`] }
@@ -193,33 +167,7 @@ export const getProductBySlug = (slug: string) => {
             if (query.empty) return null;
             
             const doc = query.docs[0];
-            const data = doc.data();
-
-            let category = null;
-            if (data?.categoryId) {
-                const catDoc = await adminDb.collection("categories").doc(data.categoryId).get();
-                if (catDoc.exists) category = { id: catDoc.id, ...catDoc.data() };
-            }
-
-            const tags = await Promise.all((data?.tagIds || []).map(async (tid: string) => {
-                const tagDoc = await adminDb.collection("tags").doc(tid).get();
-                return { tag: tagDoc.exists ? { id: tagDoc.id, ...tagDoc.data() } : { id: tid } };
-            }));
-
-            const collections = await Promise.all((data?.collectionIds || []).map(async (cid: string) => {
-                const colDoc = await adminDb.collection("collections").doc(cid).get();
-                return { collection: colDoc.exists ? { id: colDoc.id, ...colDoc.data() } : { id: cid } };
-            }));
-
-            return {
-                id: doc.id,
-                ...data,
-                category,
-                images: (data?.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)),
-                tags,
-                collections,
-                volumes: data?.volumes || [],
-            };
+            return mapProduct(doc.id, doc.data());
         },
         ['product-slug', slug],
         { tags: ['products', `product-slug-${slug}`] }
@@ -230,8 +178,6 @@ export const getProductBySlug = (slug: string) => {
 export const getFeaturedProducts = (limit = 8) => {
     return unstable_cache(
         async () => {
-            // Featured products have tag "featured". 
-            // First find the featured tag ID
             const tagQuery = await adminDb.collection("tags")
                 .where("slug", "==", "featured").limit(1).get();
             
@@ -244,20 +190,7 @@ export const getFeaturedProducts = (limit = 8) => {
                 .limit(limit)
                 .get();
 
-            return query.docs.map(doc => {
-                const d = doc.data();
-                return {
-                    id: doc.id,
-                    name: d.name,
-                    slug: d.slug,
-                    brand: d.brand,
-                    imageUrl: d.imageUrl,
-                    basePrice: d.basePrice,
-                    volumes: d.volumes || [],
-                    category: d.categoryId ? { name: d.categoryName || "" } : null,
-                    images: (d.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1)
-                };
-            });
+            return query.docs.map(doc => mapProduct(doc.id, doc.data()));
         },
         ['featured-products', String(limit)],
         { tags: ['products', 'featured'] }
@@ -272,20 +205,7 @@ export const getNewArrivals = (limit = 8) => {
                 .orderBy("createdAt", "desc")
                 .limit(limit)
                 .get();
-            return query.docs.map(doc => {
-                const d = doc.data();
-                return {
-                    id: doc.id,
-                    name: d.name,
-                    slug: d.slug,
-                    brand: d.brand,
-                    imageUrl: d.imageUrl,
-                    basePrice: d.basePrice,
-                    volumes: d.volumes || [],
-                    category: d.categoryId ? { name: d.categoryName || "" } : null,
-                    images: (d.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1)
-                };
-            });
+            return query.docs.map(doc => mapProduct(doc.id, doc.data()));
         },
         ['new-arrivals', String(limit)],
         { tags: ['products', 'new-arrivals'] }
@@ -295,31 +215,22 @@ export const getNewArrivals = (limit = 8) => {
 export const getBestSellers = (limit = 8) => {
     return unstable_cache(
         async () => {
-            // Products with embedded sales data, sorted by unitsSold
             const query = await adminDb.collection("products")
                 .where("status", "==", "ACTIVE")
                 .get();
             
             const products = query.docs.map(doc => {
-                const d = doc.data();
+                const product = mapProduct(doc.id, doc.data());
                 return {
-                    id: doc.id,
-                    name: d.name,
-                    slug: d.slug,
-                    brand: d.brand,
-                    imageUrl: d.imageUrl,
-                    basePrice: d.basePrice,
-                    volumes: d.volumes || [],
-                    category: d.categoryId ? { name: d.categoryName || "" } : null,
-                    images: (d.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1),
-                    unitsSold: d.sales?.unitsSold || 0
+                    ...product,
+                    unitsSold: (doc.data() as any).sales?.unitsSold || 0
                 };
             });
 
             return products
                 .sort((a, b) => b.unitsSold - a.unitsSold)
                 .slice(0, limit)
-                .map(({ unitsSold, ...rest }) => rest);
+                .map(({ unitsSold, ...rest }: any) => rest as Product);
         },
         ['best-sellers', String(limit)],
         { tags: ['products', 'best-sellers'] }
@@ -348,6 +259,8 @@ export const createProduct = async (data: {
     const productDoc: any = {
         ...productData,
         slug,
+        image: data.imageUrl, // Align with schema
+        price: data.basePrice, // Align with schema
         status: data.status || "ACTIVE",
         collectionIds: collectionIds || [],
         tagIds: tagIds || [],
@@ -363,6 +276,7 @@ export const createProduct = async (data: {
         })),
         sales: { unitsSold: 0, revenue: 0 },
         createdAt: new Date(),
+        updatedAt: new Date(),
     };
 
     const docRef = await adminDb.collection("products").add(productDoc);
@@ -380,7 +294,7 @@ export const createProduct = async (data: {
     }
 
     (revalidateTag as any)('products');
-    return { id: docRef.id, ...productDoc };
+    return mapProduct(docRef.id, productDoc);
 };
 
 // ── UPDATE ────────────────────────────────────────────────────────────────
@@ -403,7 +317,10 @@ export const updateProduct = async (
 ) => {
     const { collectionIds, tagIds, volumes, ...productData } = data;
 
-    const updateObj: any = { ...productData };
+    const updateObj: any = { ...productData, updatedAt: new Date() };
+
+    if (data.imageUrl) updateObj.image = data.imageUrl;
+    if (data.basePrice) updateObj.price = data.basePrice;
 
     if (collectionIds !== undefined) updateObj.collectionIds = collectionIds;
     if (tagIds !== undefined) updateObj.tagIds = tagIds;
@@ -433,5 +350,5 @@ export const getLowStockProducts = async () => {
         .where("stockWeight", "<=", 500)
         .orderBy("stockWeight", "asc")
         .get();
-    return query.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return query.docs.map(doc => mapProduct(doc.id, doc.data()));
 };

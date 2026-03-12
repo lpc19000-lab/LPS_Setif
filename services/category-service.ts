@@ -1,5 +1,8 @@
 import { adminDb } from "@/lib/firebase-admin";
 import { unstable_cache, revalidateTag } from "next/cache";
+import { Category, Product } from "@/types/firebase";
+
+export type { Category };
 
 function generateSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
