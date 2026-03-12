@@ -1,6 +1,6 @@
-import { Search, Store, ShieldBan, ShieldAlert } from "lucide-react";
+import { Search, Store, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { adminDb } from "@/lib/firebase-admin";
+import { getCustomers, Customer } from "@/services/customer-service";
 
 export const dynamic = "force-dynamic";
 
@@ -8,22 +8,7 @@ export default async function AdminCustomersPage({ params }: { params: Promise<{
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.customers" });
 
-    const customersQuery = await adminDb.collection("customers").orderBy("createdAt", "desc").get();
-    const ordersQuery = await adminDb.collection("orders").get();
-    const orderCountMap = new Map<string, number>();
-    ordersQuery.docs.forEach(doc => {
-        const cid = doc.data().customerId;
-        if (cid) orderCountMap.set(cid, (orderCountMap.get(cid) || 0) + 1);
-    });
-    const customers = customersQuery.docs.map(doc => {
-        const d = doc.data();
-        return {
-            id: doc.id,
-            ...d,
-            createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
-            _count: { orders: orderCountMap.get(doc.id) || 0 }
-        };
-    });
+    const customers: Customer[] = await getCustomers();
 
     const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat(locale === "ar" ? "ar-DZ" : "fr-FR", { dateStyle: "medium" }).format(date);
