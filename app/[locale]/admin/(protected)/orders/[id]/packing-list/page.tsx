@@ -80,7 +80,7 @@ export default async function PackingListPage({ params }: { params: Promise<{ id
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {order.items.map((item, index) => (
+                        {order.items.map((item: any, index: number) => (
                             <tr key={item.id}>
                                 <td className="py-6 text-gray-400 font-mono">{index + 1}</td>
                                 <td className="py-6">

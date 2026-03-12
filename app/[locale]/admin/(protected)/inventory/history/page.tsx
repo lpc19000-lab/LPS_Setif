@@ -29,12 +29,17 @@ export default async function InventoryHistoryPage({
     const logsSnap = await logsQuery.get();
 
     // Get product data for each log
-    const productIds = [...new Set(logsSnap.docs.map((d: any) => d.data().productId))];
+    const productIds = Array.from(new Set(logsSnap.docs.map((d: any) => d.data().productId))).filter(Boolean);
     const productDocsMap = new Map();
-    await Promise.all(productIds.map(async (pid: string) => {
-        const pDoc = await adminDb.collection("products").doc(pid).get();
-        if (pDoc.exists) productDocsMap.set(pid, { id: pDoc.id, ...pDoc.data() as any });
-    }));
+
+    if (productIds.length > 0) {
+        await Promise.all(productIds.map(async (pid) => {
+            const pDoc = await adminDb.collection("products").doc(pid as string).get();
+            if (pDoc.exists) {
+                productDocsMap.set(pid, { id: pDoc.id, ...pDoc.data() as any });
+            }
+        }));
+    }
 
     const logs = logsSnap.docs.map((doc: any) => {
         const d = doc.data();
@@ -150,7 +155,7 @@ export default async function InventoryHistoryPage({
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {logs.map((log) => (
+                            {logs.map((log: any) => (
                                 <tr key={log.id} className="hover:bg-gray-50/30 transition-colors">
                                     <td className="px-6 py-4 text-gray-500 font-medium whitespace-nowrap">
                                         {formatDate(log.createdAt)}

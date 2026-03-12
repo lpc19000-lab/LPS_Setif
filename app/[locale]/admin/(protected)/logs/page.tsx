@@ -43,7 +43,7 @@ export default async function AdminLogsPage({ params }: { params: Promise<{ loca
                                 <p>{t("no_activity")}</p>
                             </div>
                         ) : (
-                            adminLogs.map((log) => (
+                            adminLogs.map((log: any) => (
                                 <div key={log.id} className="p-4 hover:bg-gray-50 transition-colors">
                                     <div className="flex items-start gap-4">
                                         <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
@@ -102,7 +102,7 @@ export default async function AdminLogsPage({ params }: { params: Promise<{ loca
                                 <p>{t("no_errors")}</p>
                             </div>
                         ) : (
-                            systemErrors.map((error) => (
+                            systemErrors.map((error: any) => (
                                 <div key={error.id} className="p-4 hover:bg-gray-50 transition-colors">
                                     <div className="flex items-start gap-4">
                                         <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center shrink-0">

@@ -130,7 +130,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    {order.items.map((item) => (
+                                    {order.items.map((item: any) => (
                                         <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
@@ -172,7 +172,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                         </div>
                         <div className="p-6">
                             <div className="space-y-6 relative before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-px before:bg-gray-100">
-                                {order.logs.map((log) => (
+                                {order.logs.map((log: any) => (
                                     <div key={log.id} className="relative pl-10">
                                         <div className={`absolute left-0 top-1 w-5 h-5 rounded-full border-4 border-white shadow-sm flex items-center justify-center shrink-0 ${log.status === "DELIVERED" ? 'bg-emerald-500' :
                                             log.status === "CANCELLED" ? 'bg-red-500' :
