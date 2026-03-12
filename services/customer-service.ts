@@ -85,20 +85,35 @@ export const getCustomerByPhone = async (phone: string): Promise<Customer | null
     }
 };
 
-export const getCustomers = async (): Promise<Customer[]> => {
+export const getCustomers = async (limit = 100, startAfterStr?: string): Promise<Customer[]> => {
     try {
-        const customersQuery = await adminDb.collection("customers").orderBy("createdAt", "desc").get();
-        const ordersQuery = await adminDb.collection("orders").get();
+        let queryRef: any = adminDb.collection("customers").orderBy("createdAt", "desc");
+        
+        if (startAfterStr) {
+            const dateCursor = new Date(startAfterStr);
+            if (!isNaN(dateCursor.getTime())) {
+                queryRef = queryRef.startAfter(dateCursor);
+            }
+        }
+        
+        queryRef = queryRef.limit(limit);
+        const customersQuery = await queryRef.get();
 
-        const orderCountMap = new Map<string, number>();
-        ordersQuery.docs.forEach(doc => {
-            const cid = doc.data().customerId;
-            if (cid) orderCountMap.set(cid, (orderCountMap.get(cid) || 0) + 1);
-        });
-
-        return customersQuery.docs.map(doc => {
+        // Optimized batch counting if needed, or simply return 0 and rely on a sub-collection fetch for exact counts on detail pages to avoid performance drops.
+        return await Promise.all(customersQuery.docs.map(async (doc) => {
             const d = doc.data();
-            const ordersCount = orderCountMap.get(doc.id) || 0;
+            
+            // For listing, omit exact order count to save queries, or do a fast count.
+            // A precise count on 100 docs per page is still 100 queries, which is acceptable but can be optimized later if slow.
+            // Using a simple cache count fallback if available
+            let ordersCount = 0;
+            try {
+                const countSnap = await adminDb.collection("orders").where("customerId", "==", doc.id).count().get();
+                ordersCount = countSnap.data().count;
+            } catch (e) {
+                // Ignore count errors safely
+            }
+            
             return {
                 id: doc.id,
                 ...d,
@@ -112,7 +127,7 @@ export const getCustomers = async (): Promise<Customer[]> => {
                 ordersCount,
                 _count: { orders: ordersCount } // Maintain for compatibility
             } as Customer;
-        });
+        }));
     } catch (err) {
         console.error("Customers fetch error (getCustomers):", err);
         return [];

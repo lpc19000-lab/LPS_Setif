@@ -158,12 +158,21 @@ export const createOrder = async (input: CreateOrderInput) => {
 };
 
 // ── READ ──────────────────────────────────────────────────────────────────
-export const getOrders = async (limit = 50): Promise<Order[]> => {
+export const getOrders = async (limit = 50, startAfterStr?: string): Promise<Order[]> => {
     try {
-        const query = await adminDb.collection("orders")
-            .orderBy("createdAt", "desc")
-            .limit(limit)
-            .get();
+        let queryRef: any = adminDb.collection("orders").orderBy("createdAt", "desc");
+        
+        if (startAfterStr) {
+            // Need the exact document snapshot to start after in Firestore, or by field.
+            // Using field 'createdAt' is simpler if startAfterStr is a timestamp
+            const dateCursor = new Date(startAfterStr);
+            if (!isNaN(dateCursor.getTime())) {
+                queryRef = queryRef.startAfter(dateCursor);
+            }
+        }
+        
+        queryRef = queryRef.limit(limit);
+        const query = await queryRef.get();
 
         return Promise.all(query.docs.map(async (doc) => {
             const data = doc.data();

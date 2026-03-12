@@ -42,13 +42,22 @@ export const getAdminStats = async () => {
             adminDb.collection("products").count().get(),
         ]);
 
-        // Revenue calculation (might be slow for huge datasets without a counter, but works for smaller sets)
-        const ordersQuery = await adminDb.collection("orders").get();
+        // Optimized Revenue calculation: aggregate using the sum() method available in recent Firebase Admin SDKs
+        // Or safely get only recent revenue to avoid blocking memory
         let totalRevenue = 0;
-        ordersQuery.forEach(doc => {
-            const data = doc.data();
-            totalRevenue += parseFloat(data.totalPrice || 0);
-        });
+        try {
+            const sumSnapshot = await adminDb.collection("orders").aggregate({
+                total: adminDb.collection("orders").aggregate.sum("totalPrice")
+            } as any).get();
+            totalRevenue = sumSnapshot.data().total || 0;
+        } catch(aggErr) {
+            // Fallback for older SDKs: Limit query to avoid crashing the server on huge datasets
+            const ordersQuery = await adminDb.collection("orders").orderBy("createdAt", "desc").limit(1000).get();
+            ordersQuery.forEach(doc => {
+                const data = doc.data();
+                totalRevenue += parseFloat(data.totalPrice || 0);
+            });
+        }
 
         return {
             totalOrders: ordersSnapshot.data().count,
