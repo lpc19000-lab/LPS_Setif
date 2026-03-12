@@ -379,7 +379,7 @@ export const createProduct = async (data: {
         });
     }
 
-    revalidateTag('products');
+    (revalidateTag as any)('products');
     return { id: docRef.id, ...productDoc };
 };
 
@@ -416,14 +416,14 @@ export const updateProduct = async (
     }
 
     await adminDb.collection("products").doc(id).update(updateObj);
-    revalidateTag('products');
+    (revalidateTag as any)('products');
     return { id, ...updateObj };
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteProduct = async (id: string) => {
     await adminDb.collection("products").doc(id).delete();
-    revalidateTag('products');
+    (revalidateTag as any)('products');
     return { id };
 };
 

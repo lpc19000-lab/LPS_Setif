@@ -84,7 +84,7 @@ export const createCategory = async (data: {
     const slug = generateSlug(data.name);
     const docRef = await adminDb.collection("categories").add({ ...data, slug, createdAt: new Date() });
     const result = { id: docRef.id, ...data, slug };
-    revalidateTag('categories');
+    (revalidateTag as any)('categories');
     return result;
 };
 
@@ -98,13 +98,13 @@ export const updateCategory = async (
         updateData.slug = generateSlug(data.name);
     }
     await adminDb.collection("categories").doc(id).update(updateData);
-    revalidateTag('categories');
+    (revalidateTag as any)('categories');
     return { id, ...updateData };
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteCategory = async (id: string) => {
     await adminDb.collection("categories").doc(id).delete();
-    revalidateTag('categories');
+    (revalidateTag as any)('categories');
     return { id };
 };

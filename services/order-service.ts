@@ -19,6 +19,48 @@ interface CreateOrderInput {
     wilayaName?: string;
 }
 
+export interface OrderItem {
+    productId: string;
+    quantity: number;
+    price: number;
+    volumeId: string;
+    volume: any;
+    product: {
+        name: string;
+        brand: string;
+        imageUrl: string;
+    };
+    id: string;
+}
+
+export interface Order {
+    id: string;
+    customerId: string;
+    customer: {
+        id: string;
+        name: string;
+        shopName: string;
+        phone: string;
+        address: string;
+        wilaya: string;
+    } | null;
+    totalPrice: number;
+    status: string;
+    items: OrderItem[];
+    logs: any[];
+    createdAt: Date;
+    wilayaNumber?: string;
+    wilayaName?: string;
+    invoice?: {
+        invoiceNumber: string;
+        issueDate: any;
+        totalAmount: number;
+    };
+    trackingNumber?: string;
+    shippingCompany?: string;
+    shippingDate?: any;
+}
+
 // ── ATOMIC ORDER CREATION (with Tiered Pricing + Notifications + Logs) ─────
 export const createOrder = async (input: CreateOrderInput) => {
     // Step 0: Validate items
@@ -159,8 +201,8 @@ export const createOrder = async (input: CreateOrderInput) => {
     });
 
     // Post-transaction: Clear cache
-    revalidateTag(`orders:${input.customerId}`);
-    revalidateTag("orders");
+    (revalidateTag as any)(`orders:${input.customerId}`);
+    (revalidateTag as any)("orders");
 
     // Post-transaction: Trigger notifications
     try {
@@ -242,8 +284,8 @@ export const updateOrderStatus = async (
 
         t.update(orderRef, { status, logs });
 
-        revalidateTag(`orders:${order.customerId}`);
-        revalidateTag("orders");
+        (revalidateTag as any)(`orders:${order.customerId}`);
+        (revalidateTag as any)("orders");
 
         // Return updated order
         const updatedOrder = { id: orderId, ...order, status, logs };
@@ -277,7 +319,7 @@ export const updateOrderShipping = async (
 };
 
 // ── READ ──────────────────────────────────────────────────────────────────
-export const getOrders = async (limit = 50) => {
+export const getOrders = async (limit = 50): Promise<Order[]> => {
     const query = await adminDb.collection("orders")
         .orderBy("createdAt", "desc")
         .limit(limit)
@@ -302,14 +344,18 @@ export const getOrders = async (limit = 50) => {
         return {
             id: doc.id,
             ...data,
+            items: (data.items || []).map((item: any, idx: number) => ({
+                ...item,
+                id: item.id || `${doc.id}-item-${idx}`
+            })),
             createdAt: data.createdAt?.toDate(),
             customer,
             logs,
-        };
+        } as Order;
     }));
 };
 
-export const getOrderById = async (id: string) => {
+export const getOrderById = async (id: string): Promise<Order | null> => {
     const doc = await adminDb.collection("orders").doc(id).get();
     if (!doc.exists) return null;
 
@@ -320,16 +366,37 @@ export const getOrderById = async (id: string) => {
         if (custDoc.exists) customer = { id: custDoc.id, ...custDoc.data() };
     }
 
+    const items = await Promise.all((data.items || []).map(async (item: any, idx: number) => {
+        const productDoc = await adminDb.collection("products").doc(item.productId).get();
+        const productData = productDoc.exists ? productDoc.data() : null;
+        return {
+            ...item,
+            id: item.id || `${doc.id}-item-${idx}`,
+            product: {
+                name: productData?.name || "Unknown Product",
+                brand: productData?.brand || "Unknown Brand",
+                imageUrl: productData?.imageUrl || "",
+            }
+        };
+    }));
+
     const logs = (data.logs || []).sort((a: any, b: any) => {
         const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
         const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
         return bTime - aTime;
     });
 
-    return { id: doc.id, ...data, createdAt: data.createdAt?.toDate(), customer, logs };
+    return {
+        id: doc.id,
+        ...data,
+        items,
+        createdAt: data.createdAt?.toDate(),
+        customer,
+        logs
+    } as Order;
 };
 
-export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0) => {
+export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0): Promise<Order[]> => {
     return unstable_cache(
         async () => {
             const query = await adminDb.collection("orders")
@@ -347,9 +414,13 @@ export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0) =>
                 return {
                     id: doc.id,
                     ...data,
+                    items: (data.items || []).map((item: any, idx: number) => ({
+                        ...item,
+                        id: item.id || `${doc.id}-item-${idx}`
+                    })),
                     createdAt: data.createdAt?.toDate(),
                     logs,
-                };
+                } as Order;
             });
 
             return allOrders.slice(skip, skip + limit);

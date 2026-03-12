@@ -70,7 +70,7 @@ export const createCollection = async (data: { name: string }) => {
     const slug = generateSlug(data.name);
     const docRef = await adminDb.collection("collections").add({ name: data.name, slug, createdAt: new Date() });
     const result = { id: docRef.id, name: data.name, slug };
-    revalidateTag('collections');
+    (revalidateTag as any)('collections');
     return result;
 };
 
@@ -78,13 +78,13 @@ export const createCollection = async (data: { name: string }) => {
 export const updateCollection = async (id: string, data: { name: string }) => {
     const slug = generateSlug(data.name);
     await adminDb.collection("collections").doc(id).update({ name: data.name, slug });
-    revalidateTag('collections');
+    (revalidateTag as any)('collections');
     return { id, name: data.name, slug };
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteCollection = async (id: string) => {
     await adminDb.collection("collections").doc(id).delete();
-    revalidateTag('collections');
+    (revalidateTag as any)('collections');
     return { id };
 };
