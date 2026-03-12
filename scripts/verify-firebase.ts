@@ -1,34 +1,12 @@
-const fs = require('fs');
-const path = require('path');
+import { adminDb } from '../lib/firebase-admin';
 
-// 1. MANUALLY LOAD .env.local BEFORE ANY OTHER IMPORTS
-const envPath = path.resolve(process.cwd(), '.env.local');
-if (fs.existsSync(envPath)) {
-    const envContent = fs.readFileSync(envPath, 'utf8');
-    envContent.split('\n').forEach(line => {
-        const trimmedLine = line.trim();
-        if (!trimmedLine || trimmedLine.startsWith('#')) return;
-        
-        const firstEqual = trimmedLine.indexOf('=');
-        if (firstEqual !== -1) {
-            const key = trimmedLine.slice(0, firstEqual).trim();
-            let val = trimmedLine.slice(firstEqual + 1).trim();
-            if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
-            if (val.startsWith("'") && val.endsWith("'")) val = val.slice(1, -1);
-            process.env[key] = val;
-        }
-    });
-}
-
-console.log("FIREBASE_PROJECT_ID after load:", process.env.FIREBASE_PROJECT_ID);
-
-// 2. NOW DYNAMICALLY IMPORT SERVICES
+// NOW DYNAMICALLY IMPORT SERVICES
 async function verify() {
-    const { getAdminStats } = await import("./services/admin-service");
-    const { getCustomers } = await import("./services/customer-service");
-    const { getProducts } = await import("./services/product-service");
-    const { getOrders } = await import("./services/order-service");
-    const { getCategories } = await import("./services/category-service");
+    const { getAdminStats } = await import("../services/admin-service");
+    const { getCustomers } = await import("../services/customer-service");
+    const { getProducts } = await import("../services/product-service");
+    const { getOrders } = await import("../services/order-service");
+    const { getCategories } = await import("../services/category-service");
 
     console.log("--- Firebase Verification Starting ---");
     

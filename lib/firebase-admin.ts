@@ -1,36 +1,33 @@
-import * as admin from 'firebase-admin';
+import { initializeApp, cert, getApps, getApp } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
+import { getStorage } from "firebase-admin/storage";
 
-if (!admin.apps.length) {
-  try {
-    let privateKey = process.env.FIREBASE_PRIVATE_KEY || '';
-    if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
-      privateKey = privateKey.slice(1, -1);
+// Ensure Firebase Admin is initialized ONLY ONCE.
+// This is critical for Next.js hot-reloading and Vercel environments.
+const firebaseAdminApp = (() => {
+    if (getApps().length === 0) {
+        // Sanity check for environment variables to prevent initialization errors
+        if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PRIVATE_KEY) {
+            console.warn("FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, or FIREBASE_PRIVATE_KEY is missing. Firebase Admin may not function correctly.");
+        }
+
+        return initializeApp({
+            credential: cert({
+                projectId: process.env.FIREBASE_PROJECT_ID,
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                // Handle escaped newlines in Vercel environment variables
+                privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+            }),
+            storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+        });
     }
-    if (privateKey.startsWith("'") && privateKey.endsWith("'")) {
-      privateKey = privateKey.slice(1, -1);
-    }
-    privateKey = privateKey.replace(/\\n/g, '\n');
+    return getApp();
+})();
 
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey,
-      }),
-      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    });
-  } catch (error) {
-    console.error('Firebase admin initialization error', error);
-  }
-}
+// Export initialized services for project-wide use
+export const adminDb = getFirestore(firebaseAdminApp);
+export const adminAuth = getAuth(firebaseAdminApp);
+export const adminStorage = getStorage(firebaseAdminApp);
 
-export const adminAuth = admin.auth();
-export const adminStorage = admin.storage();
-export const adminDb = admin.firestore();
-try {
-  adminDb.settings({ preferRest: true });
-} catch (e) {
-  // Ignore error if already set
-}
-
-export default admin;
+export default firebaseAdminApp;

@@ -1,53 +1,8 @@
+import { adminDb } from '../lib/firebase-admin';
 import * as admin from 'firebase-admin';
 import * as bcrypt from 'bcryptjs';
-import * as path from 'path';
-import * as fs from 'fs';
 
-// Load .env.local manually
-const envPath = path.resolve(__dirname, '..', '.env.local');
-if (fs.existsSync(envPath)) {
-    const envContent = fs.readFileSync(envPath, 'utf-8');
-    for (const line of envContent.split('\n')) {
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith('#')) continue;
-        const eqIdx = trimmed.indexOf('=');
-        if (eqIdx === -1) continue;
-        const key = trimmed.slice(0, eqIdx).trim();
-        let value = trimmed.slice(eqIdx + 1).trim();
-        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-            value = value.slice(1, -1);
-        }
-        process.env[key] = value;
-    }
-    console.log('✅ Loaded .env.local');
-}
-
-// Initialize Firebase Admin directly without relying on `lib/firebase-admin`
-// to avoid any Next.js specific issues in this standalone script.
-if (!admin.apps.length) {
-    let privateKey = process.env.FIREBASE_PRIVATE_KEY || '';
-    if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
-      privateKey = privateKey.slice(1, -1);
-    }
-    if (privateKey.startsWith("'") && privateKey.endsWith("'")) {
-      privateKey = privateKey.slice(1, -1);
-    }
-    privateKey = privateKey.replace(/\\n/g, '\n');
-
-    admin.initializeApp({
-        credential: admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey,
-        }),
-        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    });
-}
-
-const db = admin.firestore();
-try {
-  db.settings({ preferRest: true });
-} catch(e) {}
+const db = adminDb;
 
 async function deleteCollection(collectionPath: string, batchSize: number) {
   const collectionRef = db.collection(collectionPath);
