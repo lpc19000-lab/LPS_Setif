@@ -19,11 +19,13 @@ export interface Customer {
   phone: string;
   shopName: string;
   wilaya: string;
+  commune?: string;
   address: string;
   createdAt: Date;
   ordersCount: number;
   wilayaNumber?: string;
   wilayaName?: string;
+  passwordHash?: string;
 }
 
 export interface Product {

@@ -174,7 +174,7 @@ export const getOrders = async (limit = 50, startAfterStr?: string): Promise<Ord
         queryRef = queryRef.limit(limit);
         const query = await queryRef.get();
 
-        return Promise.all(query.docs.map(async (doc) => {
+        return Promise.all(query.docs.map(async (doc: any) => {
             const data = doc.data();
             let customer = null;
             if (data.customerId) {

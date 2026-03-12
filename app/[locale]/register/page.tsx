@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { User, Phone, MapPin, Store, ArrowRight, Loader2 } from "lucide-react";
+import { User, Phone, MapPin, Store, ArrowRight, Loader2, Lock } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import WilayaSelector from "@/components/WilayaSelector";
+import CommuneSelector from "@/components/CommuneSelector";
 
 export default function RegisterPage() {
     const t = useTranslations("registration");
@@ -16,9 +17,11 @@ export default function RegisterPage() {
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
+        password: "",
         shopName: "",
         wilayaNumber: "",
         wilayaName: "",
+        commune: "",
         address: "",
     });
     const [loading, setLoading] = useState(false);
@@ -32,7 +35,15 @@ export default function RegisterPage() {
         setFormData({
             ...formData,
             wilayaNumber: wilaya.id,
-            wilayaName: wilaya.name
+            wilayaName: wilaya.name,
+            commune: "" // Reset commune when wilaya changes
+        });
+    };
+
+    const handleCommuneChange = (commune: { id: string; name: string }) => {
+        setFormData({
+            ...formData,
+            commune: commune.name
         });
     };
 
@@ -111,6 +122,22 @@ export default function RegisterPage() {
                                             />
                                         </div>
                                     </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{t("password")}</label>
+                                        <div className="relative">
+                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                            <input
+                                                type="password"
+                                                name="password"
+                                                required
+                                                minLength={6}
+                                                value={formData.password}
+                                                onChange={handleChange}
+                                                placeholder={t("placeholder_password")}
+                                                className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-medium"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -139,6 +166,14 @@ export default function RegisterPage() {
                                         <WilayaSelector
                                             value={formData.wilayaNumber}
                                             onChange={handleWilayaChange}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{t("commune")}</label>
+                                        <CommuneSelector
+                                            wilayaId={formData.wilayaNumber}
+                                            value={formData.commune}
+                                            onChange={handleCommuneChange}
                                         />
                                     </div>
                                 </div>

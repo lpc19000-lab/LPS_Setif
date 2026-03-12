@@ -10,6 +10,7 @@
     "postinstall": "echo 'No postinstall needed'"
   },
   "dependencies": {
+    "algerian-geo": "^1.0.10",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.0.0",
     "clsx": "^2.1.0",

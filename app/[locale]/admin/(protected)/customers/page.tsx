@@ -1,6 +1,7 @@
 import { Search, Store, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getCustomers, Customer } from "@/services/customer-service";
+import ResetPasswordButton from "@/components/admin/ResetPasswordButton";
 
 export const dynamic = "force-dynamic";
 
@@ -72,12 +73,15 @@ export default async function AdminCustomersPage({ params }: { params: Promise<{
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right rtl:text-left">
-                                        <button
-                                            className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors inline-flex items-center gap-1.5 rtl:flex-row-reverse"
-                                            title={t("suspend_title")}
-                                        >
-                                            <ShieldAlert className="w-3.5 h-3.5" /> {t("suspend")}
-                                        </button>
+                                        <div className="flex items-center justify-end rtl:justify-start gap-2">
+                                            <ResetPasswordButton customerId={customer.id} customerName={customer.shopName || customer.name} />
+                                            <button
+                                                className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors inline-flex items-center gap-1.5 rtl:flex-row-reverse"
+                                                title={t("suspend_title")}
+                                            >
+                                                <ShieldAlert className="w-3.5 h-3.5" /> {t("suspend")}
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

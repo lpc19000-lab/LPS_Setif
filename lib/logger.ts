@@ -8,11 +8,13 @@ export type LogEventType =
   | "ORDER_STATUS_CHANGED"
   | "INVENTORY_ADJUSTED"
   | "CUSTOMER_REGISTERED"
+  | "CUSTOMER_LOGIN"
   | "ADMIN_LOGIN"
   | "PRODUCT_CREATED"
   | "PRODUCT_UPDATED"
   | "PRODUCT_DELETED"
   | "CATEGORY_CREATED"
+  | "CATEGORY_DELETED"
   | "ERROR";
 
 // ── Logger ─────────────────────────────────────────────────────────────────

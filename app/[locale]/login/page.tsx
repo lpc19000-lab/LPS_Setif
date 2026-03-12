@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Phone, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { Phone, ArrowRight, Loader2, ShieldCheck, Lock } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 
 export default function LoginPage() {
     const t = useTranslations("login");
     const locale = useLocale();
     const [phone, setPhone] = useState("");
+    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
@@ -23,7 +24,7 @@ export default function LoginPage() {
             const response = await fetch("/api/customers/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone }),
+                body: JSON.stringify({ phone, password }),
             });
 
             const data = await response.json();
@@ -70,6 +71,24 @@ export default function LoginPage() {
                                     placeholder={t("phone_placeholder")}
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-gray-900 font-medium placeholder:text-gray-300 rtl:pl-4 rtl:pr-12"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="password" className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2">
+                                {t("password_label")}
+                            </label>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 rtl:left-auto rtl:right-4" />
+                                <input
+                                    id="password"
+                                    type="password"
+                                    required
+                                    placeholder={t("password_placeholder")}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-gray-900 font-medium placeholder:text-gray-300 rtl:pl-4 rtl:pr-12"
                                 />
                             </div>

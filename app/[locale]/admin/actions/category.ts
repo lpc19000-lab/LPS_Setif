@@ -57,10 +57,20 @@ export async function updateCategory(id: string, formData: FormData) {
 
 export async function deleteCategory(id: string) {
     try {
+        // Check for products in this category
+        const productCheck = await adminDb.collection("products")
+            .where("categoryId", "==", id)
+            .limit(1).get();
+
+        if (!productCheck.empty) {
+            return { success: false, error: "Cannot delete category. There are products associated with it." };
+        }
+
         await adminDb.collection("categories").doc(id).delete();
+        await logEvent("CATEGORY_DELETED", id, `Category ${id} deleted`);
         revalidatePath("/admin/categories");
         return { success: true };
     } catch (error) {
-        return { success: false, error: "Failed to delete category (might have associated products)" };
+        return { success: false, error: "Error during deletion" };
     }
 }

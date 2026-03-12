@@ -1,5 +1,6 @@
 import { adminDb } from "@/lib/firebase-admin";
 import { Customer } from "@/types/firebase";
+import bcrypt from "bcryptjs";
 
 export type { Customer };
 
@@ -7,8 +8,10 @@ export type { Customer };
 export const registerCustomer = async (data: {
     name: string;
     phone: string;
+    password: string;
     wilayaNumber: string;
     wilayaName: string;
+    commune: string;
     address: string;
     shopName: string;
 }) => {
@@ -19,13 +22,17 @@ export const registerCustomer = async (data: {
         throw new Error("A customer with this phone number already exists");
     }
 
+    const passwordHash = await bcrypt.hash(data.password, 10);
+    const { password, ...rest } = data;
+
     const docRef = await adminDb.collection("customers").add({
-        ...data,
+        ...rest,
+        passwordHash,
         wilaya: `${data.wilayaNumber} - ${data.wilayaName}`,
         createdAt: new Date(),
     });
 
-    return { id: docRef.id, ...data };
+    return { id: docRef.id, ...rest };
 };
 
 // ── READ ──────────────────────────────────────────────────────────────────
@@ -99,8 +106,7 @@ export const getCustomers = async (limit = 100, startAfterStr?: string): Promise
         queryRef = queryRef.limit(limit);
         const customersQuery = await queryRef.get();
 
-        // Optimized batch counting if needed, or simply return 0 and rely on a sub-collection fetch for exact counts on detail pages to avoid performance drops.
-        return await Promise.all(customersQuery.docs.map(async (doc) => {
+        return await Promise.all(customersQuery.docs.map(async (doc: any) => {
             const d = doc.data();
             
             // For listing, omit exact order count to save queries, or do a fast count.

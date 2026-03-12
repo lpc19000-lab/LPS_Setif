@@ -4,6 +4,7 @@ import { signJwtToken } from "@/lib/auth";
 import { customerLoginSchema, formatZodErrors } from "@/lib/validation";
 import { Errors } from "@/lib/errors";
 import { logEvent } from "@/lib/logger";
+import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
     try {
@@ -19,16 +20,29 @@ export async function POST(request: Request) {
             );
         }
 
-        const { phone } = parsed.data;
+        const { phone, password } = parsed.data;
 
         const customerQuery = await adminDb.collection("customers").where("phone", "==", phone).limit(1).get();
-        const customer = customerQuery.empty ? null : { id: customerQuery.docs[0].id, ...customerQuery.docs[0].data() as any };
+        const customerDoc = customerQuery.empty ? null : customerQuery.docs[0];
 
-        if (!customer) {
+        if (!customerDoc) {
             return NextResponse.json(
                 { success: false, error_code: "NOT_FOUND", message: "Trader account not found with this phone number" },
                 { status: 401 }
             );
+        }
+
+        const customer = { id: customerDoc.id, ...customerDoc.data() as any };
+
+        // Verify password – require passwordHash for accounts that have it
+        if (customer.passwordHash) {
+            const isPasswordValid = await bcrypt.compare(password, customer.passwordHash);
+            if (!isPasswordValid) {
+                return NextResponse.json(
+                    { success: false, error_code: "INVALID_CREDENTIALS", message: "Invalid phone number or password" },
+                    { status: 401 }
+                );
+            }
         }
 
         const token = await signJwtToken({
@@ -38,7 +52,7 @@ export async function POST(request: Request) {
         });
 
         // Log event
-        await logEvent("ADMIN_LOGIN", customer.id, `Trader ${customer.shopName} logged in`);
+        await logEvent("CUSTOMER_LOGIN", customer.id, `Trader ${customer.shopName} logged in`);
 
         const response = NextResponse.json(
             {

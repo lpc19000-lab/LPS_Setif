@@ -32,14 +32,17 @@ export const customerRegistrationSchema = z.object({
     .min(9, "Phone must be at least 9 digits")
     .max(15)
     .regex(/^[0-9+\-\s]+$/, "Invalid phone number format"),
+  password: z.string().min(6, "Password must be at least 6 characters").max(100),
   shopName: z.string().min(2, "Shop name is required").max(150),
   wilayaNumber: z.string().min(1, "Wilaya number is required"),
   wilayaName: z.string().min(1, "Wilaya name is required"),
+  commune: z.string().min(1, "Commune is required"),
   address: z.string().min(5, "Address must be at least 5 characters").max(500),
 });
 
 export const customerLoginSchema = z.object({
   phone: z.string().min(9).max(15),
+  password: z.string().min(1, "Password is required"),
 });
 
 // ── Order Payload Validation ───────────────────────────────────────────────

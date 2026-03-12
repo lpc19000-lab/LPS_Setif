@@ -19,9 +19,9 @@ export async function POST(request: Request) {
             );
         }
 
-        const { name, phone, wilayaNumber, wilayaName, address, shopName } = parsed.data;
+        const { name, phone, password, wilayaNumber, wilayaName, commune, address, shopName } = parsed.data;
 
-        const customer = await registerCustomer({ name, phone, wilayaNumber, wilayaName, address, shopName });
+        const customer = await registerCustomer({ name, phone, password, wilayaNumber, wilayaName, commune, address, shopName });
 
         const token = await signJwtToken({
             sub: customer.id,
