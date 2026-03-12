@@ -49,57 +49,62 @@ export const getActiveProducts = (filters?: {
     skip?: number;
 }) => {
     const fetchFunc = async () => {
-        let queryRef: any = adminDb.collection("products").where("status", "==", "ACTIVE");
+        try {
+            let queryRef: any = adminDb.collection("products").where("status", "==", "ACTIVE");
 
-        if (filters?.categoryId) queryRef = queryRef.where("categoryId", "==", filters.categoryId);
-        if (filters?.brand) queryRef = queryRef.where("brand", "==", filters.brand);
-        if (filters?.inStock) queryRef = queryRef.where("stockWeight", ">", 0);
+            if (filters?.categoryId) queryRef = queryRef.where("categoryId", "==", filters.categoryId);
+            if (filters?.brand) queryRef = queryRef.where("brand", "==", filters.brand);
+            if (filters?.inStock) queryRef = queryRef.where("stockWeight", ">", 0);
 
-        const snapshot = await queryRef.get();
-        let products = snapshot.docs.map((doc: any) => mapProduct(doc.id, doc.data()));
+            const snapshot = await queryRef.get();
+            let products = snapshot.docs.map((doc: any) => mapProduct(doc.id, doc.data()));
 
-        // Client-side filtering for search
-        if (filters?.search) {
-            const s = filters.search.toLowerCase();
-            products = products.filter((p: Product) =>
-                p.name?.toLowerCase().includes(s) || p.brand?.toLowerCase().includes(s)
-            );
-        }
-
-        // Collection filtering
-        if (filters?.collectionSlug) {
-            const collQuery = await adminDb.collection("collections")
-                .where("slug", "==", filters.collectionSlug).limit(1).get();
-            if (!collQuery.empty) {
-                const collId = collQuery.docs[0].id;
-                products = products.filter((p: any) =>
-                    p.collectionIds && p.collectionIds.includes(collId)
+            // Client-side filtering for search
+            if (filters?.search) {
+                const s = filters.search.toLowerCase();
+                products = products.filter((p: Product) =>
+                    p.name?.toLowerCase().includes(s) || p.brand?.toLowerCase().includes(s)
                 );
-            } else {
-                products = [];
             }
-        }
 
-        // Tag filtering
-        if (filters?.tagSlug) {
-            const tagQuery = await adminDb.collection("tags")
-                .where("slug", "==", filters.tagSlug).limit(1).get();
-            if (!tagQuery.empty) {
-                const tagId = tagQuery.docs[0].id;
-                products = products.filter((p: any) =>
-                    p.tagIds && p.tagIds.includes(tagId)
-                );
-            } else {
-                products = [];
+            // Collection filtering
+            if (filters?.collectionSlug) {
+                const collQuery = await adminDb.collection("collections")
+                    .where("slug", "==", filters.collectionSlug).limit(1).get();
+                if (!collQuery.empty) {
+                    const collId = collQuery.docs[0].id;
+                    products = products.filter((p: any) =>
+                        p.collectionIds && p.collectionIds.includes(collId)
+                    );
+                } else {
+                    products = [];
+                }
             }
+
+            // Tag filtering
+            if (filters?.tagSlug) {
+                const tagQuery = await adminDb.collection("tags")
+                    .where("slug", "==", filters.tagSlug).limit(1).get();
+                if (!tagQuery.empty) {
+                    const tagId = tagQuery.docs[0].id;
+                    products = products.filter((p: any) =>
+                        p.tagIds && p.tagIds.includes(tagId)
+                    );
+                } else {
+                    products = [];
+                }
+            }
+
+            const total = products.length;
+            const skip = filters?.skip || 0;
+            const limit = filters?.limit || 50;
+            const paged = products.slice(skip, skip + limit);
+
+            return { products: paged, total };
+        } catch (err) {
+            console.error("Products fetch error (getActiveProducts):", err);
+            return { products: [], total: 0 };
         }
-
-        const total = products.length;
-        const skip = filters?.skip || 0;
-        const limit = filters?.limit || 50;
-        const paged = products.slice(skip, skip + limit);
-
-        return { products: paged, total };
     };
 
     const cacheKey = JSON.stringify(filters || {});
@@ -120,23 +125,28 @@ export const getProducts = (filters?: {
     limit?: number;
 }) => {
     const fetchFunc = async () => {
-        let queryRef: any = adminDb.collection("products");
+        try {
+            let queryRef: any = adminDb.collection("products");
 
-        if (filters?.categoryId) queryRef = queryRef.where("categoryId", "==", filters.categoryId);
-        if (filters?.brand) queryRef = queryRef.where("brand", "==", filters.brand);
-        if (filters?.status) queryRef = queryRef.where("status", "==", filters.status);
+            if (filters?.categoryId) queryRef = queryRef.where("categoryId", "==", filters.categoryId);
+            if (filters?.brand) queryRef = queryRef.where("brand", "==", filters.brand);
+            if (filters?.status) queryRef = queryRef.where("status", "==", filters.status);
 
-        const snapshot = await queryRef.get();
-        let products = snapshot.docs.map((doc: any) => mapProduct(doc.id, doc.data()));
+            const snapshot = await queryRef.get();
+            let products = snapshot.docs.map((doc: any) => mapProduct(doc.id, doc.data()));
 
-        if (filters?.search) {
-            const s = filters.search.toLowerCase();
-            products = products.filter((p: Product) =>
-                p.name?.toLowerCase().includes(s) || p.brand?.toLowerCase().includes(s)
-            );
+            if (filters?.search) {
+                const s = filters.search.toLowerCase();
+                products = products.filter((p: Product) =>
+                    p.name?.toLowerCase().includes(s) || p.brand?.toLowerCase().includes(s)
+                );
+            }
+
+            return products.slice(0, filters?.limit || 100);
+        } catch (err) {
+            console.error("Products fetch error (getProducts):", err);
+            return [];
         }
-
-        return products.slice(0, filters?.limit || 100);
     };
 
     const cacheKey = JSON.stringify(filters || {});
@@ -150,9 +160,14 @@ export const getProducts = (filters?: {
 export const getProductById = (id: string) => {
     return unstable_cache(
         async () => {
-            const doc = await adminDb.collection("products").doc(id).get();
-            if (!doc.exists) return null;
-            return mapProduct(doc.id, doc.data());
+            try {
+                const doc = await adminDb.collection("products").doc(id).get();
+                if (!doc.exists) return null;
+                return mapProduct(doc.id, doc.data());
+            } catch (err) {
+                console.error("Product fetch error (getProductById):", err);
+                return null;
+            }
         },
         ['product-id', id],
         { tags: ['products', `product-${id}`] }
@@ -162,12 +177,17 @@ export const getProductById = (id: string) => {
 export const getProductBySlug = (slug: string) => {
     return unstable_cache(
         async () => {
-            const query = await adminDb.collection("products")
-                .where("slug", "==", slug).limit(1).get();
-            if (query.empty) return null;
-            
-            const doc = query.docs[0];
-            return mapProduct(doc.id, doc.data());
+            try {
+                const query = await adminDb.collection("products")
+                    .where("slug", "==", slug).limit(1).get();
+                if (query.empty) return null;
+                
+                const doc = query.docs[0];
+                return mapProduct(doc.id, doc.data());
+            } catch (err) {
+                console.error("Product fetch error (getProductBySlug):", err);
+                return null;
+            }
         },
         ['product-slug', slug],
         { tags: ['products', `product-slug-${slug}`] }
@@ -178,19 +198,24 @@ export const getProductBySlug = (slug: string) => {
 export const getFeaturedProducts = (limit = 8) => {
     return unstable_cache(
         async () => {
-            const tagQuery = await adminDb.collection("tags")
-                .where("slug", "==", "featured").limit(1).get();
-            
-            if (tagQuery.empty) return [];
-            const featuredTagId = tagQuery.docs[0].id;
+            try {
+                const tagQuery = await adminDb.collection("tags")
+                    .where("slug", "==", "featured").limit(1).get();
+                
+                if (tagQuery.empty) return [];
+                const featuredTagId = tagQuery.docs[0].id;
 
-            const query = await adminDb.collection("products")
-                .where("status", "==", "ACTIVE")
-                .where("tagIds", "array-contains", featuredTagId)
-                .limit(limit)
-                .get();
+                const query = await adminDb.collection("products")
+                    .where("status", "==", "ACTIVE")
+                    .where("tagIds", "array-contains", featuredTagId)
+                    .limit(limit)
+                    .get();
 
-            return query.docs.map(doc => mapProduct(doc.id, doc.data()));
+                return query.docs.map(doc => mapProduct(doc.id, doc.data()));
+            } catch (err) {
+                console.error("Products fetch error (getFeaturedProducts):", err);
+                return [];
+            }
         },
         ['featured-products', String(limit)],
         { tags: ['products', 'featured'] }
@@ -200,12 +225,17 @@ export const getFeaturedProducts = (limit = 8) => {
 export const getNewArrivals = (limit = 8) => {
     return unstable_cache(
         async () => {
-            const query = await adminDb.collection("products")
-                .where("status", "==", "ACTIVE")
-                .orderBy("createdAt", "desc")
-                .limit(limit)
-                .get();
-            return query.docs.map(doc => mapProduct(doc.id, doc.data()));
+            try {
+                const query = await adminDb.collection("products")
+                    .where("status", "==", "ACTIVE")
+                    .orderBy("createdAt", "desc")
+                    .limit(limit)
+                    .get();
+                return query.docs.map(doc => mapProduct(doc.id, doc.data()));
+            } catch (err) {
+                console.error("Products fetch error (getNewArrivals):", err);
+                return [];
+            }
         },
         ['new-arrivals', String(limit)],
         { tags: ['products', 'new-arrivals'] }
@@ -215,22 +245,27 @@ export const getNewArrivals = (limit = 8) => {
 export const getBestSellers = (limit = 8) => {
     return unstable_cache(
         async () => {
-            const query = await adminDb.collection("products")
-                .where("status", "==", "ACTIVE")
-                .get();
-            
-            const products = query.docs.map(doc => {
-                const product = mapProduct(doc.id, doc.data());
-                return {
-                    ...product,
-                    unitsSold: (doc.data() as any).sales?.unitsSold || 0
-                };
-            });
+            try {
+                const query = await adminDb.collection("products")
+                    .where("status", "==", "ACTIVE")
+                    .get();
+                
+                const products = query.docs.map(doc => {
+                    const product = mapProduct(doc.id, doc.data());
+                    return {
+                        ...product,
+                        unitsSold: (doc.data() as any).sales?.unitsSold || 0
+                    };
+                });
 
-            return products
-                .sort((a, b) => b.unitsSold - a.unitsSold)
-                .slice(0, limit)
-                .map(({ unitsSold, ...rest }: any) => rest as Product);
+                return products
+                    .sort((a, b) => b.unitsSold - a.unitsSold)
+                    .slice(0, limit)
+                    .map(({ unitsSold, ...rest }: any) => rest as Product);
+            } catch (err) {
+                console.error("Products fetch error (getBestSellers):", err);
+                return [];
+            }
         },
         ['best-sellers', String(limit)],
         { tags: ['products', 'best-sellers'] }

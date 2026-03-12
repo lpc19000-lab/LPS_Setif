@@ -9,16 +9,21 @@ function generateSlug(name: string): string {
 export const getCollections = () => {
     return unstable_cache(
         async () => {
-            const query = await adminDb.collection("collections").orderBy("name", "asc").get();
-            return Promise.all(query.docs.map(async (doc) => {
-                const c = doc.data();
-                // Products associated with this collection
-                const productsQuery = await adminDb.collection("products")
-                    .where("collectionIds", "array-contains", doc.id)
-                    .get();
-                const products = productsQuery.docs.map(p => ({ id: p.id }));
-                return { id: doc.id, ...c, products };
-            }));
+            try {
+                const query = await adminDb.collection("collections").orderBy("name", "asc").get();
+                return Promise.all(query.docs.map(async (doc) => {
+                    const c = doc.data();
+                    // Products associated with this collection
+                    const productsQuery = await adminDb.collection("products")
+                        .where("collectionIds", "array-contains", doc.id)
+                        .get();
+                    const products = productsQuery.docs.map(p => ({ id: p.id }));
+                    return { id: doc.id, ...c, products };
+                }));
+            } catch (err) {
+                console.error("Collections fetch error (getCollections):", err);
+                return [];
+            }
         },
         ['collections-list'],
         { revalidate: 300, tags: ['collections'] }
@@ -26,43 +31,48 @@ export const getCollections = () => {
 };
 
 export const getCollectionBySlug = async (slug: string) => {
-    const collQuery = await adminDb.collection("collections").where("slug", "==", slug).limit(1).get();
-    if (collQuery.empty) return null;
-    
-    const collectionDoc = collQuery.docs[0];
-    const collection = { id: collectionDoc.id, ...collectionDoc.data() };
-
-    const productsQuery = await adminDb.collection("products")
-        .where("collectionIds", "array-contains", collectionDoc.id)
-        .where("status", "==", "ACTIVE")
-        .get();
-
-    const products = productsQuery.docs.map(doc => {
-        const pData = doc.data();
-        let images = [];
-        if (pData.images && Array.isArray(pData.images)) {
-            images = pData.images.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1);
-        }
+    try {
+        const collQuery = await adminDb.collection("collections").where("slug", "==", slug).limit(1).get();
+        if (collQuery.empty) return null;
         
-        let categoryInfo = null;
-        if (pData.categoryId) {
-            // we'll just return categoryId, the full category usually needs another fetch 
-            // but for a listing page we might just need basic info.
-            categoryInfo = { id: pData.categoryId };
-        }
+        const collectionDoc = collQuery.docs[0];
+        const collection = { id: collectionDoc.id, ...collectionDoc.data() };
 
-        // We wrap it to match the Prisma join table shape: `product.product.name`
-        return {
-            product: {
-                id: doc.id,
-                ...pData,
-                images,
-                category: categoryInfo
+        const productsQuery = await adminDb.collection("products")
+            .where("collectionIds", "array-contains", collectionDoc.id)
+            .where("status", "==", "ACTIVE")
+            .get();
+
+        const products = productsQuery.docs.map(doc => {
+            const pData = doc.data();
+            let images = [];
+            if (pData.images && Array.isArray(pData.images)) {
+                images = pData.images.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1);
             }
-        };
-    });
+            
+            let categoryInfo = null;
+            if (pData.categoryId) {
+                // we'll just return categoryId, the full category usually needs another fetch 
+                // but for a listing page we might just need basic info.
+                categoryInfo = { id: pData.categoryId };
+            }
 
-    return { ...collection, products };
+            // Match the legacy expected shape: `product: { ... }`
+            return {
+                product: {
+                    id: doc.id,
+                    ...pData,
+                    images,
+                    category: categoryInfo
+                }
+            };
+        });
+
+        return { ...collection, products };
+    } catch (err) {
+        console.error("Collection fetch error (getCollectionBySlug):", err);
+        return null;
+    }
 };
 
 // ── CREATE ────────────────────────────────────────────────────────────────

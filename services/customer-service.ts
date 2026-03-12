@@ -30,64 +30,22 @@ export const registerCustomer = async (data: {
 
 // ── READ ──────────────────────────────────────────────────────────────────
 export const getCustomerById = async (id: string): Promise<Customer | null> => {
-    const doc = await adminDb.collection("customers").doc(id).get();
-    if (!doc.exists) return null;
+    try {
+        const doc = await adminDb.collection("customers").doc(id).get();
+        if (!doc.exists) return null;
 
-    const d = doc.data()!;
-    const ordersQuery = await adminDb.collection("orders")
-        .where("customerId", "==", id)
-        .orderBy("createdAt", "desc")
-        .get();
+        const d = doc.data()!;
+        const ordersQuery = await adminDb.collection("orders")
+            .where("customerId", "==", id)
+            .orderBy("createdAt", "desc")
+            .get();
 
-    const orders = ordersQuery.docs.map(o => ({
-        id: o.id,
-        ...o.data(),
-        createdAt: o.data().createdAt?.toDate()
-    }));
+        const orders = ordersQuery.docs.map(o => ({
+            id: o.id,
+            ...o.data(),
+            createdAt: o.data().createdAt?.toDate()
+        }));
 
-    return {
-        id: doc.id,
-        ...d,
-        email: d.email || "",
-        name: d.name || "Unknown",
-        phone: d.phone || "",
-        wilaya: d.wilaya || "",
-        address: d.address || "",
-        shopName: d.shopName || "Customer",
-        createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
-        ordersCount: orders.length,
-        orders
-    } as Customer;
-};
-
-export const getCustomerByPhone = async (phone: string): Promise<Customer | null> => {
-    const query = await adminDb.collection("customers").where("phone", "==", phone).limit(1).get();
-    if (query.empty) return null;
-    const doc = query.docs[0];
-    const d = doc.data();
-    return {
-        id: doc.id,
-        ...d,
-        email: d.email || "",
-        shopName: d.shopName || "Customer",
-        createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
-        ordersCount: 0, // Simplified for byPhone read
-    } as Customer;
-};
-
-export const getCustomers = async (): Promise<Customer[]> => {
-    const customersQuery = await adminDb.collection("customers").orderBy("createdAt", "desc").get();
-    const ordersQuery = await adminDb.collection("orders").get();
-
-    const orderCountMap = new Map<string, number>();
-    ordersQuery.docs.forEach(doc => {
-        const cid = doc.data().customerId;
-        if (cid) orderCountMap.set(cid, (orderCountMap.get(cid) || 0) + 1);
-    });
-
-    return customersQuery.docs.map(doc => {
-        const d = doc.data();
-        const ordersCount = orderCountMap.get(doc.id) || 0;
         return {
             id: doc.id,
             ...d,
@@ -98,10 +56,67 @@ export const getCustomers = async (): Promise<Customer[]> => {
             address: d.address || "",
             shopName: d.shopName || "Customer",
             createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
-            ordersCount,
-            _count: { orders: ordersCount } // Maintain for compatibility
+            ordersCount: orders.length,
+            orders
         } as Customer;
-    });
+    } catch (err) {
+        console.error("Customer fetch error (getCustomerById):", err);
+        return null;
+    }
+};
+
+export const getCustomerByPhone = async (phone: string): Promise<Customer | null> => {
+    try {
+        const query = await adminDb.collection("customers").where("phone", "==", phone).limit(1).get();
+        if (query.empty) return null;
+        const doc = query.docs[0];
+        const d = doc.data();
+        return {
+            id: doc.id,
+            ...d,
+            email: d.email || "",
+            shopName: d.shopName || "Customer",
+            createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
+            ordersCount: 0, // Simplified for byPhone read
+        } as Customer;
+    } catch (err) {
+        console.error("Customer fetch error (getCustomerByPhone):", err);
+        return null;
+    }
+};
+
+export const getCustomers = async (): Promise<Customer[]> => {
+    try {
+        const customersQuery = await adminDb.collection("customers").orderBy("createdAt", "desc").get();
+        const ordersQuery = await adminDb.collection("orders").get();
+
+        const orderCountMap = new Map<string, number>();
+        ordersQuery.docs.forEach(doc => {
+            const cid = doc.data().customerId;
+            if (cid) orderCountMap.set(cid, (orderCountMap.get(cid) || 0) + 1);
+        });
+
+        return customersQuery.docs.map(doc => {
+            const d = doc.data();
+            const ordersCount = orderCountMap.get(doc.id) || 0;
+            return {
+                id: doc.id,
+                ...d,
+                email: d.email || "",
+                name: d.name || "Unknown",
+                phone: d.phone || "",
+                wilaya: d.wilaya || "",
+                address: d.address || "",
+                shopName: d.shopName || "Customer",
+                createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
+                ordersCount,
+                _count: { orders: ordersCount } // Maintain for compatibility
+            } as Customer;
+        });
+    } catch (err) {
+        console.error("Customers fetch error (getCustomers):", err);
+        return [];
+    }
 };
 
 // ── UPDATE ────────────────────────────────────────────────────────────────

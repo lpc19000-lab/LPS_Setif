@@ -12,14 +12,19 @@ function generateSlug(name: string): string {
 export const getCategories = () => {
     return unstable_cache(
         async () => {
-            const categoriesQuery = await adminDb.collection("categories").orderBy("name", "asc").get();
-            return Promise.all(categoriesQuery.docs.map(async (doc) => {
-                const cat = doc.data();
-                // Fetch products count/ids for the category
-                const productsQuery = await adminDb.collection("products").where("categoryId", "==", doc.id).get();
-                const products = productsQuery.docs.map(p => ({ id: p.id }));
-                return { id: doc.id, ...cat, products };
-            }));
+            try {
+                const categoriesQuery = await adminDb.collection("categories").orderBy("name", "asc").get();
+                return Promise.all(categoriesQuery.docs.map(async (doc) => {
+                    const cat = doc.data();
+                    // Fetch products count/ids for the category
+                    const productsQuery = await adminDb.collection("products").where("categoryId", "==", doc.id).get();
+                    const products = productsQuery.docs.map(p => ({ id: p.id }));
+                    return { id: doc.id, ...cat, products };
+                }));
+            } catch (err) {
+                console.error("Categories fetch error (getCategories):", err);
+                return [];
+            }
         },
         ['categories-list'],
         { revalidate: 300, tags: ['categories'] }
@@ -27,56 +32,66 @@ export const getCategories = () => {
 };
 
 export const getCategoryById = async (id: string) => {
-    const doc = await adminDb.collection("categories").doc(id).get();
-    if (!doc.exists) return null;
-    
-    const productsQuery = await adminDb.collection("products")
-        .where("categoryId", "==", id)
-        .where("status", "==", "ACTIVE")
-        .orderBy("createdAt", "desc")
-        .get();
+    try {
+        const doc = await adminDb.collection("categories").doc(id).get();
+        if (!doc.exists) return null;
+        
+        const productsQuery = await adminDb.collection("products")
+            .where("categoryId", "==", id)
+            .where("status", "==", "ACTIVE")
+            .orderBy("createdAt", "desc")
+            .get();
 
-    const products = productsQuery.docs.map(p => {
-        const pData = p.data();
-        let images = [];
-        if (pData.images && Array.isArray(pData.images)) {
-            images = pData.images.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1);
-        }
-        return { id: p.id, ...pData, images, category: { id: doc.id, ...doc.data() } };
-    });
+        const products = productsQuery.docs.map(p => {
+            const pData = p.data();
+            let images = [];
+            if (pData.images && Array.isArray(pData.images)) {
+                images = pData.images.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1);
+            }
+            return { id: p.id, ...pData, images, category: { id: doc.id, ...doc.data() } };
+        });
 
-    return { id: doc.id, ...doc.data(), products };
+        return { id: doc.id, ...doc.data(), products };
+    } catch (err) {
+        console.error("Category fetch error (getCategoryById):", err);
+        return null;
+    }
 };
 
 export const getCategoryBySlug = async (slug: string) => {
-    const query = await adminDb.collection("categories").where("slug", "==", slug).limit(1).get();
-    if (query.empty) return null;
-    
-    const doc = query.docs[0];
-    const category = { id: doc.id, ...doc.data() };
-    
-    // Fallback if querying doesn't work out due to lacking composite index in FB immediately
-    const productsQuery = await adminDb.collection("products")
-        .where("categoryId", "==", doc.id)
-        .where("status", "==", "ACTIVE")
-        .get(); // Sorting happens in JS to avoid immediate index requirement for migration
+    try {
+        const query = await adminDb.collection("categories").where("slug", "==", slug).limit(1).get();
+        if (query.empty) return null;
+        
+        const doc = query.docs[0];
+        const category = { id: doc.id, ...doc.data() };
+        
+        // Fallback if querying doesn't work out due to lacking composite index in FB immediately
+        const productsQuery = await adminDb.collection("products")
+            .where("categoryId", "==", doc.id)
+            .where("status", "==", "ACTIVE")
+            .get(); // Sorting happens in JS to avoid immediate index requirement for migration
 
-    const products = productsQuery.docs.map(p => {
-        const pData = p.data();
-        let images = [];
-        if (pData.images && Array.isArray(pData.images)) {
-            images = pData.images.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1);
-        }
-        return { 
-            id: p.id, 
-            ...pData, 
-            createdAt: pData.createdAt?.toDate() || new Date(),
-            images, 
-            category 
-        };
-    }).sort((a: any, b: any) => b.createdAt.getTime() - a.createdAt.getTime());
+        const products = productsQuery.docs.map(p => {
+            const pData = p.data();
+            let images = [];
+            if (pData.images && Array.isArray(pData.images)) {
+                images = pData.images.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1);
+            }
+            return { 
+                id: p.id, 
+                ...pData, 
+                createdAt: pData.createdAt?.toDate() || new Date(),
+                images, 
+                category 
+            };
+        }).sort((a: any, b: any) => b.createdAt.getTime() - a.createdAt.getTime());
 
-    return { ...category, products };
+        return { ...category, products };
+    } catch (err) {
+        console.error("Category fetch error (getCategoryBySlug):", err);
+        return null;
+    }
 };
 
 // ── CREATE ────────────────────────────────────────────────────────────────

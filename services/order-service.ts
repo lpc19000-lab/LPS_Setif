@@ -159,58 +159,73 @@ export const createOrder = async (input: CreateOrderInput) => {
 
 // ── READ ──────────────────────────────────────────────────────────────────
 export const getOrders = async (limit = 50): Promise<Order[]> => {
-    const query = await adminDb.collection("orders")
-        .orderBy("createdAt", "desc")
-        .limit(limit)
-        .get();
+    try {
+        const query = await adminDb.collection("orders")
+            .orderBy("createdAt", "desc")
+            .limit(limit)
+            .get();
 
-    return Promise.all(query.docs.map(async (doc) => {
-        const data = doc.data();
+        return Promise.all(query.docs.map(async (doc) => {
+            const data = doc.data();
+            let customer = null;
+            if (data.customerId) {
+                const custDoc = await adminDb.collection("customers").doc(data.customerId).get();
+                if (custDoc.exists) customer = { id: custDoc.id, ...custDoc.data() };
+            }
+            return mapOrder(doc.id, { ...data, customer });
+        }));
+    } catch (err) {
+        console.error("Orders fetch error (getOrders):", err);
+        return [];
+    }
+};
+
+export const getOrderById = async (id: string): Promise<Order | null> => {
+    try {
+        const doc = await adminDb.collection("orders").doc(id).get();
+        if (!doc.exists) return null;
+
+        const data = doc.data()!;
         let customer = null;
         if (data.customerId) {
             const custDoc = await adminDb.collection("customers").doc(data.customerId).get();
             if (custDoc.exists) customer = { id: custDoc.id, ...custDoc.data() };
         }
-        return mapOrder(doc.id, { ...data, customer });
-    }));
-};
 
-export const getOrderById = async (id: string): Promise<Order | null> => {
-    const doc = await adminDb.collection("orders").doc(id).get();
-    if (!doc.exists) return null;
+        const items = await Promise.all((data.items || []).map(async (item: any, idx: number) => {
+            const productDoc = await adminDb.collection("products").doc(item.productId).get();
+            const productData = productDoc.exists ? productDoc.data() : null;
+            return {
+                ...item,
+                id: item.id || `${doc.id}-item-${idx}`,
+                product: {
+                    name: productData?.name || "Unknown Product",
+                    brand: productData?.brand || "Unknown Brand",
+                    imageUrl: productData?.imageUrl || productData?.image || "",
+                }
+            };
+        }));
 
-    const data = doc.data()!;
-    let customer = null;
-    if (data.customerId) {
-        const custDoc = await adminDb.collection("customers").doc(data.customerId).get();
-        if (custDoc.exists) customer = { id: custDoc.id, ...custDoc.data() };
+        return mapOrder(doc.id, { ...data, customer, items });
+    } catch (err) {
+        console.error("Order fetch error (getOrderById):", err);
+        return null;
     }
-
-    const items = await Promise.all((data.items || []).map(async (item: any, idx: number) => {
-        const productDoc = await adminDb.collection("products").doc(item.productId).get();
-        const productData = productDoc.exists ? productDoc.data() : null;
-        return {
-            ...item,
-            id: item.id || `${doc.id}-item-${idx}`,
-            product: {
-                name: productData?.name || "Unknown Product",
-                brand: productData?.brand || "Unknown Brand",
-                imageUrl: productData?.imageUrl || productData?.image || "",
-            }
-        };
-    }));
-
-    return mapOrder(doc.id, { ...data, customer, items });
 };
 
 export const countOrdersByCustomer = (customerId: string): Promise<number> => {
     return unstable_cache(
         async () => {
-            const snapshot = await adminDb.collection("orders")
-                .where("customerId", "==", customerId)
-                .count()
-                .get();
-            return snapshot.data().count;
+            try {
+                const snapshot = await adminDb.collection("orders")
+                    .where("customerId", "==", customerId)
+                    .count()
+                    .get();
+                return snapshot.data().count;
+            } catch (err) {
+                console.error("Order fetch error (countOrdersByCustomer):", err);
+                return 0;
+            }
         },
         [`orders-count-${customerId}`],
         { tags: [`orders:${customerId}`], revalidate: 3600 }
@@ -220,13 +235,18 @@ export const countOrdersByCustomer = (customerId: string): Promise<number> => {
 export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0): Promise<Order[]> => {
     return unstable_cache(
         async () => {
-            const query = await adminDb.collection("orders")
-                .where("customerId", "==", customerId)
-                .orderBy("createdAt", "desc")
-                .get();
+            try {
+                const query = await adminDb.collection("orders")
+                    .where("customerId", "==", customerId)
+                    .orderBy("createdAt", "desc")
+                    .get();
 
-            const allOrders = query.docs.map(doc => mapOrder(doc.id, doc.data()));
-            return allOrders.slice(skip, skip + limit);
+                const allOrders = query.docs.map(doc => mapOrder(doc.id, doc.data()));
+                return allOrders.slice(skip, skip + limit);
+            } catch (err) {
+                console.error("Order fetch error (getOrdersByCustomer):", err);
+                return [];
+            }
         },
         [`orders-${customerId}-${limit}-${skip}`],
         { tags: [`orders:${customerId}`, "orders"], revalidate: 3600 }
