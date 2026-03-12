@@ -35,6 +35,7 @@ export default function ProductPage() {
     const [loading, setLoading] = useState(true);
     const [selectedVolumeId, setSelectedVolumeId] = useState("");
     const [quantity, setQuantity] = useState(1);
+    const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [adding, setAdding] = useState(false);
 
@@ -42,25 +43,42 @@ export default function ProductPage() {
 
     useEffect(() => {
         if (!params.slug) return;
+        setLoading(true);
+        setError("");
+
         fetch(`/api/products/${params.slug}`)
             .then((r) => r.json())
             .then((json) => {
-                if (json.success) {
+                if (json.success && json.data) {
                     setProduct(json.data);
                     if (json.data.volumes?.length > 0) {
                         setSelectedVolumeId(json.data.volumes[0].id);
                     }
                     setQuantity(1);
+                } else {
+                    setError(json.error || t("not_found"));
                 }
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
-    }, [params.slug]);
+            .catch((err) => {
+                console.error("Fetch product error:", err);
+                setError(t("not_found"));
+                setLoading(false);
+            });
+    }, [params.slug, t]);
 
     // ── REALTIME UPDATES ───────────────────────────────────────────────────
     useRealtime("products", (payload: any) => {
         if (payload.eventType === "UPDATE" && product && payload.new.id === product.id) {
-            setProduct((prev) => prev ? { ...prev, ...payload.new } : null);
+            // Apply mapping similar to mapProduct in service
+            const updatedData = payload.new;
+            const mappedProduct = {
+                ...product,
+                ...updatedData,
+                imageUrl: updatedData.imageUrl || updatedData.image || product.imageUrl,
+                basePrice: Number(updatedData.basePrice || updatedData.price || product.basePrice),
+            };
+            setProduct(mappedProduct);
         }
     });
 
@@ -110,11 +128,11 @@ export default function ProductPage() {
         );
     }
 
-    if (!product) {
+    if (error || !product) {
         return (
             <main className="pt-24 min-h-screen flex flex-col items-center justify-center gap-4">
-                <h1 className="text-2xl font-serif text-gray-400">{t("not_found")}</h1>
-                <Link href={`/${locale}/catalog`} className="btn-primary">
+                <h1 className="text-2xl font-serif text-gray-400">{error || t("not_found")}</h1>
+                <Link href={`/${locale}/catalog`} className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-all">
                     {t("back_to_shop")}
                 </Link>
             </main>

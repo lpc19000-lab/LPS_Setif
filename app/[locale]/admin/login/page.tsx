@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useLocale } from "next-intl";
 
 export default function AdminLogin() {
     const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ export default function AdminLogin() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const locale = useLocale();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,7 +30,9 @@ export default function AdminLogin() {
             const data = await res.json();
 
             if (data.success) {
-                router.push("/admin/dashboard");
+                // Determine layout path based on role if needed
+                const targetPath = data.role === "VENDOR" ? `/${locale}/admin/dashboard` : `/${locale}/admin/dashboard`;
+                router.push(targetPath);
                 router.refresh();
             } else {
                 setError(data.error || "Login failed");

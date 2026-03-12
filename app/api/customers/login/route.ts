@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         const token = await signJwtToken({
             sub: customer.id,
             phone: customer.phone,
-            role: "TRADER",
+            role: customer.role || "TRADER",
         });
 
         // Log event
@@ -61,7 +61,8 @@ export async function POST(request: Request) {
                 data: {
                     id: customer.id,
                     name: customer.name,
-                    shopName: customer.shopName
+                    shopName: customer.shopName,
+                    role: customer.role || "TRADER"
                 }
             },
             { status: 200 }

@@ -39,49 +39,61 @@ export async function middleware(request: NextRequest) {
 
     // ── ADMIN PROTECTION ──────────────────────────────────────────────────
     if (pathname.includes("/admin")) {
-        const adminLoginPath = "/admin/login";
-        if (pathname.includes(adminLoginPath)) {
+        // Find current locale from pathname or cookie, default to 'fr'
+        const locale = pathname.split('/')[1] || routing.defaultLocale;
+        const isValidLocale = routing.locales.includes(locale as any);
+        const lang = isValidLocale ? locale : routing.defaultLocale;
+
+        const adminLoginPath = `/${lang}/admin/login`;
+        const adminDashboardPath = `/${lang}/admin/dashboard`;
+
+        if (pathname.includes("/admin/login")) {
             const token = request.cookies.get("admin_token")?.value;
             if (token) {
                 const payload = await verifyJwtToken(token);
-                if (payload && (payload.role === "ADMIN" || payload.role === "SUPER_ADMIN")) {
-                    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+                if (payload && (payload.role === "ADMIN" || payload.role === "SUPER_ADMIN" || payload.role === "VENDOR")) {
+                    return NextResponse.redirect(new URL(adminDashboardPath, request.url));
                 }
             }
             return handleIntl(request);
         }
 
         const token = request.cookies.get("admin_token")?.value;
-        if (!token) return NextResponse.redirect(new URL("/admin/login", request.url));
+        if (!token) return NextResponse.redirect(new URL(adminLoginPath, request.url));
 
         try {
             const payload = await verifyJwtToken(token);
-            if (!payload || (payload.role !== "ADMIN" && payload.role !== "SUPER_ADMIN")) {
-                return NextResponse.redirect(new URL("/admin/login", request.url));
+            if (!payload || (payload.role !== "ADMIN" && payload.role !== "SUPER_ADMIN" && payload.role !== "VENDOR")) {
+                return NextResponse.redirect(new URL(adminLoginPath, request.url));
             }
             return handleIntl(request);
         } catch (error) {
             console.error("Admin auth error:", error);
-            return NextResponse.redirect(new URL("/admin/login", request.url));
+            return NextResponse.redirect(new URL(adminLoginPath, request.url));
         }
     }
 
     // ── CUSTOMER (TRADER) PROTECTION ───────────────────────────────────────
     if (pathname.includes("/account")) {
+        const locale = pathname.split('/')[1] || routing.defaultLocale;
+        const isValidLocale = routing.locales.includes(locale as any);
+        const lang = isValidLocale ? locale : routing.defaultLocale;
+        const loginPath = `/${lang}/login`;
+
         const token = request.cookies.get("customer_token")?.value;
         if (!token) {
-            return NextResponse.redirect(new URL("/login", request.url));
+            return NextResponse.redirect(new URL(loginPath, request.url));
         }
 
         try {
             const payload = await verifyJwtToken(token);
-            if (!payload || payload?.role !== "TRADER") {
-                return NextResponse.redirect(new URL("/login", request.url));
+            if (!payload) {
+                return NextResponse.redirect(new URL(loginPath, request.url));
             }
             return handleIntl(request);
         } catch (error) {
             console.error("Customer auth error:", error);
-            return NextResponse.redirect(new URL("/login", request.url));
+            return NextResponse.redirect(new URL(loginPath, request.url));
         }
     }
 

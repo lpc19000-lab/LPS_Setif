@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         }
 
         // Add role check if needed
-        if (admin.role !== "SUPER_ADMIN" && admin.role !== "ADMIN") {
+        if (admin.role !== "SUPER_ADMIN" && admin.role !== "ADMIN" && admin.role !== "VENDOR") {
             return NextResponse.json(
                 { success: false, error: "Access denied" },
                 { status: 403 }
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         });
 
         const response = NextResponse.json(
-            { success: true, message: "Login successful" },
+            { success: true, message: "Login successful", role: admin.role },
             { status: 200 }
         );
 

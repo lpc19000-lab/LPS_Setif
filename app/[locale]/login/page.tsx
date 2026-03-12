@@ -30,7 +30,12 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (data.success) {
-                router.push(`/${locale}/account`);
+                const role = data.data.role;
+                if (role === "ADMIN" || role === "SUPER_ADMIN" || role === "VENDOR") {
+                    router.push(`/${locale}/admin/dashboard`);
+                } else {
+                    router.push(`/${locale}/account`);
+                }
                 router.refresh();
             } else {
                 setError(data.error || t("error_login_failed"));
