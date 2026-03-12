@@ -18,6 +18,8 @@ export async function POST(request: Request) {
         const adminQuery = await adminDb.collection("admins").where("email", "==", email).limit(1).get();
         const admin = adminQuery.empty ? null : { id: adminQuery.docs[0].id, ...adminQuery.docs[0].data() as any };
 
+        console.log(`[AdminLoginAPI] Admin found: ${!!admin}, Email: ${email}`);
+
         if (!admin) {
             return NextResponse.json(
                 { success: false, error: "Invalid credentials" },
@@ -35,7 +37,9 @@ export async function POST(request: Request) {
         }
 
         // Add role check if needed
+        console.log(`[AdminLoginAPI] Verifying role: ${admin.role}`);
         if (admin.role !== "SUPER_ADMIN" && admin.role !== "ADMIN" && admin.role !== "VENDOR") {
+            console.warn(`[AdminLoginAPI] Access denied for role: ${admin.role}`);
             return NextResponse.json(
                 { success: false, error: "Access denied" },
                 { status: 403 }

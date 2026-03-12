@@ -21,6 +21,7 @@ export default function AdminLogin() {
         setError("");
 
         try {
+            console.log(`[AdminLogin] Attempting login for email: ${email}`);
             const res = await fetch("/api/admin/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -28,16 +29,21 @@ export default function AdminLogin() {
             });
 
             const data = await res.json();
+            console.log(`[AdminLogin] Response:`, data);
 
             if (data.success) {
+                console.log(`[AdminLogin] Success. Role: ${data.role}`);
                 // Determine layout path based on role if needed
-                const targetPath = data.role === "VENDOR" ? `/${locale}/admin/dashboard` : `/${locale}/admin/dashboard`;
+                const targetPath = `/${locale}/admin/dashboard`;
+                console.log(`[AdminLogin] Redirecting to: ${targetPath}`);
                 router.push(targetPath);
                 router.refresh();
             } else {
+                console.warn(`[AdminLogin] Failed:`, data.error);
                 setError(data.error || "Login failed");
             }
         } catch (err) {
+            console.error("[AdminLogin] Unexpected error:", err);
             setError("Something went wrong. Please try again.");
         } finally {
             setLoading(false);

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Search, ChevronDown, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
-import * as geo from "algerian-geo";
+import { algeriaLocations, type WilayaData } from "@/data/algeria-locations";
 
 interface CommuneSelectorProps {
     wilayaId: string | null;
@@ -13,22 +13,27 @@ interface CommuneSelectorProps {
     label?: string;
 }
 
+interface CommuneItem {
+    id: string;
+    name: string;
+}
+
 export default function CommuneSelector({ wilayaId, value, onChange, error, label }: CommuneSelectorProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const t = useTranslations("common.labels");
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const communes = useMemo(() => {
+    const communes = useMemo((): CommuneItem[] => {
         if (!wilayaId) return [];
-        return geo.getCommunesByWilayaCode(wilayaId) || [];
+        const wilaya = algeriaLocations.find((w: WilayaData) => String(w.id) === String(wilayaId));
+        return wilaya ? wilaya.communes.map((name: string, index: number) => ({ id: `${wilayaId}-${index}`, name })) : [];
     }, [wilayaId]);
 
-    const selectedCommune = communes.find((c: any) => c.id === value || c.name === value);
+    const selectedCommune = communes.find((c: CommuneItem) => c.name === value);
 
-    const filteredCommunes = communes.filter((c: any) =>
-        c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.id.includes(searchTerm)
+    const filteredCommunes = communes.filter((c: CommuneItem) =>
+        c.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     useEffect(() => {
@@ -44,7 +49,7 @@ export default function CommuneSelector({ wilayaId, value, onChange, error, labe
     // Reset when wilaya changes
     useEffect(() => {
         if (!wilayaId) return;
-        const stillValid = communes.find((c: any) => c.name === value || c.id === value);
+        const stillValid = communes.find((c: CommuneItem) => c.name === value || c.id === value);
         if (!stillValid && value) {
             // Signal a reset to parent without causing infinite loops (only if there was an old value)
              onChange({ id: "", name: "" });
@@ -84,7 +89,7 @@ export default function CommuneSelector({ wilayaId, value, onChange, error, labe
                     </div>
                     <div className="overflow-y-auto flex-1">
                         {filteredCommunes.length > 0 ? (
-                            filteredCommunes.map((commune: any) => (
+                            filteredCommunes.map((commune: CommuneItem) => (
                                 <button
                                     key={commune.id}
                                     type="button"

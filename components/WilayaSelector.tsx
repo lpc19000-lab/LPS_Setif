@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Search, ChevronDown, Check } from "lucide-react";
-import { WILAYAS } from "@/lib/constants/wilayas";
+import { algeriaLocations as WILAYAS, type WilayaData } from "@/data/algeria-locations";
 import { useTranslations } from "next-intl";
 
 interface WilayaSelectorProps {
@@ -18,11 +18,11 @@ export default function WilayaSelector({ value, onChange, error, label }: Wilaya
     const t = useTranslations("common.labels");
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const selectedWilaya = WILAYAS.find(w => w.id === value || w.name === value);
+    const selectedWilaya = WILAYAS.find((w: WilayaData) => String(w.id) === String(value) || w.name === value);
 
-    const filteredWilayas = WILAYAS.filter(w =>
+    const filteredWilayas = WILAYAS.filter((w: WilayaData) =>
         w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        w.id.includes(searchTerm)
+        String(w.id).includes(searchTerm)
     );
 
     useEffect(() => {
@@ -65,7 +65,7 @@ export default function WilayaSelector({ value, onChange, error, label }: Wilaya
                     </div>
                     <div className="overflow-y-auto flex-1">
                         {filteredWilayas.length > 0 ? (
-                            filteredWilayas.map((wilaya) => (
+                            filteredWilayas.map((wilaya: WilayaData) => (
                                 <button
                                     key={wilaya.id}
                                     type="button"

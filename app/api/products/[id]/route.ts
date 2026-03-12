@@ -6,23 +6,28 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
+    console.log(`[ProductAPI] Fetching product: ${id}`);
     try {
         let product = await getProductById(id);
         
         // If not found by ID, try finding by Slug
         if (!product) {
+            console.log(`[ProductAPI] Product not found by ID, trying slug: ${id}`);
             const { getProductBySlug } = await import("@/services/product-service");
             product = await getProductBySlug(id);
         }
 
         if (!product) {
+            console.warn(`[ProductAPI] Product NOT FOUND: ${id}`);
             return NextResponse.json(
                 { success: false, error: "Product not found" },
                 { status: 404 }
             );
         }
+        console.log(`[ProductAPI] Product found: ${product.name}`);
         return NextResponse.json({ success: true, data: product });
     } catch (error) {
+        console.error(`[ProductAPI] Fetch error for ${id}:`, error);
         return NextResponse.json(
             { success: false, error: "Failed to fetch product" },
             { status: 500 }

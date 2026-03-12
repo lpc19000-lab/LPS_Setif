@@ -43,25 +43,29 @@ export default function ProductPage() {
 
     useEffect(() => {
         if (!params.slug) return;
+        console.log(`[ProductPage] Fetching product for slug: ${params.slug}`);
         setLoading(true);
         setError("");
 
         fetch(`/api/products/${params.slug}`)
             .then((r) => r.json())
             .then((json) => {
+                console.log(`[ProductPage] Product API result:`, json);
                 if (json.success && json.data) {
                     setProduct(json.data);
+                    console.log(`[ProductPage] Product loaded successfully: ${json.data.name} (${json.data.id})`);
                     if (json.data.volumes?.length > 0) {
                         setSelectedVolumeId(json.data.volumes[0].id);
                     }
                     setQuantity(1);
                 } else {
+                    console.warn(`[ProductPage] Product not found or error:`, json.error);
                     setError(json.error || t("not_found"));
                 }
                 setLoading(false);
             })
             .catch((err) => {
-                console.error("Fetch product error:", err);
+                console.error("[ProductPage] Fetch error:", err);
                 setError(t("not_found"));
                 setLoading(false);
             });
@@ -129,10 +133,15 @@ export default function ProductPage() {
     }
 
     if (error || !product) {
+        console.log(`[ProductPage] Error or no product. Error: ${error}`);
         return (
-            <main className="pt-24 min-h-screen flex flex-col items-center justify-center gap-4">
-                <h1 className="text-2xl font-serif text-gray-400">{error || t("not_found")}</h1>
-                <Link href={`/${locale}/catalog`} className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-all">
+            <main className="pt-24 min-h-screen flex flex-col items-center justify-center gap-4 bg-[#FAFAF8]">
+                <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                    <ShieldCheck className="w-10 h-10 text-red-200" />
+                </div>
+                <h1 className="text-3xl font-serif text-gray-900 font-bold">{t("not_found")}</h1>
+                <p className="text-gray-500 max-w-md text-center mb-8">{error || "The fragrance you are looking for might have been moved or is no longer available."}</p>
+                <Link href={`/${locale}/catalog`} className="px-10 py-4 bg-primary text-white rounded-2xl font-bold hover:bg-primary-dark transition-all shadow-xl shadow-primary/20">
                     {t("back_to_shop")}
                 </Link>
             </main>

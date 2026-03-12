@@ -62,6 +62,7 @@ export default async function AdminCustomersPage({ params }: { params: Promise<{
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="text-gray-900 font-medium">{customer.wilaya}</div>
+                                        <div className="text-gray-600 text-[11px] font-semibold">{customer.commune}</div>
                                         <div className="text-gray-500 text-xs mt-0.5 max-w-[200px] truncate" title={customer.address}>{customer.address}</div>
                                     </td>
                                     <td className="px-6 py-4 text-gray-500 whitespace-nowrap">

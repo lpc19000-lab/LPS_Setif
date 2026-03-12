@@ -20,16 +20,28 @@ export async function POST(request: Request) {
         }
 
         const { name, phone, password, wilayaNumber, wilayaName, commune, address, shopName } = parsed.data;
+        console.log(`[RegisterAPI] Attempting registration for: ${shopName} (${phone}), Wilaya: ${wilayaName}, Commune: ${commune}`);
 
-        const customer = await registerCustomer({ name, phone, password, wilayaNumber, wilayaName, commune, address, shopName });
+        const customer = await registerCustomer({ 
+            name, 
+            phone, 
+            password, 
+            wilayaNumber, 
+            wilayaName, 
+            commune, 
+            address, 
+            shopName,
+            role: "TRADER" // Explicitly setting default role
+        });
 
         const token = await signJwtToken({
             sub: customer.id,
             phone: customer.phone,
-            role: "TRADER",
+            role: customer.role || "TRADER",
         });
 
         // Log event
+        console.log(`[RegisterAPI] Success. ID: ${customer.id}`);
         await logEvent("CUSTOMER_REGISTERED", customer.id, `New trader registered: ${customer.shopName} (${customer.phone})`);
 
         const response = NextResponse.json({ success: true, data: customer }, { status: 201 });

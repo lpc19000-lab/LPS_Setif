@@ -26,6 +26,7 @@ export interface Customer {
   wilayaNumber?: string;
   wilayaName?: string;
   passwordHash?: string;
+  role?: string;
 }
 
 export interface Product {

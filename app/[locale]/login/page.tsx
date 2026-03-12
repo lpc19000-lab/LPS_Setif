@@ -21,6 +21,7 @@ export default function LoginPage() {
         setError("");
 
         try {
+            console.log(`[LoginForm] Attempting login for phone: ${phone}`);
             const response = await fetch("/api/customers/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -28,20 +29,25 @@ export default function LoginPage() {
             });
 
             const data = await response.json();
+            console.log(`[LoginForm] Login Response:`, data);
 
             if (data.success) {
                 const role = data.data.role;
+                console.log(`[LoginForm] Login Success. Role: ${role}`);
                 if (role === "ADMIN" || role === "SUPER_ADMIN" || role === "VENDOR") {
+                    console.log(`[LoginForm] Redirecting to Admin Dashboard`);
                     router.push(`/${locale}/admin/dashboard`);
                 } else {
+                    console.log(`[LoginForm] Redirecting to Account`);
                     router.push(`/${locale}/account`);
                 }
                 router.refresh();
             } else {
+                console.warn(`[LoginForm] Login Failed:`, data.error);
                 setError(data.error || t("error_login_failed"));
             }
         } catch (err) {
-            console.error("Login error:", err);
+            console.error("[LoginForm] Unexpected Login Error:", err);
             setError(t("error_generic"));
         } finally {
             setLoading(false);

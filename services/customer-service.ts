@@ -14,6 +14,7 @@ export const registerCustomer = async (data: {
     commune: string;
     address: string;
     shopName: string;
+    role?: string;
 }) => {
     // Check if phone is already registered
     const existing = await adminDb.collection("customers").where("phone", "==", data.phone).limit(1).get();
@@ -27,12 +28,13 @@ export const registerCustomer = async (data: {
 
     const docRef = await adminDb.collection("customers").add({
         ...rest,
+        role: data.role || "TRADER",
         passwordHash,
         wilaya: `${data.wilayaNumber} - ${data.wilayaName}`,
         createdAt: new Date(),
     });
 
-    return { id: docRef.id, ...rest };
+    return { id: docRef.id, ...rest, role: data.role || "TRADER" };
 };
 
 // ── READ ──────────────────────────────────────────────────────────────────

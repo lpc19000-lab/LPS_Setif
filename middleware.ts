@@ -13,6 +13,7 @@ export const config = {
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
+    console.log(`[Middleware] Debug: Pathname: ${pathname}`);
 
     // ── RATE LIMITING (API routes only) ─────────────────────────────────────
     if (pathname.startsWith("/api/")) {
@@ -24,6 +25,7 @@ export async function middleware(request: NextRequest) {
                 request.headers.get("x-real-ip") ||
                 "unknown";
             if (isRateLimited(ip)) {
+                console.log(`[Middleware] Rate limited IP: ${ip}`);
                 return NextResponse.json(
                     { success: false, error_code: "RATE_LIMITED", message: "Too many requests. Please try again later." },
                     { status: 429 }
@@ -49,9 +51,12 @@ export async function middleware(request: NextRequest) {
 
         if (pathname.includes("/admin/login")) {
             const token = request.cookies.get("admin_token")?.value;
+            console.log(`[Middleware] Admin Login Path. Token exists: ${!!token}`);
             if (token) {
                 const payload = await verifyJwtToken(token);
+                console.log(`[Middleware] Admin Token Payload:`, payload);
                 if (payload && (payload.role === "ADMIN" || payload.role === "SUPER_ADMIN" || payload.role === "VENDOR")) {
+                    console.log(`[Middleware] Valid Admin Token. Redirecting to dashboard.`);
                     return NextResponse.redirect(new URL(adminDashboardPath, request.url));
                 }
             }
@@ -59,16 +64,22 @@ export async function middleware(request: NextRequest) {
         }
 
         const token = request.cookies.get("admin_token")?.value;
-        if (!token) return NextResponse.redirect(new URL(adminLoginPath, request.url));
+        console.log(`[Middleware] Admin Protected Path. Token exists: ${!!token}`);
+        if (!token) {
+            console.log(`[Middleware] No admin token. Redirecting to login.`);
+            return NextResponse.redirect(new URL(adminLoginPath, request.url));
+        }
 
         try {
             const payload = await verifyJwtToken(token);
+            console.log(`[Middleware] Admin Token Payload:`, payload);
             if (!payload || (payload.role !== "ADMIN" && payload.role !== "SUPER_ADMIN" && payload.role !== "VENDOR")) {
+                console.log(`[Middleware] Invalid/Unauthorized Admin Token. Redirecting to login.`);
                 return NextResponse.redirect(new URL(adminLoginPath, request.url));
             }
             return handleIntl(request);
         } catch (error) {
-            console.error("Admin auth error:", error);
+            console.error("[Middleware] Admin auth error:", error);
             return NextResponse.redirect(new URL(adminLoginPath, request.url));
         }
     }
@@ -81,18 +92,22 @@ export async function middleware(request: NextRequest) {
         const loginPath = `/${lang}/login`;
 
         const token = request.cookies.get("customer_token")?.value;
+        console.log(`[Middleware] Account Protected Path. Token exists: ${!!token}`);
         if (!token) {
+            console.log(`[Middleware] No customer token. Redirecting to login.`);
             return NextResponse.redirect(new URL(loginPath, request.url));
         }
 
         try {
             const payload = await verifyJwtToken(token);
+            console.log(`[Middleware] Customer Token Payload:`, payload);
             if (!payload) {
+                console.log(`[Middleware] Invalid Customer Token. Redirecting to login.`);
                 return NextResponse.redirect(new URL(loginPath, request.url));
             }
             return handleIntl(request);
         } catch (error) {
-            console.error("Customer auth error:", error);
+            console.error("[Middleware] Customer auth error:", error);
             return NextResponse.redirect(new URL(loginPath, request.url));
         }
     }
