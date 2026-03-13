@@ -34,6 +34,7 @@ function CatalogContent() {
 
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [availableBrands, setAvailableBrands] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [search, setSearch] = useState("");
@@ -45,6 +46,7 @@ function CatalogContent() {
 
     useEffect(() => {
         fetchCategories();
+        fetchBrands();
     }, []);
 
     useEffect(() => {
@@ -97,6 +99,16 @@ function CatalogContent() {
         }
     };
 
+    const fetchBrands = async () => {
+        try {
+            const res = await fetch("/api/brands");
+            const json = await res.json();
+            if (json.success) setAvailableBrands(json.data);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     const brands = Array.from(new Set(products.map((p) => p.brand).filter(Boolean)));
 
     return (
@@ -139,7 +151,7 @@ function CatalogContent() {
                         className="input-luxury md:w-48"
                     >
                         <option value="">{tCommon("all_brands")}</option>
-                        {brands.map((b) => (
+                        {availableBrands.map((b) => (
                             <option key={b} value={b}>{b}</option>
                         ))}
                     </select>
