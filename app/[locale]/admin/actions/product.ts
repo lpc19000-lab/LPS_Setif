@@ -143,7 +143,7 @@ export async function deleteProduct(id: string) {
         // In a real app, we'd use a more efficient denormalized reference or a status check
         // For this audit, we'll try the common pattern
         const allOrders = await adminDb.collection("orders").limit(20).get(); // Scan small batch for quick check
-        const isReferenced = allOrders.docs.some(doc => doc.data().items?.some((item: any) => item.productId === id));
+        const isReferenced = allOrders.docs.some((doc: any) => doc.data().items?.some((item: any) => item.productId === id));
 
         if (isReferenced) {
             return { success: false, error: "Cannot delete product. It is referenced in existing orders." };

@@ -11,26 +11,29 @@ export default async function AdminOrdersPage({ params }: { params: Promise<{ lo
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.orders" });
     const ordersSnap = await adminDb.collection("orders").orderBy("createdAt", "desc").get();
-    const orders = ordersSnap.docs.map((o: QueryDocumentSnapshot<DocumentData>) => ({
-        id: o.id,
-        ...o.data() as any,
-        createdAt: (o.data() as any).createdAt?.toDate(),
-        items: (o.data() as any).items.map((i: any) => ({
-            ...i,
-            price: Number(i.price || 0),
-            product: i.product ? {
-                ...i.product,
-                basePrice: Number((i.product as any).basePrice || (i.product as any).price || 0),
+    const orders = ordersSnap.docs.map((o: QueryDocumentSnapshot<DocumentData>) => {
+        const data = o.data() as any;
+        return {
+            id: o.id,
+            ...data,
+            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+            items: (data.items || []).map((i: any) => ({
+                ...i,
+                price: Number(i.price || 0),
+                product: i.product ? {
+                    ...i.product,
+                    basePrice: Number(i.product.basePrice || i.product.price || 0),
+                } : null
+            })),
+            invoice: data.invoice ? {
+                ...data.invoice,
+                totalAmount: Number(data.invoice.totalAmount || 0)
             } : null
-        })),
-        invoice: (o.data() as any).invoice ? {
-            ...(o.data() as any).invoice,
-            totalAmount: Number((o.data() as any).invoice.totalAmount || 0)
-        } : null
-    }));
+        };
+    });
 
     // Serialize Decimal amounts for the Client Component
-    const serializedOrders = orders.map((o) => ({
+    const serializedOrders = orders.map((o: any) => ({
         ...o,
         totalPrice: Number(o.totalPrice),
         items: o.items.map((i: any) => ({

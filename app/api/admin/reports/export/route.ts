@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +19,8 @@ export async function GET(request: Request) {
         if (type === "inventory") {
             const productsQuery = await adminDb.collection("products").orderBy("name", "asc").get();
             csvData = "ID,Name,Brand,Category,BasePrice,StockWeight,LowStockThreshold\n";
-            productsQuery.docs.forEach(doc => {
-                const p = doc.data();
+            productsQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+                const p = doc.data() as any;
                 csvData += `${doc.id},"${p.name}","${p.brand}","${p.categoryName || ''}",${p.basePrice},${p.stockWeight},${p.lowStockThreshold || 500}\n`;
             });
             filename = `inventory_report_${new Date().toISOString().split('T')[0]}.csv`;
@@ -32,8 +33,8 @@ export async function GET(request: Request) {
                 .get();
 
             csvData = "OrderID,Date,Customer,TotalItems,TotalRevenue,Status\n";
-            for (const doc of ordersQuery.docs) {
-                const o = doc.data();
+            for (const doc of (ordersQuery.docs as QueryDocumentSnapshot<DocumentData>[])) {
+                const o = doc.data() as any;
                 const createdAt = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
                 const totalItems = (o.items || []).reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
                 
@@ -52,7 +53,7 @@ export async function GET(request: Request) {
             const ordersQuery = await adminDb.collection("orders").where("status", "!=", "CANCELLED").get();
 
             const customerOrdersMap = new Map<string, { count: number; totalSpent: number }>();
-            ordersQuery.docs.forEach(doc => {
+            ordersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
                 const o = doc.data();
                 if (o.customerId) {
                     const curr = customerOrdersMap.get(o.customerId) || { count: 0, totalSpent: 0 };
@@ -63,7 +64,7 @@ export async function GET(request: Request) {
             });
 
             csvData = "CustomerID,ShopName,ContactName,Phone,Wilaya,TotalOrders,TotalSpent\n";
-            customersQuery.docs.forEach(doc => {
+            customersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
                 const c = doc.data();
                 const stats = customerOrdersMap.get(doc.id) || { count: 0, totalSpent: 0 };
                 csvData += `${doc.id},"${c.shopName}","${c.name}","${c.phone}","${c.wilaya}",${stats.count},${stats.totalSpent}\n`;
