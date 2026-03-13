@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 import { DollarSign, Package, Users, ShoppingCart, Clock, Trophy, AlertTriangle, Bell, Activity } from "lucide-react";
 import { getInventoryHealthScore } from "@/services/intelligence-service";
 import SafeImage from "@/components/SafeImage";
@@ -49,39 +50,39 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
     const unreadNotifications = notificationsSnap.data().count;
 
     // Process orders data
-    const allOrders = ordersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+    const allOrders = ordersSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
     const totalOrders = allOrders.length;
-    const pendingOrders = allOrders.filter(o => o.status === "PENDING").length;
-    const nonCancelled = allOrders.filter(o => o.status !== "CANCELLED");
+    const pendingOrders = allOrders.filter((o: any) => o.status === "PENDING").length;
+    const nonCancelled = allOrders.filter((o: any) => o.status !== "CANCELLED");
 
-    const revenue = nonCancelled.reduce((sum, o) => sum + Number(o.totalPrice || 0), 0);
+    const revenue = nonCancelled.reduce((sum: number, o: any) => sum + Number(o.totalPrice || 0), 0);
 
-    const unpaidOrders = nonCancelled.filter(o => o.paymentStatus === "UNPAID" || o.paymentStatus === "PARTIALLY_PAID");
-    const unpaidBalance = unpaidOrders.reduce((sum, o) => sum + Number(o.totalPrice || 0) - Number(o.amountPaid || 0), 0);
-    const partiallyPaidOrders = allOrders.filter(o => o.paymentStatus === "PARTIALLY_PAID").length;
+    const unpaidOrders = nonCancelled.filter((o: any) => o.paymentStatus === "UNPAID" || o.paymentStatus === "PARTIALLY_PAID");
+    const unpaidBalance = unpaidOrders.reduce((sum: number, o: any) => sum + Number(o.totalPrice || 0) - Number(o.amountPaid || 0), 0);
+    const partiallyPaidOrders = allOrders.filter((o: any) => o.paymentStatus === "PARTIALLY_PAID").length;
 
     const dailyRevenue = nonCancelled
-        .filter(o => {
+        .filter((o: any) => {
             const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
             return d >= startOfDay;
         })
-        .reduce((sum, o) => sum + Number(o.totalPrice || 0), 0);
+        .reduce((sum: number, o: any) => sum + Number(o.totalPrice || 0), 0);
 
     const monthlyRevenue = nonCancelled
-        .filter(o => {
+        .filter((o: any) => {
             const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
             return d >= startOfMonth;
         })
-        .reduce((sum, o) => sum + Number(o.totalPrice || 0), 0);
+        .reduce((sum: number, o: any) => sum + Number(o.totalPrice || 0), 0);
 
-    const lowStockProducts = productsSnap.docs.filter(doc => {
+    const lowStockProducts = productsSnap.docs.filter((doc: QueryDocumentSnapshot<DocumentData>) => {
         const d = doc.data();
         return (d.stockWeight || 0) <= (d.lowStockThreshold || 500) && (d.stockWeight || 0) > 0;
     }).length;
 
     // Best sellers from product sales data
     const bestSellers = productsSnap.docs
-        .map(doc => {
+        .map((doc: QueryDocumentSnapshot<DocumentData>) => {
             const d = doc.data();
             return {
                 id: doc.id,
@@ -90,20 +91,20 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                 product: { id: doc.id, name: d.name, imageUrl: d.imageUrl, category: d.categoryId ? { name: d.categoryName || '' } : null }
             };
         })
-        .filter(p => p.unitsSold > 0)
-        .sort((a, b) => b.unitsSold - a.unitsSold)
+        .filter((p: any) => p.unitsSold > 0)
+        .sort((a: any, b: any) => b.unitsSold - a.unitsSold)
         .slice(0, 5);
 
     // Recent orders
     const recentOrders = await Promise.all(
         allOrders
-            .sort((a, b) => {
+            .sort((a: any, b: any) => {
                 const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.createdAt).getTime();
                 const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.createdAt).getTime();
                 return bTime - aTime;
             })
             .slice(0, 5)
-            .map(async (order) => {
+            .map(async (order: any) => {
                 let customer = { shopName: "Unknown", name: "" };
                 if (order.customerId) {
                     const custDoc = await adminDb.collection("customers").doc(order.customerId).get();
@@ -383,7 +384,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {bestSellers.map((sale, index) => (
+                                {bestSellers.map((sale: any, index: number) => (
                                     <tr key={sale.id} className="hover:bg-gray-50/50 transition-colors">
                                         <td className="px-6 py-4">
                                             <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index === 0 ? 'bg-[#D4AF37]/20 text-[#D4AF37]' :

@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
 function generateSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -13,7 +14,7 @@ export const getTags = async () => {
         const productsQuery = await adminDb.collection("products")
             .where("tagIds", "array-contains", doc.id)
             .get();
-        const products = productsQuery.docs.map(p => ({ id: p.id }));
+        const products = productsQuery.docs.map((p: QueryDocumentSnapshot<DocumentData>) => ({ id: p.id }));
         return { id: doc.id, ...data, products };
     }));
 };

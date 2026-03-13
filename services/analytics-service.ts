@@ -1,10 +1,11 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
 // ── PRODUCT PERFORMANCE & DEMAND FORECAST ─────────────────────────────────
 export const getProductAnalytics = async () => {
     // In Firebase we assume sales is embedded inside product document
     const productsQuery = await adminDb.collection("products").get();
-    let productsWithSales = productsQuery.docs.map(doc => {
+    let productsWithSales = productsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
         const p = doc.data();
         return {
             id: doc.id,
@@ -25,7 +26,7 @@ export const getProductAnalytics = async () => {
 
     const recentDemandMap = new Map<string, number>();
 
-    recentOrdersQuery.docs.forEach(doc => {
+    recentOrdersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
         const orderData = doc.data();
         if (orderData.items && Array.isArray(orderData.items)) {
             orderData.items.forEach((item: any) => {
@@ -134,7 +135,7 @@ export const getTopCustomers = async (limit = 10) => {
         }
     });
 
-    const customerLTV = customersQuery.docs.map(doc => {
+    const customerLTV = customersQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
         const c = doc.data();
         const stats = customerSpentMap.get(doc.id) || { totalSpent: 0, count: 0 };
         return {

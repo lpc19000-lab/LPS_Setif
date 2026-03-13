@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
 // ── CREATE NOTIFICATION ───────────────────────────────────────────────────
 export const createNotification = async (
@@ -24,7 +25,7 @@ export const getNotifications = async (limit = 30) => {
         .orderBy("createdAt", "desc")
         .limit(limit)
         .get();
-    return query.docs.map(doc => ({
+    return query.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate()

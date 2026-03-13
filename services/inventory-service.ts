@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
 // ── STOCK ADJUSTMENTS ─────────────────────────────────────────────────────
 export const decrementStock = async (productId: string, quantity: number, weight: number = 100) => {
@@ -46,7 +47,7 @@ export const getStockLevel = async (productId: string) => {
 
 export const getLowStockProducts = async (threshold = 500) => {
     const query = await adminDb.collection("products").where("stockWeight", "<=", threshold).orderBy("stockWeight", "asc").get();
-    return query.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return query.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
 };
 
 // ── ADMIN ADJUSTMENTS ─────────────────────────────────────────────────────
@@ -98,9 +99,9 @@ export const getInventoryHistory = async (filters?: { productId?: string; change
     
     // We disable sorting by createdAt locally if query requires compound index that doesn't exist yet
     // For migration, we'll fetch then sort to be safe
-    const query = await queryRef.get();
+    const snapshot = await queryRef.get();
     
-    const logs = await Promise.all(query.docs.map(async (doc: any) => {
+    const logs = await Promise.all(snapshot.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
         const data = doc.data();
         let productInfo = null;
         if (data.productId) {

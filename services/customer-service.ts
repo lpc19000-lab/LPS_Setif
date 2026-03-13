@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 import { Customer } from "@/types/firebase";
 import bcrypt from "bcryptjs";
 
@@ -49,10 +50,10 @@ export const getCustomerById = async (id: string): Promise<Customer | null> => {
             .orderBy("createdAt", "desc")
             .get();
 
-        const orders = ordersQuery.docs.map(o => ({
+        const orders = ordersQuery.docs.map((o: QueryDocumentSnapshot<DocumentData>) => ({
             id: o.id,
-            ...o.data(),
-            createdAt: o.data().createdAt?.toDate()
+            ...o.data() as any,
+            createdAt: (o.data() as any).createdAt?.toDate()
         }));
 
         return {
@@ -108,7 +109,7 @@ export const getCustomers = async (limit = 100, startAfterStr?: string): Promise
         queryRef = queryRef.limit(limit);
         const customersQuery = await queryRef.get();
 
-        return await Promise.all(customersQuery.docs.map(async (doc: any) => {
+        return await Promise.all(customersQuery.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
             const d = doc.data();
             
             // For listing, omit exact order count to save queries, or do a fast count.

@@ -1,9 +1,10 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
 // ── SMART RESTOCK SYSTEM ──────────────────────────────────────────────────
 export const getRestockSuggestions = async () => {
     const productsQuery = await adminDb.collection("products").get();
-    const products = productsQuery.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const products = productsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -89,7 +90,7 @@ export const getDeadStock = async () => {
     const productsQuery = await adminDb.collection("products").where("stockWeight", ">", 0).get();
     
     const deadProducts = productsQuery.docs
-        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }))
         .filter(p => !activeProductIds.has(p.id));
 
     return deadProducts.map((p: any) => {
@@ -173,7 +174,7 @@ export const getProfitAnalytics = async () => {
     // Top Profitable Products
     const productsQuery = await adminDb.collection("products").get();
     
-    const productsProfit = productsQuery.docs.map(doc => {
+    const productsProfit = productsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
         const p = doc.data();
         const sales = p.sales || { unitsSold: 0, revenue: 0 };
         
@@ -205,7 +206,7 @@ export const getInventoryHealthScore = async () => {
     let score = 100;
 
     const productsQuery = await adminDb.collection("products").get();
-    const products = productsQuery.docs.map(doc => doc.data());
+    const products = productsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => doc.data());
 
     const lowStockCount = products.filter(p => (p.stockWeight || 0) <= (p.lowStockThreshold || 500)).length;
     score -= (lowStockCount * 2); 

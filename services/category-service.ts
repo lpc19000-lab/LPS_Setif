@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 import { unstable_cache, revalidateTag } from "next/cache";
 import { Category, Product } from "@/types/firebase";
 
@@ -14,11 +15,11 @@ export const getCategories = () => {
         async () => {
             try {
                 const categoriesQuery = await adminDb.collection("categories").orderBy("name", "asc").get();
-                return Promise.all(categoriesQuery.docs.map(async (doc) => {
+                return Promise.all(categoriesQuery.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
                     const cat = doc.data();
                     // Fetch products count/ids for the category
                     const productsQuery = await adminDb.collection("products").where("categoryId", "==", doc.id).get();
-                    const products = productsQuery.docs.map(p => ({ id: p.id }));
+                    const products = productsQuery.docs.map((p: QueryDocumentSnapshot<DocumentData>) => ({ id: p.id }));
                     return { id: doc.id, ...cat, products };
                 }));
             } catch (err) {
@@ -42,7 +43,7 @@ export const getCategoryById = async (id: string) => {
             .orderBy("createdAt", "desc")
             .get();
 
-        const products = productsQuery.docs.map(p => {
+        const products = productsQuery.docs.map((p: QueryDocumentSnapshot<DocumentData>) => {
             const pData = p.data();
             let images = [];
             if (pData.images && Array.isArray(pData.images)) {
@@ -72,7 +73,7 @@ export const getCategoryBySlug = async (slug: string) => {
             .where("status", "==", "ACTIVE")
             .get(); // Sorting happens in JS to avoid immediate index requirement for migration
 
-        const products = productsQuery.docs.map(p => {
+        const products = productsQuery.docs.map((p: QueryDocumentSnapshot<DocumentData>) => {
             const pData = p.data();
             let images = [];
             if (pData.images && Array.isArray(pData.images)) {

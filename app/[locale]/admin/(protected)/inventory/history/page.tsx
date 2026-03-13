@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 import { History, Package, ArrowLeft, Filter, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -29,7 +30,7 @@ export default async function InventoryHistoryPage({
     const logsSnap = await logsQuery.get();
 
     // Get product data for each log
-    const productIds = Array.from(new Set(logsSnap.docs.map((d: any) => d.data().productId))).filter(Boolean);
+    const productIds = Array.from(new Set(logsSnap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => d.data().productId))).filter(Boolean);
     const productDocsMap = new Map();
 
     if (productIds.length > 0) {
@@ -41,7 +42,7 @@ export default async function InventoryHistoryPage({
         }));
     }
 
-    const logs = logsSnap.docs.map((doc: any) => {
+    const logs = logsSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
         const d = doc.data();
         return {
             id: doc.id,
@@ -52,7 +53,7 @@ export default async function InventoryHistoryPage({
     });
 
     const productsSnap = await adminDb.collection("products").get();
-    const products = productsSnap.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
+    const products = productsSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, name: doc.data().name }));
 
     const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-DZ' : 'fr-FR', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
@@ -98,7 +99,7 @@ export default async function InventoryHistoryPage({
                         className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 appearance-none font-medium text-gray-700"
                     >
                         <option value="">{t("filter_all_products")}</option>
-                        {products.map(p => (
+                        {products.map((p: any) => (
                             <option key={p.id} value={p.id}>{p.name}</option>
                         ))}
                     </select>

@@ -1,6 +1,7 @@
 import CollectionClientView from "@/components/admin/CollectionClientView";
 import { getTranslations } from "next-intl/server";
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,7 @@ export default async function AdminCollectionsPage({ params }: { params: Promise
     const t = await getTranslations({ locale, namespace: "admin.collections" });
 
     const collectionsSnap = await adminDb.collection("collections").orderBy("name", "asc").get();
-    const collections = await Promise.all(collectionsSnap.docs.map(async (doc) => {
+    const collections = await Promise.all(collectionsSnap.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
         const productsCount = await adminDb.collection("products").where("collectionIds", "array-contains", doc.id).count().get();
         return { id: doc.id, ...doc.data() as any, products: Array(productsCount.data().count).fill({ id: '' }) };
     }));

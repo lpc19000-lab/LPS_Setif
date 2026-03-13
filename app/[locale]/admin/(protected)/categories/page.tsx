@@ -1,6 +1,7 @@
 import CategoryClientView from "@/components/admin/CategoryClientView";
 import { getTranslations } from "next-intl/server";
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,7 @@ export default async function AdminCategoriesPage({ params }: { params: Promise<
     const t = await getTranslations({ locale, namespace: "admin.categories" });
 
     const categoriesSnap = await adminDb.collection("categories").orderBy("name", "asc").get();
-    const categories = await Promise.all(categoriesSnap.docs.map(async (doc) => {
+    const categories = await Promise.all(categoriesSnap.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
         const productsCount = await adminDb.collection("products").where("categoryId", "==", doc.id).count().get();
         return { id: doc.id, ...doc.data() as any, _count: { products: productsCount.data().count } };
     }));

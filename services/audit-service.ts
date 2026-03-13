@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
 // ── LOGGING ─────────────────────────────────────────────────────────────────
 export const logAdminAction = async (data: {
@@ -53,7 +54,6 @@ export const getAdminLogs = async (limit = 100) => {
     const logs = [];
     for (const doc of logsQuery.docs) {
         const logData = doc.data();
-        // Fetch admin info for include
         let adminInfo = null;
         if (logData.adminId) {
             const adminDoc = await adminDb.collection("admins").doc(logData.adminId).get();
@@ -65,7 +65,7 @@ export const getAdminLogs = async (limit = 100) => {
         logs.push({
             id: doc.id,
             ...logData,
-            createdAt: logData.createdAt?.toDate(),
+            createdAt: logData.createdAt?.toDate ? logData.createdAt.toDate() : new Date(logData.createdAt),
             admin: adminInfo
         });
     }
@@ -78,10 +78,10 @@ export const getSystemErrors = async (limit = 100) => {
         .limit(limit)
         .get();
 
-    return errsQuery.docs.map(doc => ({
+    return errsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
         id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate()
+        ...doc.data() as any,
+        createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : new Date(doc.data().createdAt)
     }));
 };
 
@@ -107,14 +107,12 @@ export const getSystemHealth = async () => {
             adminDb.collection("system_errors").where("createdAt", ">=", yesterday).count().get()
         ]);
 
-        // Inventory Health (approximation for NoSQL, normally we'd query where stock_weight > 0 and <= threshold)
-        // This requires a composite index
         let lowStockProducts = 0;
         let deadProducts = 0;
         
         try {
             const lowStockQuery = await adminDb.collection("products").where("stockWeight", ">", 0).get();
-            lowStockQuery.docs.forEach(doc => {
+            lowStockQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
                 const data = doc.data();
                 if (data.stockWeight <= (data.lowStockThreshold || 500)) {
                     lowStockProducts++;

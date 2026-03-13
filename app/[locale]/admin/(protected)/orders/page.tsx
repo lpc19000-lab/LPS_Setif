@@ -1,3 +1,5 @@
+import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 import { getOrders } from "@/services/order-service";
 import OrderClientView from "@/components/admin/OrderClientView";
 import RealtimeReloader from "@/components/admin/RealtimeReloader";
@@ -8,13 +10,30 @@ export const dynamic = "force-dynamic";
 export default async function AdminOrdersPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.orders" });
-    const orders = await getOrders();
+    const ordersSnap = await adminDb.collection("orders").orderBy("createdAt", "desc").get();
+    const orders = ordersSnap.docs.map((o: QueryDocumentSnapshot<DocumentData>) => ({
+        id: o.id,
+        ...o.data() as any,
+        createdAt: (o.data() as any).createdAt?.toDate(),
+        items: (o.data() as any).items.map((i: any) => ({
+            ...i,
+            price: Number(i.price || 0),
+            product: i.product ? {
+                ...i.product,
+                basePrice: Number((i.product as any).basePrice || (i.product as any).price || 0),
+            } : null
+        })),
+        invoice: o.invoice ? {
+            ...o.invoice,
+            totalAmount: Number(o.invoice.totalAmount || 0)
+        } : null
+    }));
 
     // Serialize Decimal amounts for the Client Component
     const serializedOrders = orders.map((o) => ({
         ...o,
         totalPrice: Number(o.totalPrice),
-        items: o.items.map(i => ({
+        items: o.items.map((i: any) => ({
             ...i,
             price: Number(i.price || 0),
             product: i.product ? {

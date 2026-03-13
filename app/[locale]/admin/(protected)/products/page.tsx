@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 import ProductClientView from "@/components/admin/ProductClientView";
 import RealtimeReloader from "@/components/admin/RealtimeReloader";
 import { getTranslations } from "next-intl/server";
@@ -15,7 +16,7 @@ export default async function AdminProductsPage({ params }: { params: Promise<{ 
         adminDb.collection("tags").orderBy("name", "asc").get(),
     ]);
 
-    const products = productsSnap.docs.map(doc => {
+    const products = productsSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
         const d: any = doc.data();
         return {
             id: doc.id,
@@ -27,9 +28,9 @@ export default async function AdminProductsPage({ params }: { params: Promise<{ 
             images: d.images || [],
         };
     });
-    const categories = categoriesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
-    const collections = collectionsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
-    const tags = tagsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+    const categories = categoriesSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
+    const collections = collectionsSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
+    const tags = tagsSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
 
     const serializedProducts = products.map((p: any) => ({
         ...p,

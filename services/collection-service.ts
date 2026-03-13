@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 import { unstable_cache, revalidateTag } from "next/cache";
 
 function generateSlug(name: string): string {
@@ -11,13 +12,13 @@ export const getCollections = () => {
         async () => {
             try {
                 const query = await adminDb.collection("collections").orderBy("name", "asc").get();
-                return Promise.all(query.docs.map(async (doc) => {
+                return Promise.all(query.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
                     const c = doc.data();
                     // Products associated with this collection
                     const productsQuery = await adminDb.collection("products")
                         .where("collectionIds", "array-contains", doc.id)
                         .get();
-                    const products = productsQuery.docs.map(p => ({ id: p.id }));
+                    const products = productsQuery.docs.map((p: QueryDocumentSnapshot<DocumentData>) => ({ id: p.id }));
                     return { id: doc.id, ...c, products };
                 }));
             } catch (err) {
@@ -43,7 +44,7 @@ export const getCollectionBySlug = async (slug: string) => {
             .where("status", "==", "ACTIVE")
             .get();
 
-        const products = productsQuery.docs.map(doc => {
+        const products = productsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
             const pData = doc.data();
             let images = [];
             if (pData.images && Array.isArray(pData.images)) {

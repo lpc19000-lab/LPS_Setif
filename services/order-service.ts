@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 import { notifyNewOrder, notifyLowStock } from "./notification-service";
 import { Errors } from "@/lib/errors";
 import { unstable_cache, revalidateTag } from "next/cache";
@@ -170,11 +171,11 @@ export const getOrders = async (limit = 50, startAfterStr?: string): Promise<Ord
                 queryRef = queryRef.startAfter(dateCursor);
             }
         }
-        
-        queryRef = queryRef.limit(limit);
-        const query = await queryRef.get();
 
-        return Promise.all(query.docs.map(async (doc: any) => {
+        queryRef = queryRef.limit(limit);
+        const snapshot = await queryRef.get();
+
+        return Promise.all(snapshot.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
             const data = doc.data();
             let customer = null;
             if (data.customerId) {
@@ -250,7 +251,7 @@ export const getOrdersByCustomer = (customerId: string, limit = 50, skip = 0): P
                     .orderBy("createdAt", "desc")
                     .get();
 
-                const allOrders = query.docs.map(doc => mapOrder(doc.id, doc.data()));
+                const allOrders = query.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => mapOrder(doc.id, doc.data()));
                 return allOrders.slice(skip, skip + limit);
             } catch (err) {
                 console.error("Order fetch error (getOrdersByCustomer):", err);

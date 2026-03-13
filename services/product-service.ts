@@ -1,4 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 import { unstable_cache, revalidateTag } from "next/cache";
 import { Product } from "@/types/firebase";
 
@@ -57,7 +58,7 @@ export const getActiveProducts = (filters?: {
             if (filters?.inStock) queryRef = queryRef.where("stockWeight", ">", 0);
 
             const snapshot = await queryRef.get();
-            let products = snapshot.docs.map((doc: any) => mapProduct(doc.id, doc.data()));
+            let products = snapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => mapProduct(doc.id, doc.data()));
 
             // Client-side filtering for search
             if (filters?.search) {
@@ -133,7 +134,7 @@ export const getProducts = (filters?: {
             if (filters?.status) queryRef = queryRef.where("status", "==", filters.status);
 
             const snapshot = await queryRef.get();
-            let products = snapshot.docs.map((doc: any) => mapProduct(doc.id, doc.data()));
+            let products = snapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => mapProduct(doc.id, doc.data()));
 
             if (filters?.search) {
                 const s = filters.search.toLowerCase();
@@ -211,7 +212,7 @@ export const getFeaturedProducts = (limit = 8) => {
                     .limit(limit)
                     .get();
 
-                return query.docs.map(doc => mapProduct(doc.id, doc.data()));
+                return query.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => mapProduct(doc.id, doc.data()));
             } catch (err) {
                 console.error("Products fetch error (getFeaturedProducts):", err);
                 return [];
@@ -231,7 +232,7 @@ export const getNewArrivals = (limit = 8) => {
                     .orderBy("createdAt", "desc")
                     .limit(limit)
                     .get();
-                return query.docs.map(doc => mapProduct(doc.id, doc.data()));
+                return query.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => mapProduct(doc.id, doc.data()));
             } catch (err) {
                 console.error("Products fetch error (getNewArrivals):", err);
                 return [];
@@ -250,7 +251,7 @@ export const getBestSellers = (limit = 8) => {
                     .where("status", "==", "ACTIVE")
                     .get();
                 
-                const products = query.docs.map(doc => {
+                const products = query.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
                     const product = mapProduct(doc.id, doc.data());
                     return {
                         ...product,
@@ -385,5 +386,5 @@ export const getLowStockProducts = async () => {
         .where("stockWeight", "<=", 500)
         .orderBy("stockWeight", "asc")
         .get();
-    return query.docs.map(doc => mapProduct(doc.id, doc.data()));
+    return query.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => mapProduct(doc.id, doc.data()));
 };
