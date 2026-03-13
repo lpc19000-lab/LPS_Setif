@@ -14,6 +14,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         }
 
         if (!product) {
+            return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+        }
+
         console.log(`[ProductAPI] Product found: ${product.name}`);
         return NextResponse.json({ success: true, data: product });
     } catch (error) {
