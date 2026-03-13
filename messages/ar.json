@@ -698,9 +698,10 @@
             "smart_alert": "تنبيه ذكي نشط",
             "no_alerts": "لا توجد تنبيهات نشطة. الأنظمة طبيعية.",
             "inventory_health": "صحة المخزون"
-        },
-        "inventory_history": {
-            "title": "سجل المخزون",
+        }
+    },
+    "inventory_history": {
+        "title": "سجل المخزون",
             "subtitle": "تتبع جميع تحركات المخزون عبر المبيعات، الإلغاءات، والتعديلات اليدوية.",
             "filter_product": "المنتج",
             "filter_all_products": "جميع المنتجات",

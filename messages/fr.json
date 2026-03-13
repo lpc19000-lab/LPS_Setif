@@ -654,6 +654,11 @@
             "no_unread": "Tout est à jour !",
             "no_notifications_desc": "Aucune notification pour le moment."
         },
+        "header": {
+            "smart_alert": "Alerte Intelligente Active",
+            "no_alerts": "Aucune alerte active. Systèmes normaux.",
+            "inventory_health": "Santé de l'Inventaire"
+        },
         "system": {
             "title": "Santé et État du Système",
             "subtitle": "Surveillez les performances du serveur, la connectivité de la base de données et les services externes.",
@@ -694,11 +699,6 @@
                 "desc": "Tous les audits de performance et les validations d'intégrité suggèrent que la plateforme fonctionne à son efficacité maximale. Les sauvegardes automatiques et les vérifications de santé sont actives."
             }
         }
-    },
-    "header": {
-        "smart_alert": "Alerte Intelligente Active",
-        "no_alerts": "Aucune alerte active. Systèmes normaux.",
-        "inventory_health": "Santé de l'Inventaire"
     },
     "inventory_history": {
         "title": "Historique de l'Inventaire",

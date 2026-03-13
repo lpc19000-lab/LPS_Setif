@@ -249,6 +249,8 @@ export const getBestSellers = (limit = 8) => {
             try {
                 const query = await adminDb.collection("products")
                     .where("status", "==", "ACTIVE")
+                    .orderBy("sales.unitsSold", "desc")
+                    .limit(limit)
                     .get();
                 
                 const products = query.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {

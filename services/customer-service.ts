@@ -109,19 +109,8 @@ export const getCustomers = async (limit = 100, startAfterStr?: string): Promise
         queryRef = queryRef.limit(limit);
         const customersQuery = await queryRef.get();
 
-        return await Promise.all(customersQuery.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
+        return customersQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
             const d = doc.data();
-            
-            // For listing, omit exact order count to save queries, or do a fast count.
-            // A precise count on 100 docs per page is still 100 queries, which is acceptable but can be optimized later if slow.
-            // Using a simple cache count fallback if available
-            let ordersCount = 0;
-            try {
-                const countSnap = await adminDb.collection("orders").where("customerId", "==", doc.id).count().get();
-                ordersCount = countSnap.data().count;
-            } catch (e) {
-                // Ignore count errors safely
-            }
             
             return {
                 id: doc.id,
@@ -133,10 +122,10 @@ export const getCustomers = async (limit = 100, startAfterStr?: string): Promise
                 address: d.address || "",
                 shopName: d.shopName || "Customer",
                 createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
-                ordersCount,
-                _count: { orders: ordersCount } // Maintain for compatibility
+                ordersCount: d.ordersCount || 0,
+                _count: { orders: d.ordersCount || 0 } 
             } as Customer;
-        }));
+        });
     } catch (err) {
         console.error("Customers fetch error (getCustomers):", err);
         return [];

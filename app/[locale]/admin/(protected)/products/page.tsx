@@ -10,7 +10,7 @@ export default async function AdminProductsPage({ params }: { params: Promise<{ 
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.products" });
     const [productsSnap, categoriesSnap, collectionsSnap, tagsSnap] = await Promise.all([
-        adminDb.collection("products").orderBy("createdAt", "desc").get(),
+        adminDb.collection("products").orderBy("createdAt", "desc").limit(100).get(),
         adminDb.collection("categories").orderBy("name", "asc").get(),
         adminDb.collection("collections").orderBy("name", "asc").get(),
         adminDb.collection("tags").orderBy("name", "asc").get(),

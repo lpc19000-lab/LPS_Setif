@@ -21,18 +21,20 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
     // ... (rest of the code)
 
     // Fetch all data from Firebase
-    let productsSnap: any, customersSnap: any, ordersSnap: any, notificationsSnap: any, inventoryHealthScore: number = 0;
+    // Fetch all data from Firebase
+    let productsSnap: any, productsCountSnap: any, customersSnap: any, ordersSnap: any, notificationsSnap: any, inventoryHealthScore: number = 0;
     
     try {
-        [productsSnap, customersSnap, ordersSnap, notificationsSnap, inventoryHealthScore] = await Promise.all([
-            adminDb.collection("products").get(),
+        [productsCountSnap, productsSnap, customersSnap, ordersSnap, notificationsSnap, inventoryHealthScore] = await Promise.all([
+            adminDb.collection("products").count().get(),
+            adminDb.collection("products").limit(500).get(), // Capped for summary analysis
             adminDb.collection("customers").count().get(),
-            adminDb.collection("orders").get(),
+            adminDb.collection("orders").orderBy("createdAt", "desc").limit(100).get(), 
             adminDb.collection("notifications").where("isRead", "==", false).count().get(),
             getInventoryHealthScore(),
         ]);
-    } catch (error) {
-        console.error("[Dashboard] Critical data fetching error:", error);
+    } catch (err) {
+        console.error("Dashboard data fetch error:", err);
         return (
             <div className="p-8 text-center bg-white rounded-3xl border border-red-100 shadow-sm">
                 <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
@@ -45,7 +47,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
         );
     }
 
-    const totalProducts = productsSnap.size;
+    const totalProducts = productsCountSnap.data().count;
     const totalCustomers = customersSnap.data().count;
     const unreadNotifications = notificationsSnap.data().count;
 
