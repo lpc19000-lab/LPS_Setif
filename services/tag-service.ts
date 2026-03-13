@@ -8,7 +8,7 @@ function generateSlug(name: string): string {
 // ── READ ──────────────────────────────────────────────────────────────────
 export const getTags = async () => {
     const query = await adminDb.collection("tags").orderBy("name", "asc").get();
-    return Promise.all(query.docs.map(async (doc) => {
+    return Promise.all(query.docs.map(async (doc: any) => {
         const data = doc.data();
         // Find products that reference this tag
         const productsQuery = await adminDb.collection("products")

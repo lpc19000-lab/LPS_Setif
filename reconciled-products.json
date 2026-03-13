@@ -1,0 +1,5186 @@
+[
+  {
+    "name": "1881 FEMME",
+    "price": 1600,
+    "brand": "1881",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\1881 FEMME.htm"
+  },
+  {
+    "name": "212 EXTRA FEMME",
+    "price": 1350,
+    "brand": "212",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\212 EXTRA FEMME.htm"
+  },
+  {
+    "name": "212 MAN",
+    "price": 1550,
+    "brand": "212",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\212 MAN.htm"
+  },
+  {
+    "name": "212 SEXY",
+    "price": 1350,
+    "brand": "212",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\212 SEXY.jpg"
+  },
+  {
+    "name": "212 VIP EXTRA",
+    "price": 1350,
+    "brand": "212",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\212 VIP EXTRA.htm"
+  },
+  {
+    "name": "212 WILD PARTY",
+    "price": 1350,
+    "brand": "212",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\212 WILD PARTY.jpg"
+  },
+  {
+    "name": "ABSOLU AVENTUS 2025",
+    "price": 1750,
+    "brand": "ABSOLU",
+    "imagePath": null
+  },
+  {
+    "name": "ACCENTO",
+    "price": 1650,
+    "brand": "ACCENTO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ACCENTO.png"
+  },
+  {
+    "name": "ACQUA ABSOLU",
+    "price": 1350,
+    "brand": "ACQUA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ACQUA ABSOLU.jpg"
+  },
+  {
+    "name": "ACQUA DI GIO",
+    "price": 1350,
+    "brand": "ACQUA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ACQUA DI GIO.jpg"
+  },
+  {
+    "name": "ADIDAS",
+    "price": 1350,
+    "brand": "ADIDAS",
+    "imagePath": null
+  },
+  {
+    "name": "AFTERNOON SWIM",
+    "price": 1650,
+    "brand": "AFTERNOON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AFTERNOON SWIM.jpg"
+  },
+  {
+    "name": "AFTERNOON SWIM TQ",
+    "price": 2500,
+    "brand": "AFTERNOON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AFTERNOON SWIM TQ.avif"
+  },
+  {
+    "name": "AHLAM EL ARAB",
+    "price": 1750,
+    "brand": "AHLAM",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AHLAM EL ARAB.htm"
+  },
+  {
+    "name": "ALEXENDRIA 2 TQ",
+    "price": 2500,
+    "brand": "ALEXENDRIA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ALEXENDRIA 2 TQ.htm"
+  },
+  {
+    "name": "ALIEN FEMME",
+    "price": 1350,
+    "brand": "ALIEN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ALIEN FEMME.htm"
+  },
+  {
+    "name": "ALIEN GODESS",
+    "price": 1450,
+    "brand": "ALIEN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ALIEN GODESS.htm"
+  },
+  {
+    "name": "ALIEN MAN",
+    "price": 1450,
+    "brand": "ALIEN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ALIEN MAN.htm"
+  },
+  {
+    "name": "ALL OF ME",
+    "price": 1450,
+    "brand": "ALL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ALL OF ME.htm"
+  },
+  {
+    "name": "ALLURE SPORT",
+    "price": 1300,
+    "brand": "ALLURE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ALLURE SPORT.htm"
+  },
+  {
+    "name": "ALMAZ KAJAL",
+    "price": 2500,
+    "brand": "ALMAZ",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ALMAZ KAJAL.htm"
+  },
+  {
+    "name": "ALMAZ KAJAL TQ",
+    "price": 2500,
+    "brand": "ALMAZ",
+    "imagePath": null
+  },
+  {
+    "name": "AL THAIR TQ",
+    "price": 2500,
+    "brand": "AL",
+    "imagePath": null
+  },
+  {
+    "name": "AMARIDJ",
+    "price": 1600,
+    "brand": "AMARIDJ",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AMARIDJ.jpg"
+  },
+  {
+    "name": "AMBER DESIR",
+    "price": 1750,
+    "brand": "AMBER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AMBER DESIR.jpg"
+  },
+  {
+    "name": "AMBER ROSE",
+    "price": 1350,
+    "brand": "AMBER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AMBER ROSE.jpg"
+  },
+  {
+    "name": "AMIRA PRIVE ROSE",
+    "price": 1550,
+    "brand": "AMIRA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AMIRA PRIVE ROSE.htm"
+  },
+  {
+    "name": "AMIRAT EL ARAB",
+    "price": 1550,
+    "brand": "AMIRAT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AMIRAT EL ARAB.jpg"
+  },
+  {
+    "name": "AMIR BANAFA3 TQ ++",
+    "price": 3200,
+    "brand": "AMIR",
+    "imagePath": null
+  },
+  {
+    "name": "AMIR EL ARAB",
+    "price": 1450,
+    "brand": "AMIR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AMIR EL ARAB.jpg"
+  },
+  {
+    "name": "AMIR EL OUD",
+    "price": 1900,
+    "brand": "AMIR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AMIR EL OUD.jpg"
+  },
+  {
+    "name": "AMOR",
+    "price": 1350,
+    "brand": "AMOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AMOR.htm"
+  },
+  {
+    "name": "ANA ABIYEDH",
+    "price": 1600,
+    "brand": "ANA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ANA ABIYEDH.jpg"
+  },
+  {
+    "name": "ANGEL ELIXIR",
+    "price": 1500,
+    "brand": "ANGEL",
+    "imagePath": null
+  },
+  {
+    "name": "ANGEL FANTASME",
+    "price": 1450,
+    "brand": "ANGEL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ANGEL FANTASME.jpg"
+  },
+  {
+    "name": "ANGEL NOVA",
+    "price": 1350,
+    "brand": "ANGEL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ANGEL NOVA.jpg"
+  },
+  {
+    "name": "ANGELS SHARE",
+    "price": 1650,
+    "brand": "ANGEL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ANGELS SHARE.jpg"
+  },
+  {
+    "name": "ANI NISHAN TQ",
+    "price": 2500,
+    "brand": "ANI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ANI NISHAN TQ.jpg"
+  },
+  {
+    "name": "AQUA AMARA",
+    "price": 1650,
+    "brand": "AQUA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AQUA AMARA.jpg"
+  },
+  {
+    "name": "AQUA DEL SOL",
+    "price": 1350,
+    "brand": "AQUA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AQUA DEL SOL.jpg"
+  },
+  {
+    "name": "AQUA DI GIO PARFUM",
+    "price": 1500,
+    "brand": "AQUA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AQUA DI GIO PARFUM.jpg"
+  },
+  {
+    "name": "AQUA INVICTUS",
+    "price": 1450,
+    "brand": "AQUA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AQUA INVICTUS.jpg"
+  },
+  {
+    "name": "AQUA KISS",
+    "price": 1350,
+    "brand": "AQUA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AQUA KISS.jpg"
+  },
+  {
+    "name": "AQUA MEDIA FORTE",
+    "price": 1750,
+    "brand": "AQUA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AQUA MEDIA FORTE.jpg"
+  },
+  {
+    "name": "ARABIANS TONKA",
+    "price": 1400,
+    "brand": "ARABIANS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ARABIANS TONKA.jpg"
+  },
+  {
+    "name": "GIRL OF NOW",
+    "price": 1450,
+    "brand": "GIRL",
+    "imagePath": null
+  },
+  {
+    "name": "ARMANI PRIVE",
+    "price": 1600,
+    "brand": "ARMANI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ARMANI PRIVE.jpg"
+  },
+  {
+    "name": "ARMANI SI",
+    "price": 1350,
+    "brand": "ARMANI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ARMANI SI.jpg"
+  },
+  {
+    "name": "AROUSSA",
+    "price": 1350,
+    "brand": "AROUSSA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AROUSSA.avif"
+  },
+  {
+    "name": "ASAD",
+    "price": 1600,
+    "brand": "ASAD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\ASAD.jpg"
+  },
+  {
+    "name": "ASAD ZANZIBAR TQ++",
+    "price": 2700,
+    "brand": "ASAD",
+    "imagePath": null
+  },
+  {
+    "name": "AVENTUS COLOGNE",
+    "price": 1650,
+    "brand": "AVENTUS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AVENTUS COLOGNE.jpg"
+  },
+  {
+    "name": "AVENTUS CREED",
+    "price": 1650,
+    "brand": "AVENTUS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AVENTUS CREED.jpg"
+  },
+  {
+    "name": "AVENTUS CREED TQ",
+    "price": 2500,
+    "brand": "AVENTUS",
+    "imagePath": null
+  },
+  {
+    "name": "AVENTUS FEMME",
+    "price": 1350,
+    "brand": "AVENTUS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AVENTUS FEMME.htm"
+  },
+  {
+    "name": "AXE CHOCOLAT",
+    "price": 1350,
+    "brand": "AXE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AXE CHOCOLAT.webp"
+  },
+  {
+    "name": "AXE INFINITE",
+    "price": 1550,
+    "brand": "AXE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AXE INFINITE.jpg"
+  },
+  {
+    "name": "AZZARO AZURE",
+    "price": 1350,
+    "brand": "AZZARO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AZZARO AZURE.jpg"
+  },
+  {
+    "name": "AZZARO CHROME",
+    "price": 1500,
+    "brand": "AZZARO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AZZARO CHROME.jpg"
+  },
+  {
+    "name": "AZZARO CHROME TQ",
+    "price": 2500,
+    "brand": "AZZARO",
+    "imagePath": null
+  },
+  {
+    "name": "AZZARO HOMME",
+    "price": 1350,
+    "brand": "AZZARO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AZZARO HOMME.webp"
+  },
+  {
+    "name": "AZZARO POUR ELLE",
+    "price": 1350,
+    "brand": "AZZARO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AZZARO POUR ELLE.jpg"
+  },
+  {
+    "name": "AZZARO SEA",
+    "price": 1500,
+    "brand": "AZZARO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AZZARO SEA.jpg"
+  },
+  {
+    "name": "AZZARO SPORT",
+    "price": 1350,
+    "brand": "AZZARO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\AZZARO SPORT.jpg"
+  },
+  {
+    "name": "AZZARO VISITE TQ",
+    "price": 2500,
+    "brand": "AZZARO",
+    "imagePath": null
+  },
+  {
+    "name": "BACCARAT ROUGE",
+    "price": 1600,
+    "brand": "BACCARAT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BACCARAT ROUGE.webp"
+  },
+  {
+    "name": "BAD BOY",
+    "price": 1350,
+    "brand": "BAD BOY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BAD BOY.jpg"
+  },
+  {
+    "name": "BADI3 EL OUD TQ++",
+    "price": 3000,
+    "brand": "BADI3",
+    "imagePath": null
+  },
+  {
+    "name": "BAKHOUR",
+    "price": 1350,
+    "brand": "BAKHOUR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BAKHOUR.jpg"
+  },
+  {
+    "name": "BARE VANILLA",
+    "price": 1350,
+    "brand": "BARE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BARE VANILLA.jpg"
+  },
+  {
+    "name": "B BLACK MAN",
+    "price": 1500,
+    "brand": "B BLACK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\B BLACK MAN.avif"
+  },
+  {
+    "name": "BECAUSE IT'S YOU",
+    "price": 1450,
+    "brand": "BECAUSE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BECAUSE IT'S YOU.jpg"
+  },
+  {
+    "name": "BELLA",
+    "price": 1350,
+    "brand": "BELLA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BELLA.webp"
+  },
+  {
+    "name": "BELLE DE JOUR",
+    "price": 1650,
+    "brand": "BELLE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BELLE DE JOUR.jpg"
+  },
+  {
+    "name": "BELLE FLEUR TERRIBLE",
+    "price": 1400,
+    "brand": "BELLE",
+    "imagePath": null
+  },
+  {
+    "name": "BELLE PARADISE",
+    "price": 1350,
+    "brand": "BELLE",
+    "imagePath": null
+  },
+  {
+    "name": "BLACK AFGANO TQ",
+    "price": 2500,
+    "brand": "BLACK",
+    "imagePath": null
+  },
+  {
+    "name": "BLACK JAGUAR TQ",
+    "price": 2500,
+    "brand": "BLACK",
+    "imagePath": null
+  },
+  {
+    "name": "BLACK MEISTER STUCK",
+    "price": 1600,
+    "brand": "BLACK",
+    "imagePath": null
+  },
+  {
+    "name": "BLACK OPIUM",
+    "price": 1350,
+    "brand": "BLACK",
+    "imagePath": null
+  },
+  {
+    "name": "BLACK OPIUM NUIT BLANCHE",
+    "price": 1350,
+    "brand": "BLACK",
+    "imagePath": null
+  },
+  {
+    "name": "BLACK ORCHID",
+    "price": 1550,
+    "brand": "BLACK",
+    "imagePath": null
+  },
+  {
+    "name": "BLACK SEDUCTION",
+    "price": 1350,
+    "brand": "BLACK",
+    "imagePath": null
+  },
+  {
+    "name": "BLACK TOUCH",
+    "price": 1500,
+    "brand": "BLACK",
+    "imagePath": null
+  },
+  {
+    "name": "BLACK VANILLE",
+    "price": 1450,
+    "brand": "BLACK",
+    "imagePath": null
+  },
+  {
+    "name": "BLACK XS",
+    "price": 1350,
+    "brand": "BLACK",
+    "imagePath": null
+  },
+  {
+    "name": "BLEU CHANEL",
+    "price": 1350,
+    "brand": "BLEU CHANEL",
+    "imagePath": null
+  },
+  {
+    "name": "BLEU CHANEL LEXCLUSIF TQ",
+    "price": 2500,
+    "brand": "BLEU CHANEL",
+    "imagePath": null
+  },
+  {
+    "name": "BLEU CHANEL PARFUM",
+    "price": 1750,
+    "brand": "BLEU CHANEL",
+    "imagePath": null
+  },
+  {
+    "name": "BLEU CHANEL TQ",
+    "price": 2500,
+    "brand": "BLEU CHANEL",
+    "imagePath": null
+  },
+  {
+    "name": "BLEU NOIR PARFUM",
+    "price": 1500,
+    "brand": "BLEU",
+    "imagePath": null
+  },
+  {
+    "name": "BLOOM",
+    "price": 1350,
+    "brand": "BLOOM",
+    "imagePath": null
+  },
+  {
+    "name": "BLOOM DI FIORI",
+    "price": 1450,
+    "brand": "BLOOM",
+    "imagePath": null
+  },
+  {
+    "name": "BLOOMING BOUQUET",
+    "price": 1400,
+    "brand": "BLOOM",
+    "imagePath": null
+  },
+  {
+    "name": "BLUE SEDUCTION",
+    "price": 1350,
+    "brand": "BLUE",
+    "imagePath": null
+  },
+  {
+    "name": "BLUE TALISMAN TQ ++",
+    "price": 2800,
+    "brand": "BLUE",
+    "imagePath": null
+  },
+  {
+    "name": "BLUE TOUCH",
+    "price": 1600,
+    "brand": "BLUE",
+    "imagePath": null
+  },
+  {
+    "name": "BODY BURBERRY",
+    "price": 1350,
+    "brand": "BODY BURBERRY",
+    "imagePath": null
+  },
+  {
+    "name": "BOIS",
+    "price": 1600,
+    "brand": "BOIS",
+    "imagePath": null
+  },
+  {
+    "name": "BOIS D'ARGENT",
+    "price": 1450,
+    "brand": "BOIS",
+    "imagePath": null
+  },
+  {
+    "name": "BOIS D'ARGENT TQ",
+    "price": 2500,
+    "brand": "BOIS",
+    "imagePath": null
+  },
+  {
+    "name": "BOIS IMPERIAL TQ ++",
+    "price": 3500,
+    "brand": "BOIS",
+    "imagePath": null
+  },
+  {
+    "name": "BOIS PACIFIC",
+    "price": 1500,
+    "brand": "BOIS",
+    "imagePath": null
+  },
+  {
+    "name": "BOMB SHELL",
+    "price": 1350,
+    "brand": "BOMB SHELL",
+    "imagePath": null
+  },
+  {
+    "name": "BONBON BLEU",
+    "price": 1350,
+    "brand": "BONBON",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE BOOSTER TQ",
+    "price": 2500,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "BORN IN ROMA",
+    "price": 1650,
+    "brand": "BORN IN ROMA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BORN IN ROMA.jpg"
+  },
+  {
+    "name": "BORN IN ROMA F",
+    "price": 1350,
+    "brand": "BORN IN ROMA",
+    "imagePath": null
+  },
+  {
+    "name": "BOSS BOTTLED",
+    "price": 1350,
+    "brand": "BOSS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BOSS BOTTLED.jpg"
+  },
+  {
+    "name": "BOSS MARINE",
+    "price": 1550,
+    "brand": "BOSS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BOSS MARINE.jpg"
+  },
+  {
+    "name": "BOSS MARINE TQ",
+    "price": 2500,
+    "brand": "BOSS",
+    "imagePath": null
+  },
+  {
+    "name": "BOSS TONIC",
+    "price": 1350,
+    "brand": "BOSS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BOSS TONIC.jpg"
+  },
+  {
+    "name": "BOSS TONIC TQ",
+    "price": 2500,
+    "brand": "BOSS",
+    "imagePath": null
+  },
+  {
+    "name": "BOTTLED ABSOLU",
+    "price": 1400,
+    "brand": "BOTTLED",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BOTTLED ABSOLU.webp"
+  },
+  {
+    "name": "BURBERRY GODESS",
+    "price": 1350,
+    "brand": "BURBERRY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BURBERRY GODESS.jpg"
+  },
+  {
+    "name": "BURBERRY HER",
+    "price": 1350,
+    "brand": "BURBERRY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BURBERRY HER.jpg"
+  },
+  {
+    "name": "BURBERRY HERO",
+    "price": 1450,
+    "brand": "BURBERRY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BURBERRY HERO.webp"
+  },
+  {
+    "name": "BURBERRY HER TQ",
+    "price": 2500,
+    "brand": "BURBERRY",
+    "imagePath": null
+  },
+  {
+    "name": "BURBERRY INTENSE",
+    "price": 1450,
+    "brand": "BURBERRY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\BURBERRY INTENSE.webp"
+  },
+  {
+    "name": "CACHMERE",
+    "price": 1450,
+    "brand": "CACHMERE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CACHMERE.jpg"
+  },
+  {
+    "name": "CACTUS GARDEN TQ",
+    "price": 3000,
+    "brand": "CACTUS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CACTUS GARDEN TQ.jpg"
+  },
+  {
+    "name": "CALIFORNIA DREAM TQ++",
+    "price": 5000,
+    "brand": "CALIFORNIA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CALIFORNIA DREAM TQ++.webp"
+  },
+  {
+    "name": "CANDY LOVE",
+    "price": 1400,
+    "brand": "CANDY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CANDY LOVE.jpg"
+  },
+  {
+    "name": "CARAMEL",
+    "price": 1350,
+    "brand": "CARAMEL",
+    "imagePath": null
+  },
+  {
+    "name": "CASSIOPEA",
+    "price": 1750,
+    "brand": "CASSIOPEA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CASSIOPEA.jpg"
+  },
+  {
+    "name": "CEDRA BOISE",
+    "price": 1500,
+    "brand": "CEDRA BOISE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CEDRA BOISE.webp"
+  },
+  {
+    "name": "CERUTTI 1881",
+    "price": 1600,
+    "brand": "CERUTTI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CERUTTI 1881.jpg"
+  },
+  {
+    "name": "CHAIR MAN",
+    "price": 1550,
+    "brand": "CHAIR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHAIR MAN.jpg"
+  },
+  {
+    "name": "CHANCE",
+    "price": 1350,
+    "brand": "CHANCE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHANCE.webp"
+  },
+  {
+    "name": "CHANEL 19",
+    "price": 1650,
+    "brand": "CHANEL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHANEL 19.jpg"
+  },
+  {
+    "name": "CHANEL 5",
+    "price": 1350,
+    "brand": "CHANEL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHANEL 5.jpg"
+  },
+  {
+    "name": "CHERRY IN THEAIR",
+    "price": 1350,
+    "brand": "CHERRY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHERRY IN THEAIR.jpg"
+  },
+  {
+    "name": "CHERRY OUD",
+    "price": 1950,
+    "brand": "CHERRY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHERRY OUD.jpg"
+  },
+  {
+    "name": "CHERRY SMOKE",
+    "price": 2500,
+    "brand": "CHERRY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHERRY SMOKE.jpg"
+  },
+  {
+    "name": "CHIC",
+    "price": 1350,
+    "brand": "CHIC",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHIC.jpg"
+  },
+  {
+    "name": "CHIKHA",
+    "price": 1600,
+    "brand": "CHIKHA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHIKHA.jpg"
+  },
+  {
+    "name": "CHI OUD TQ",
+    "price": 3200,
+    "brand": "CHI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHI OUD TQ.webp"
+  },
+  {
+    "name": "CHLOE",
+    "price": 1400,
+    "brand": "CHLOE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHLOE.jpg"
+  },
+  {
+    "name": "CHLOE L'EAU",
+    "price": 1350,
+    "brand": "CHLOE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHLOE L'EAU.jpg"
+  },
+  {
+    "name": "CH MAN SPORT",
+    "price": 1550,
+    "brand": "CH MAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CH MAN SPORT.jpg"
+  },
+  {
+    "name": "CH PRIVE HOMME",
+    "price": 1550,
+    "brand": "CH PRIVE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CH PRIVE HOMME.jpg"
+  },
+  {
+    "name": "CHROME TQ",
+    "price": 2500,
+    "brand": "CHROME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CHROME TQ.jpg"
+  },
+  {
+    "name": "CINEMA",
+    "price": 1350,
+    "brand": "CINEMA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CINEMA.jpg"
+  },
+  {
+    "name": "CK 2",
+    "price": 1350,
+    "brand": "CK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CK 2.jpg"
+  },
+  {
+    "name": "CK ONE",
+    "price": 1350,
+    "brand": "CK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CK ONE.jpg"
+  },
+  {
+    "name": "CK ONE ESSENSE",
+    "price": 1350,
+    "brand": "CK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CK ONE ESSENSE.jpg"
+  },
+  {
+    "name": "CK ONE REFLECTION",
+    "price": 1350,
+    "brand": "CK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CK ONE REFLECTION.jpg"
+  },
+  {
+    "name": "CK ONE SUMMER",
+    "price": 1350,
+    "brand": "CK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CK ONE SUMMER.jpg"
+  },
+  {
+    "name": "CLASSIQUE GOLD",
+    "price": 1650,
+    "brand": "CLASSIQUE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CLASSIQUE GOLD.avif"
+  },
+  {
+    "name": "CLASSIQUE PIN UP",
+    "price": 1400,
+    "brand": "CLASSIQUE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CLASSIQUE PIN UP.jpg"
+  },
+  {
+    "name": "CLK EVERY ONE",
+    "price": 1350,
+    "brand": "CLK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CLK EVERY ONE.jpg"
+  },
+  {
+    "name": "CLUB DE NUIT INTENSE",
+    "price": 1650,
+    "brand": "CLUB DE NUIT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CLUB DE NUIT INTENSE.jpg"
+  },
+  {
+    "name": "COCAINE",
+    "price": 1700,
+    "brand": "COCAINE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\COCAINE.jpg"
+  },
+  {
+    "name": "COCKTAIL MARACUJA",
+    "price": 1550,
+    "brand": "COCKTAIL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\COCKTAIL MARACUJA.jpg"
+  },
+  {
+    "name": "COCO MADEMOISELLE",
+    "price": 1350,
+    "brand": "COCO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\COCO MADEMOISELLE.jpg"
+  },
+  {
+    "name": "COCONUT PASSION",
+    "price": 1350,
+    "brand": "COCO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\COCONUT PASSION.jpg"
+  },
+  {
+    "name": "COCO VANILLE",
+    "price": 1350,
+    "brand": "COCO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\COCO VANILLE.jpg"
+  },
+  {
+    "name": "CODE ARMANI EDP",
+    "price": 1600,
+    "brand": "CODE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CODE ARMANI EDP.webp"
+  },
+  {
+    "name": "CODE SPORT",
+    "price": 1350,
+    "brand": "CODE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CODE SPORT.jpg"
+  },
+  {
+    "name": "CŒUR FOU TQ",
+    "price": 2500,
+    "brand": "Other",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CŒUR FOU TQ.webp"
+  },
+  {
+    "name": "COOL WATER",
+    "price": 1350,
+    "brand": "COOL WATER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\COOL WATER.jpg"
+  },
+  {
+    "name": "COOL WATER BLUE",
+    "price": 1350,
+    "brand": "COOL WATER",
+    "imagePath": null
+  },
+  {
+    "name": "COSMIC CLOUD",
+    "price": 1750,
+    "brand": "COSMIC",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\COSMIC CLOUD.jpg"
+  },
+  {
+    "name": "CREME BRULE",
+    "price": 1350,
+    "brand": "CREME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CREME BRULE.jpg"
+  },
+  {
+    "name": "CRYSTAL NOIR",
+    "price": 1350,
+    "brand": "CRYSTAL NOIR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\CRYSTAL NOIR.jpg"
+  },
+  {
+    "name": "DAHLIADIVIN",
+    "price": 1350,
+    "brand": "DAHLIADIVIN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DAHLIADIVIN.jpg"
+  },
+  {
+    "name": "DALAA BANAT",
+    "price": 1350,
+    "brand": "DALAA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DALAA BANAT.webp"
+  },
+  {
+    "name": "DANGEROUS ME",
+    "price": 1450,
+    "brand": "DANGEROUS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DANGEROUS ME.jpg"
+  },
+  {
+    "name": "D DIESEL",
+    "price": 1450,
+    "brand": "D",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\D DIESEL.jpg"
+  },
+  {
+    "name": "DECADENSE",
+    "price": 1500,
+    "brand": "DECADENSE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DECADENSE.jpg"
+  },
+  {
+    "name": "DECLARATION",
+    "price": 1650,
+    "brand": "DECLARATION",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DECLARATION.jpg"
+  },
+  {
+    "name": "DECLARATION D'UN SOIR",
+    "price": 1650,
+    "brand": "DECLARATION",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DECLARATION D'UN SOIR.jpg"
+  },
+  {
+    "name": "DECLARATION TQ",
+    "price": 2500,
+    "brand": "DECLARATION",
+    "imagePath": null
+  },
+  {
+    "name": "DEFY",
+    "price": 1650,
+    "brand": "DEFY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DEFY.jpg"
+  },
+  {
+    "name": "DELINA",
+    "price": 1600,
+    "brand": "DELINA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DELINA.jpg"
+  },
+  {
+    "name": "DENGEROUS ME",
+    "price": 1350,
+    "brand": "DENGEROUS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DENGEROUS ME.jpg"
+  },
+  {
+    "name": "DENTELLLE DE ROSES",
+    "price": 1350,
+    "brand": "DENTELLLE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DENTELLLE DE ROSES.jpg"
+  },
+  {
+    "name": "DESIR BLEU",
+    "price": 1350,
+    "brand": "DESIR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DESIR BLEU.jpg"
+  },
+  {
+    "name": "DEVOTION FEMME",
+    "price": 1450,
+    "brand": "DEVOTION",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DEVOTION FEMME.jpg"
+  },
+  {
+    "name": "DIABLE BLEU",
+    "price": 1650,
+    "brand": "DIABLE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIABLE BLEU.jpg"
+  },
+  {
+    "name": "DIAMOND BLEU",
+    "price": 1350,
+    "brand": "DIAMOND",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIAMOND BLEU.avif"
+  },
+  {
+    "name": "DIAPASON",
+    "price": 1650,
+    "brand": "DIAPASON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIAPASON.jpg"
+  },
+  {
+    "name": "DIESEL TATOO",
+    "price": 1350,
+    "brand": "DIESEL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIESEL TATOO.jpg"
+  },
+  {
+    "name": "DIOR ADDICT",
+    "price": 1500,
+    "brand": "DIOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIOR ADDICT.jpg"
+  },
+  {
+    "name": "DIOR AMOUR",
+    "price": 1450,
+    "brand": "DIOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIOR AMOUR.jpg"
+  },
+  {
+    "name": "DIOR COLOGNE",
+    "price": 1350,
+    "brand": "DIOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIOR COLOGNE.jpg"
+  },
+  {
+    "name": "DIOR COLOGNE 2022",
+    "price": 1650,
+    "brand": "DIOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIOR COLOGNE 2022.webp"
+  },
+  {
+    "name": "DIOR COLOGNE TQ",
+    "price": 2500,
+    "brand": "DIOR",
+    "imagePath": null
+  },
+  {
+    "name": "DIOR GRIS TQ",
+    "price": 2500,
+    "brand": "DIOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIOR GRIS TQ.jpg"
+  },
+  {
+    "name": "DIOR HOMME",
+    "price": 1500,
+    "brand": "DIOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIOR HOMME.jpg"
+  },
+  {
+    "name": "DIOR HOMME 2020",
+    "price": 1500,
+    "brand": "DIOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIOR HOMME 2020.webp"
+  },
+  {
+    "name": "DIOR HOMME PARFUM",
+    "price": 1500,
+    "brand": "DIOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIOR HOMME PARFUM.jpg"
+  },
+  {
+    "name": "DIOR HOMME SPORT",
+    "price": 1500,
+    "brand": "DIOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DIOR HOMME SPORT.jpg"
+  },
+  {
+    "name": "DIOR INTENSE",
+    "price": 1500,
+    "brand": "DIOR",
+    "imagePath": null
+  },
+  {
+    "name": "DIOR INTENSE TQ",
+    "price": 2500,
+    "brand": "DIOR",
+    "imagePath": null
+  },
+  {
+    "name": "DIORIVIERA TQ",
+    "price": 2500,
+    "brand": "DIOR",
+    "imagePath": null
+  },
+  {
+    "name": "DIRHEM TQ",
+    "price": 2500,
+    "brand": "DIRHEM",
+    "imagePath": null
+  },
+  {
+    "name": "DIVINE",
+    "price": 1350,
+    "brand": "DIVINE",
+    "imagePath": null
+  },
+  {
+    "name": "DOLCE GABANNA",
+    "price": 1600,
+    "brand": "DOLCE",
+    "imagePath": null
+  },
+  {
+    "name": "DOLCE VIOLET",
+    "price": 1450,
+    "brand": "DOLCE",
+    "imagePath": null
+  },
+  {
+    "name": "DONNA",
+    "price": 1350,
+    "brand": "DONNA",
+    "imagePath": null
+  },
+  {
+    "name": "DOT",
+    "price": 1350,
+    "brand": "DOT",
+    "imagePath": null
+  },
+  {
+    "name": "DOT DRAMA",
+    "price": 1400,
+    "brand": "DOT",
+    "imagePath": null
+  },
+  {
+    "name": "DOUAA",
+    "price": 1350,
+    "brand": "DOUAA",
+    "imagePath": null
+  },
+  {
+    "name": "DOVE",
+    "price": 900,
+    "brand": "DOVE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DOVE.webp"
+  },
+  {
+    "name": "D RED DIESEL",
+    "price": 1500,
+    "brand": "D",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\D RED DIESEL.jpg"
+  },
+  {
+    "name": "DYLAN BLEU FEMME",
+    "price": 1350,
+    "brand": "DYLAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DYLAN BLEU FEMME.jpg"
+  },
+  {
+    "name": "DYLAN BLEU HOMME",
+    "price": 1500,
+    "brand": "DYLAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DYLAN BLEU HOMME.jpg"
+  },
+  {
+    "name": "DYLAN TURQUOISE",
+    "price": 1350,
+    "brand": "DYLAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\DYLAN TURQUOISE.jpg"
+  },
+  {
+    "name": "EAU DE LACOSTE",
+    "price": 1500,
+    "brand": "EAU DE LACOSTE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\EAU DE LACOSTE.jpg"
+  },
+  {
+    "name": "EAU DE VIE",
+    "price": 1350,
+    "brand": "EAU",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\EAU DE VIE.avif"
+  },
+  {
+    "name": "EAU ELECTRIC",
+    "price": 1350,
+    "brand": "EAU",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\EAU ELECTRIC.jpg"
+  },
+  {
+    "name": "EAU GIVREE",
+    "price": 1350,
+    "brand": "EAU",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\EAU GIVREE.jpg"
+  },
+  {
+    "name": "EAU SAUVAGE",
+    "price": 1500,
+    "brand": "EAU SAUVAGE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\EAU SAUVAGE.jpg"
+  },
+  {
+    "name": "EAU SO FRESH",
+    "price": 1500,
+    "brand": "EAU",
+    "imagePath": null
+  },
+  {
+    "name": "EAU SO SEXY",
+    "price": 1500,
+    "brand": "EAU",
+    "imagePath": null
+  },
+  {
+    "name": "EAU TENDRE",
+    "price": 1350,
+    "brand": "EAU",
+    "imagePath": null
+  },
+  {
+    "name": "EAU VIVE",
+    "price": 1350,
+    "brand": "EAU",
+    "imagePath": null
+  },
+  {
+    "name": "EBENE FUME",
+    "price": 1750,
+    "brand": "EBENE",
+    "imagePath": null
+  },
+  {
+    "name": "EDEN",
+    "price": 1350,
+    "brand": "EDEN",
+    "imagePath": null
+  },
+  {
+    "name": "EDEN JUICY APPLE",
+    "price": 1650,
+    "brand": "EDEN",
+    "imagePath": null
+  },
+  {
+    "name": "EDEN PARK CUP",
+    "price": 1350,
+    "brand": "EDEN",
+    "imagePath": null
+  },
+  {
+    "name": "EDEN SPARKLING",
+    "price": 1650,
+    "brand": "EDEN",
+    "imagePath": null
+  },
+  {
+    "name": "EDITION BLANCHE",
+    "price": 1600,
+    "brand": "EDITION",
+    "imagePath": null
+  },
+  {
+    "name": "EGOISTE PLATINIUM",
+    "price": 1600,
+    "brand": "EGOISTE",
+    "imagePath": null
+  },
+  {
+    "name": "EGOISTE PLATINIUM TQ",
+    "price": 2500,
+    "brand": "EGOISTE",
+    "imagePath": null
+  },
+  {
+    "name": "EHSAS ELARABIA TQ",
+    "price": 2500,
+    "brand": "EHSAS",
+    "imagePath": null
+  },
+  {
+    "name": "EKOS ALMA 2025",
+    "price": 1600,
+    "brand": "EKOS",
+    "imagePath": null
+  },
+  {
+    "name": "ELECTRIC CHERRY",
+    "price": 1850,
+    "brand": "ELECTRIC",
+    "imagePath": null
+  },
+  {
+    "name": "ELECTRIC WAVE",
+    "price": 1350,
+    "brand": "ELECTRIC",
+    "imagePath": null
+  },
+  {
+    "name": "ELEGANT VETIVER",
+    "price": 1500,
+    "brand": "ELEGANT",
+    "imagePath": null
+  },
+  {
+    "name": "ELINA",
+    "price": 1350,
+    "brand": "ELINA",
+    "imagePath": null
+  },
+  {
+    "name": "ELLA ELLA",
+    "price": 1350,
+    "brand": "ELLA",
+    "imagePath": null
+  },
+  {
+    "name": "EL SENIOR",
+    "price": 1550,
+    "brand": "EL",
+    "imagePath": null
+  },
+  {
+    "name": "ENCRE NOIR TQ",
+    "price": 2500,
+    "brand": "ENCRE",
+    "imagePath": null
+  },
+  {
+    "name": "ENIGMA TQ",
+    "price": 2500,
+    "brand": "ENIGMA",
+    "imagePath": null
+  },
+  {
+    "name": "ENVY ME",
+    "price": 1350,
+    "brand": "ENVY",
+    "imagePath": null
+  },
+  {
+    "name": "EPICES EXQUISES",
+    "price": 2500,
+    "brand": "EPICES",
+    "imagePath": null
+  },
+  {
+    "name": "ERBA GOLD TQ",
+    "price": 1650,
+    "brand": "ERBA",
+    "imagePath": null
+  },
+  {
+    "name": "ERBA PURA",
+    "price": 1550,
+    "brand": "ERBA",
+    "imagePath": null
+  },
+  {
+    "name": "ERBA PURA TQ",
+    "price": 2500,
+    "brand": "ERBA",
+    "imagePath": null
+  },
+  {
+    "name": "EROS ENERGY",
+    "price": 1350,
+    "brand": "EROS",
+    "imagePath": null
+  },
+  {
+    "name": "EROS FEMME",
+    "price": 1350,
+    "brand": "EROS",
+    "imagePath": null
+  },
+  {
+    "name": "EROS FEMME TQ",
+    "price": 2500,
+    "brand": "EROS",
+    "imagePath": null
+  },
+  {
+    "name": "EROS FLAMME",
+    "price": 1500,
+    "brand": "EROS",
+    "imagePath": null
+  },
+  {
+    "name": "EROS HOMME",
+    "price": 1350,
+    "brand": "EROS",
+    "imagePath": null
+  },
+  {
+    "name": "EROS HOMME TQ",
+    "price": 2500,
+    "brand": "EROS",
+    "imagePath": null
+  },
+  {
+    "name": "EROTIC ME",
+    "price": 1500,
+    "brand": "EROTIC",
+    "imagePath": null
+  },
+  {
+    "name": "ETERNITY",
+    "price": 1350,
+    "brand": "ETERNITY",
+    "imagePath": null
+  },
+  {
+    "name": "ETERNITY FEMME",
+    "price": 1350,
+    "brand": "ETERNITY",
+    "imagePath": null
+  },
+  {
+    "name": "ETERNITY PARFUM",
+    "price": 1450,
+    "brand": "ETERNITY",
+    "imagePath": null
+  },
+  {
+    "name": "EUPHORIA",
+    "price": 1350,
+    "brand": "EUPHORIA",
+    "imagePath": null
+  },
+  {
+    "name": "EXPLORER",
+    "price": 1550,
+    "brand": "EXPLORER",
+    "imagePath": null
+  },
+  {
+    "name": "EXPLORER EXTREME",
+    "price": 1500,
+    "brand": "EXPLORER",
+    "imagePath": null
+  },
+  {
+    "name": "FABULOUS",
+    "price": 1350,
+    "brand": "FABULOUS",
+    "imagePath": null
+  },
+  {
+    "name": "FAHRENHEIT",
+    "price": 1350,
+    "brand": "FAHRENHEIT",
+    "imagePath": null
+  },
+  {
+    "name": "FAHRENHEIT 32",
+    "price": 1600,
+    "brand": "FAHRENHEIT",
+    "imagePath": null
+  },
+  {
+    "name": "FAME",
+    "price": 1400,
+    "brand": "FAME",
+    "imagePath": null
+  },
+  {
+    "name": "FANTASY",
+    "price": 1450,
+    "brand": "FANTASY",
+    "imagePath": null
+  },
+  {
+    "name": "FAN YOUR FLAMES TQ",
+    "price": 2500,
+    "brand": "FAN",
+    "imagePath": null
+  },
+  {
+    "name": "FASHIONABLY LONDON",
+    "price": 1450,
+    "brand": "FASHIONABLY",
+    "imagePath": null
+  },
+  {
+    "name": "FIOR DILOTO",
+    "price": 1650,
+    "brand": "Other",
+    "imagePath": null
+  },
+  {
+    "name": "FIORE DEL DRAGON",
+    "price": 1650,
+    "brand": "FIORE",
+    "imagePath": null
+  },
+  {
+    "name": "FIXATEUR",
+    "price": 1200,
+    "brand": "FIXATEUR",
+    "imagePath": null
+  },
+  {
+    "name": "FLEUR MAJESTY ROSE ROYALE",
+    "price": 1650,
+    "brand": "FLEUR",
+    "imagePath": null
+  },
+  {
+    "name": "FLOR DEL SOL",
+    "price": 1350,
+    "brand": "FLOR",
+    "imagePath": null
+  },
+  {
+    "name": "FLOWER IN THE AIR",
+    "price": 1350,
+    "brand": "FLOWER",
+    "imagePath": null
+  },
+  {
+    "name": "FOREVER YOUNG",
+    "price": 1400,
+    "brand": "FOREVER",
+    "imagePath": null
+  },
+  {
+    "name": "FRENCH PANACH F",
+    "price": 1400,
+    "brand": "FRENCH",
+    "imagePath": null
+  },
+  {
+    "name": "FUEL FOR LIFE",
+    "price": 1550,
+    "brand": "FUEL",
+    "imagePath": null
+  },
+  {
+    "name": "GABRIELLE",
+    "price": 1350,
+    "brand": "GABRIELLE",
+    "imagePath": null
+  },
+  {
+    "name": "GARDEN",
+    "price": 1350,
+    "brand": "GARDEN",
+    "imagePath": null
+  },
+  {
+    "name": "GENTLEMAN TQ",
+    "price": 2500,
+    "brand": "GENTLEMAN",
+    "imagePath": null
+  },
+  {
+    "name": "GENTLEMAN RESERVE",
+    "price": 1500,
+    "brand": "GENTLEMAN",
+    "imagePath": null
+  },
+  {
+    "name": "GENTLEMAN SOCIETY",
+    "price": 1500,
+    "brand": "GENTLEMAN",
+    "imagePath": null
+  },
+  {
+    "name": "GIRL OF NOW",
+    "price": 1350,
+    "brand": "GIRL",
+    "imagePath": null
+  },
+  {
+    "name": "GLOURIOUS",
+    "price": 1350,
+    "brand": "GLOURIOUS",
+    "imagePath": null
+  },
+  {
+    "name": "GODOLPHIN TQ",
+    "price": 2500,
+    "brand": "GODOLPHIN",
+    "imagePath": null
+  },
+  {
+    "name": "GOLD INTENSITIVE",
+    "price": 1350,
+    "brand": "GOLD",
+    "imagePath": null
+  },
+  {
+    "name": "GOOD GIRL",
+    "price": 1450,
+    "brand": "GOOD GIRL",
+    "imagePath": null
+  },
+  {
+    "name": "GOOD GIRL BLUSH",
+    "price": 1350,
+    "brand": "GOOD GIRL",
+    "imagePath": null
+  },
+  {
+    "name": "GOOD GIRL SUPREME",
+    "price": 1450,
+    "brand": "GOOD GIRL",
+    "imagePath": null
+  },
+  {
+    "name": "GRANBALLO",
+    "price": 1450,
+    "brand": "GRANBALLO",
+    "imagePath": null
+  },
+  {
+    "name": "GRAND BAL",
+    "price": 1600,
+    "brand": "GRAND",
+    "imagePath": null
+  },
+  {
+    "name": "GRAND BAL TQ",
+    "price": 3000,
+    "brand": "GRAND",
+    "imagePath": null
+  },
+  {
+    "name": "GRAND SOIR TQ",
+    "price": 2500,
+    "brand": "GRAND",
+    "imagePath": null
+  },
+  {
+    "name": "GREENLY TQ",
+    "price": 2700,
+    "brand": "GREENLY",
+    "imagePath": null
+  },
+  {
+    "name": "GREY PARIS",
+    "price": 1550,
+    "brand": "GREY",
+    "imagePath": null
+  },
+  {
+    "name": "GRIS CHARNEL TQ",
+    "price": 2500,
+    "brand": "GRIS",
+    "imagePath": null
+  },
+  {
+    "name": "GRIS MONTAIGNE",
+    "price": 1400,
+    "brand": "GRIS",
+    "imagePath": null
+  },
+  {
+    "name": "GRIS MONTAIGNE TQ",
+    "price": 1850,
+    "brand": "GRIS",
+    "imagePath": null
+  },
+  {
+    "name": "GUCCI BAMBOO",
+    "price": 1450,
+    "brand": "GUCCI",
+    "imagePath": null
+  },
+  {
+    "name": "GUCCI GUILTY",
+    "price": 1500,
+    "brand": "GUCCI",
+    "imagePath": null
+  },
+  {
+    "name": "GUCCI OUD",
+    "price": 1600,
+    "brand": "GUCCI",
+    "imagePath": null
+  },
+  {
+    "name": "GUESS MAN",
+    "price": 1650,
+    "brand": "GUESS",
+    "imagePath": null
+  },
+  {
+    "name": "GUILTY ABSOLU",
+    "price": 1350,
+    "brand": "GUILTY",
+    "imagePath": null
+  },
+  {
+    "name": "GUILTY ELIXIR PARFUM",
+    "price": 1500,
+    "brand": "GUILTY",
+    "imagePath": null
+  },
+  {
+    "name": "GUISADATITANIUM",
+    "price": 1450,
+    "brand": "GUISADATITANIUM",
+    "imagePath": null
+  },
+  {
+    "name": "H24",
+    "price": 1550,
+    "brand": "H24",
+    "imagePath": null
+  },
+  {
+    "name": "HABIT ROUGE TQ",
+    "price": 2500,
+    "brand": "HABIT",
+    "imagePath": null
+  },
+  {
+    "name": "HALLOWEEN 2025",
+    "price": 1550,
+    "brand": "HALLOWEEN",
+    "imagePath": null
+  },
+  {
+    "name": "HAPPY CLINIQUE",
+    "price": 1500,
+    "brand": "HAPPY",
+    "imagePath": null
+  },
+  {
+    "name": "HAPPY CLINIQUE FEMME",
+    "price": 1450,
+    "brand": "HAPPY",
+    "imagePath": null
+  },
+  {
+    "name": "HAPPY CLINIQUE TQ",
+    "price": 2500,
+    "brand": "HAPPY",
+    "imagePath": null
+  },
+  {
+    "name": "HAPPY HOUR TQ",
+    "price": 2500,
+    "brand": "HAPPY",
+    "imagePath": null
+  },
+  {
+    "name": "HAYATI",
+    "price": 1600,
+    "brand": "HAYATI",
+    "imagePath": null
+  },
+  {
+    "name": "HEAVEN",
+    "price": 1350,
+    "brand": "HEAVEN",
+    "imagePath": null
+  },
+  {
+    "name": "HELIOTROPE",
+    "price": 1350,
+    "brand": "HELIOTROPE",
+    "imagePath": null
+  },
+  {
+    "name": "HIDJAZ",
+    "price": 1450,
+    "brand": "HIDJAZ",
+    "imagePath": null
+  },
+  {
+    "name": "HOLY PIONY TQ",
+    "price": 2500,
+    "brand": "HOLY",
+    "imagePath": null
+  },
+  {
+    "name": "HUGO BOOS",
+    "price": 1450,
+    "brand": "HUGO",
+    "imagePath": null
+  },
+  {
+    "name": "HOT WATER",
+    "price": 1350,
+    "brand": "HOT",
+    "imagePath": null
+  },
+  {
+    "name": "HUGO ELEMENT",
+    "price": 1350,
+    "brand": "HUGO",
+    "imagePath": null
+  },
+  {
+    "name": "HUGO EXTREME",
+    "price": 1500,
+    "brand": "HUGO",
+    "imagePath": null
+  },
+  {
+    "name": "HUGO EXTREME TQ",
+    "price": 2500,
+    "brand": "HUGO",
+    "imagePath": null
+  },
+  {
+    "name": "HUGO INTENSE",
+    "price": 1600,
+    "brand": "HUGO",
+    "imagePath": null
+  },
+  {
+    "name": "HUGO REFLECTIVE",
+    "price": 1500,
+    "brand": "HUGO",
+    "imagePath": null
+  },
+  {
+    "name": "HUGO X SUPERMAN",
+    "price": 1500,
+    "brand": "HUGO",
+    "imagePath": null
+  },
+  {
+    "name": "HUNDRED SILENT WAYS TQ",
+    "price": 2500,
+    "brand": "HUNDRED",
+    "imagePath": null
+  },
+  {
+    "name": "HYPNOSE",
+    "price": 1350,
+    "brand": "HYPNOSE",
+    "imagePath": null
+  },
+  {
+    "name": "HYPNOTIC POISON",
+    "price": 1350,
+    "brand": "HYPNOTIC",
+    "imagePath": null
+  },
+  {
+    "name": "I AM YOUR MAN",
+    "price": 1300,
+    "brand": "I",
+    "imagePath": null
+  },
+  {
+    "name": "IDOLE",
+    "price": 1550,
+    "brand": "IDOLE",
+    "imagePath": null
+  },
+  {
+    "name": "IDYLLE",
+    "price": 1350,
+    "brand": "IDYLLE",
+    "imagePath": null
+  },
+  {
+    "name": "ILLICIT GREEN",
+    "price": 1350,
+    "brand": "ILLICIT",
+    "imagePath": null
+  },
+  {
+    "name": "IMMAGINATION TQ",
+    "price": 2500,
+    "brand": "IMMAGINATION",
+    "imagePath": null
+  },
+  {
+    "name": "IMPERIAL PURPLE",
+    "price": 1500,
+    "brand": "IMPERIAL",
+    "imagePath": null
+  },
+  {
+    "name": "IN BLACK",
+    "price": 1450,
+    "brand": "IN",
+    "imagePath": null
+  },
+  {
+    "name": "INCIDENSE",
+    "price": 1550,
+    "brand": "INCIDENSE",
+    "imagePath": null
+  },
+  {
+    "name": "INSOLENSE",
+    "price": 1600,
+    "brand": "INSOLENSE",
+    "imagePath": null
+  },
+  {
+    "name": "INTERLUDE MAN TQ",
+    "price": 2500,
+    "brand": "INTERLUDE",
+    "imagePath": null
+  },
+  {
+    "name": "INTXICATED",
+    "price": 2500,
+    "brand": "INTXICATED",
+    "imagePath": null
+  },
+  {
+    "name": "INVICTUS",
+    "price": 1500,
+    "brand": "INVICTUS",
+    "imagePath": null
+  },
+  {
+    "name": "INVICTUS LEGENDE",
+    "price": 1350,
+    "brand": "INVICTUS",
+    "imagePath": null
+  },
+  {
+    "name": "INVICTUS ONYX",
+    "price": 1600,
+    "brand": "INVICTUS",
+    "imagePath": null
+  },
+  {
+    "name": "INVICTUS PARFUM",
+    "price": 1500,
+    "brand": "INVICTUS",
+    "imagePath": null
+  },
+  {
+    "name": "INVICTUS PLATINIUM",
+    "price": 1450,
+    "brand": "INVICTUS",
+    "imagePath": null
+  },
+  {
+    "name": "INVICTUS TQ",
+    "price": 2500,
+    "brand": "INVICTUS",
+    "imagePath": null
+  },
+  {
+    "name": "INVICTUS VICTORY",
+    "price": 1350,
+    "brand": "INVICTUS",
+    "imagePath": null
+  },
+  {
+    "name": "INVICTUS VICTORY ABSOLU",
+    "price": 1400,
+    "brand": "INVICTUS",
+    "imagePath": null
+  },
+  {
+    "name": "INVICTUS VICTORY ELIXIR",
+    "price": 1500,
+    "brand": "INVICTUS",
+    "imagePath": null
+  },
+  {
+    "name": "IRRESISTIBLE FLORAL",
+    "price": 1450,
+    "brand": "IRRESISTIBLE",
+    "imagePath": null
+  },
+  {
+    "name": "IRRESISTIBLEFLORAL",
+    "price": 1450,
+    "brand": "IRRESISTIBLEFLORAL",
+    "imagePath": null
+  },
+  {
+    "name": "ITALIAN ZESTE",
+    "price": 1450,
+    "brand": "ITALIAN",
+    "imagePath": null
+  },
+  {
+    "name": "ITALICA",
+    "price": 2500,
+    "brand": "ITALICA",
+    "imagePath": null
+  },
+  {
+    "name": "J'ADORE",
+    "price": 1500,
+    "brand": "J'ADORE",
+    "imagePath": null
+  },
+  {
+    "name": "J'ADORE ABSOLU",
+    "price": 1350,
+    "brand": "J'ADORE",
+    "imagePath": null
+  },
+  {
+    "name": "J'ADORE INFINISSIME",
+    "price": 1500,
+    "brand": "J'ADORE",
+    "imagePath": null
+  },
+  {
+    "name": "J'ADORE IN JOY",
+    "price": 1350,
+    "brand": "J'ADORE",
+    "imagePath": null
+  },
+  {
+    "name": "J'ADORE IN JOY",
+    "price": 1500,
+    "brand": "J'ADORE",
+    "imagePath": null
+  },
+  {
+    "name": "J'ADORE LUMIERE",
+    "price": 1550,
+    "brand": "J'ADORE",
+    "imagePath": null
+  },
+  {
+    "name": "JASMIN KOSOMONO",
+    "price": 1600,
+    "brand": "JASMIN",
+    "imagePath": null
+  },
+  {
+    "name": "JAWAD EL LIL",
+    "price": 2500,
+    "brand": "JAWAD",
+    "imagePath": null
+  },
+  {
+    "name": "JEU D'AMOUR",
+    "price": 1400,
+    "brand": "JEU",
+    "imagePath": null
+  },
+  {
+    "name": "JOUDHOUR EL OUD",
+    "price": 1750,
+    "brand": "JOUDHOUR",
+    "imagePath": null
+  },
+  {
+    "name": "JOY",
+    "price": 1400,
+    "brand": "JOY",
+    "imagePath": null
+  },
+  {
+    "name": "JUST A KISS",
+    "price": 1500,
+    "brand": "JUST",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\JUST A KISS.jpg"
+  },
+  {
+    "name": "KALAN",
+    "price": 1650,
+    "brand": "KALAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KALAN.jpg"
+  },
+  {
+    "name": "KALIMAT",
+    "price": 2500,
+    "brand": "KALIMAT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KALIMAT.jpg"
+  },
+  {
+    "name": "KARAGOZ",
+    "price": 2500,
+    "brand": "KARAGOZ",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KARAGOZ.webp"
+  },
+  {
+    "name": "KEAPOPPY BOUQUET",
+    "price": 1350,
+    "brand": "KEAPOPPY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KEAPOPPY BOUQUET.webp"
+  },
+  {
+    "name": "K EAU DE PARFUM INTENS",
+    "price": 1500,
+    "brand": "K",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\K EAU DE PARFUM INTENS.webp"
+  },
+  {
+    "name": "KENZO FLOWER",
+    "price": 1350,
+    "brand": "KENZO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KENZO FLOWER.jpg"
+  },
+  {
+    "name": "KENZO HOMME TQ",
+    "price": 2500,
+    "brand": "KENZO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KENZO HOMME TQ.jpg"
+  },
+  {
+    "name": "KENZO POWER",
+    "price": 1350,
+    "brand": "KENZO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KENZO POWER.jpg"
+  },
+  {
+    "name": "KENZO WORLD",
+    "price": 1350,
+    "brand": "KENZO",
+    "imagePath": null
+  },
+  {
+    "name": "khaliji",
+    "price": 1400,
+    "brand": "khaliji",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\khaliji.jpg"
+  },
+  {
+    "name": "KHAMRAH",
+    "price": 1650,
+    "brand": "KHAMRAH",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KHAMRAH.webp"
+  },
+  {
+    "name": "KHAMRAH DUKHAN",
+    "price": 1650,
+    "brand": "KHAMRAH",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KHAMRAH DUKHAN.webp"
+  },
+  {
+    "name": "KHOUKH",
+    "price": 900,
+    "brand": "KHOUKH",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KHOUKH.avif"
+  },
+  {
+    "name": "KING OF SEDUCTION",
+    "price": 1350,
+    "brand": "KING",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KING OF SEDUCTION.jpg"
+  },
+  {
+    "name": "KIRKE",
+    "price": 1600,
+    "brand": "KIRKE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KIRKE.webp"
+  },
+  {
+    "name": "K KING",
+    "price": 1350,
+    "brand": "K",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\K KING.jpg"
+  },
+  {
+    "name": "KOUROS",
+    "price": 1500,
+    "brand": "KOUROS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\KOUROS.webp"
+  },
+  {
+    "name": "L12.12 ENERGISED",
+    "price": 1500,
+    "brand": "L12.12",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\L12.12 ENERGISED.jpg"
+  },
+  {
+    "name": "L12.12 MAGNITIC",
+    "price": 1500,
+    "brand": "L12.12",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\LPS IMAGE\\L12.12 MAGNITIC.jpg"
+  },
+  {
+    "name": "L12.12 ROSE",
+    "price": 1350,
+    "brand": "L12.12",
+    "imagePath": null
+  },
+  {
+    "name": "L12.12 SPARKLING",
+    "price": 1350,
+    "brand": "L12.12",
+    "imagePath": null
+  },
+  {
+    "name": "LA BEAU PARFUM",
+    "price": 1500,
+    "brand": "LA",
+    "imagePath": null
+  },
+  {
+    "name": "LA BELLE",
+    "price": 1500,
+    "brand": "LA",
+    "imagePath": null
+  },
+  {
+    "name": "LA BELLE FLOWER",
+    "price": 1450,
+    "brand": "LA",
+    "imagePath": null
+  },
+  {
+    "name": "LACOLE NOIR",
+    "price": 2500,
+    "brand": "LACOLE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOLLE NOIR TQ",
+    "price": 2500,
+    "brand": "LACOLLE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE BLANC",
+    "price": 1350,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE BLEU",
+    "price": 1650,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE BOOSTER",
+    "price": 1350,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE CHALLENGE",
+    "price": 1350,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE ELEGANTE",
+    "price": 1500,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE JAUNE",
+    "price": 1500,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE LEGERE",
+    "price": 1350,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE NOIR",
+    "price": 1500,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE ORIGINAL",
+    "price": 1600,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE PANACHE",
+    "price": 1350,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE PANACHE F",
+    "price": 1350,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE ROSE INTENSE",
+    "price": 1450,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE ROUGE",
+    "price": 1500,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LACOSTE TIMELESS",
+    "price": 1350,
+    "brand": "LACOSTE",
+    "imagePath": null
+  },
+  {
+    "name": "LADY LUCKY",
+    "price": 1350,
+    "brand": "LADY",
+    "imagePath": null
+  },
+  {
+    "name": "LADY MILLION",
+    "price": 1350,
+    "brand": "LADY MILLION",
+    "imagePath": null
+  },
+  {
+    "name": "LADY MILLION ROYAL",
+    "price": 1350,
+    "brand": "LADY MILLION",
+    "imagePath": null
+  },
+  {
+    "name": "LAIT DE CORP",
+    "price": 950,
+    "brand": "LAIT",
+    "imagePath": null
+  },
+  {
+    "name": "LA NUIT DE L'HOMME",
+    "price": 1750,
+    "brand": "LA",
+    "imagePath": null
+  },
+  {
+    "name": "LANUITDELHOMME",
+    "price": 1750,
+    "brand": "LANUITDELHOMME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LANUITDELHOMME.avif"
+  },
+  {
+    "name": "LA NUIT TRESOR",
+    "price": 1550,
+    "brand": "LA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LA NUIT TRESOR.avif"
+  },
+  {
+    "name": "LA NUIT TRESOR PARFUM",
+    "price": 1500,
+    "brand": "LA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LA NUIT TRESOR PARFUM.avif"
+  },
+  {
+    "name": "LAPIDUS",
+    "price": 1500,
+    "brand": "LAPIDUS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LAPIDUS.avif"
+  },
+  {
+    "name": "LA VIE EST BELLE",
+    "price": 1350,
+    "brand": "LA VIE EST BELLE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LA VIE EST BELLE.avif"
+  },
+  {
+    "name": "LAYALI MALAKI",
+    "price": 1850,
+    "brand": "LAYALI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LAYALI MALAKI.jpg"
+  },
+  {
+    "name": "LAYL SATI3",
+    "price": 1850,
+    "brand": "LAYL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LAYL SATI3.webp"
+  },
+  {
+    "name": "LAYTON",
+    "price": 2500,
+    "brand": "LAYTON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LAYTON.avif"
+  },
+  {
+    "name": "LEAU",
+    "price": 750,
+    "brand": "LEAU",
+    "imagePath": null
+  },
+  {
+    "name": "LEAU ROUGE",
+    "price": 1350,
+    "brand": "LEAU",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LEAU ROUGE.jpg"
+  },
+  {
+    "name": "LE BEAU",
+    "price": 1750,
+    "brand": "LE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LE BEAU.avif"
+  },
+  {
+    "name": "LE BEAU FLOWER",
+    "price": 1500,
+    "brand": "LE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LE BEAU FLOWER.avif"
+  },
+  {
+    "name": "LE BEAU PARADISE",
+    "price": 1350,
+    "brand": "LE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LE BEAU PARADISE.avif"
+  },
+  {
+    "name": "LE BEAU PARFUM TQ",
+    "price": 2500,
+    "brand": "LE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LE BEAU PARFUM TQ.avif"
+  },
+  {
+    "name": "LEGENDE",
+    "price": 1500,
+    "brand": "LEGENDE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LEGENDE.avif"
+  },
+  {
+    "name": "LEGENDE BLUE",
+    "price": 1350,
+    "brand": "LEGENDE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LEGENDE BLUE.avif"
+  },
+  {
+    "name": "LEGENDE RED",
+    "price": 1550,
+    "brand": "LEGENDE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LEGENDE RED.avif"
+  },
+  {
+    "name": "LE MALE",
+    "price": 1350,
+    "brand": "LE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LE MALE.avif"
+  },
+  {
+    "name": "LE MALE ELIXIR",
+    "price": 1500,
+    "brand": "LE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LE MALE ELIXIR.avif"
+  },
+  {
+    "name": "LE MALE ELIXIR ABSOLU",
+    "price": 1650,
+    "brand": "Other",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LE MALE ELIXIR ABSOLU.avif"
+  },
+  {
+    "name": "LE MALE LOVER",
+    "price": 1450,
+    "brand": "LE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LE MALE LOVER.avif"
+  },
+  {
+    "name": "LE MALE ON BOARD",
+    "price": 1350,
+    "brand": "LE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LE MALE ON BOARD.avif"
+  },
+  {
+    "name": "LEMALE PARFUM",
+    "price": 1550,
+    "brand": "LEMALE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LEMALE PARFUM.avif"
+  },
+  {
+    "name": "LE PARFUM",
+    "price": 1400,
+    "brand": "LE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LE PARFUM.avif"
+  },
+  {
+    "name": "L'EXTASE",
+    "price": 1350,
+    "brand": "L'EXTASE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\L'EXTASE.avif"
+  },
+  {
+    "name": "L'HOMME A LA ROSE",
+    "price": 2500,
+    "brand": "L'HOMME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\L'HOMME A LA ROSE.avif"
+  },
+  {
+    "name": "L'HOMME IDEAL EXTREME",
+    "price": 1500,
+    "brand": "L'HOMME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\L'HOMME IDEAL EXTREME.avif"
+  },
+  {
+    "name": "L'HOMME LIBRE",
+    "price": 1450,
+    "brand": "L'HOMME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\L'HOMME LIBRE.avif"
+  },
+  {
+    "name": "L'HOMME SPORT",
+    "price": 1400,
+    "brand": "L'HOMME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\L'HOMME SPORT.avif"
+  },
+  {
+    "name": "L'HOMME TQ",
+    "price": 2500,
+    "brand": "L'HOMME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\L'HOMME TQ.avif"
+  },
+  {
+    "name": "L'HOMMME IDEAL",
+    "price": 1600,
+    "brand": "L'HOMMME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\L'HOMMME IDEAL.avif"
+  },
+  {
+    "name": "LIBRE",
+    "price": 1400,
+    "brand": "LIBRE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LIBRE.avif"
+  },
+  {
+    "name": "LIBRE LE PARFUM",
+    "price": 1350,
+    "brand": "Other",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LIBRE LE PARFUM.avif"
+  },
+  {
+    "name": "LIBRE LE PARFUM",
+    "price": 1350,
+    "brand": "Other",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LIBRE LE PARFUM.avif"
+  },
+  {
+    "name": "LIGHT BLUE INTENSE",
+    "price": 1500,
+    "brand": "LIGHT BLUE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LIGHT BLUE INTENSE.avif"
+  },
+  {
+    "name": "LIGHT BLUE SUMMER VIBE",
+    "price": 1350,
+    "brand": "LIGHT BLUE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LIGHT BLUE SUMMER VIBE.avif"
+  },
+  {
+    "name": "L'IMMENSITE",
+    "price": 2500,
+    "brand": "L'IMMENSITE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\L'IMMENSITE.avif"
+  },
+  {
+    "name": "LIMPERATRICE",
+    "price": 1450,
+    "brand": "Other",
+    "imagePath": null
+  },
+  {
+    "name": "L'IMPERATRICE",
+    "price": 1500,
+    "brand": "L'IMPERATRICE",
+    "imagePath": null
+  },
+  {
+    "name": "L'INSTANT CRASH",
+    "price": 1350,
+    "brand": "L'INSTANT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\L'INSTANT CRASH.avif"
+  },
+  {
+    "name": "LINSTANT F",
+    "price": 1350,
+    "brand": "LINSTANT",
+    "imagePath": null
+  },
+  {
+    "name": "L'INSTANT TQ",
+    "price": 2500,
+    "brand": "L'INSTANT",
+    "imagePath": null
+  },
+  {
+    "name": "L'INTERDIT",
+    "price": 1350,
+    "brand": "L'INTERDIT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\L'INTERDIT.avif"
+  },
+  {
+    "name": "L'INTERDIT NOCTURAL",
+    "price": 1650,
+    "brand": "L'INTERDIT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\L'INTERDIT NOCTURAL.avif"
+  },
+  {
+    "name": "LION DE CHANEL",
+    "price": 1450,
+    "brand": "LION",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LION DE CHANEL.avif"
+  },
+  {
+    "name": "LIRA XERJOFF",
+    "price": 1550,
+    "brand": "Other",
+    "imagePath": null
+  },
+  {
+    "name": "LOST CHERRY",
+    "price": 2600,
+    "brand": "LOST",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LOST CHERRY.avif"
+  },
+  {
+    "name": "LOUALOUAT BAHRIN",
+    "price": 1900,
+    "brand": "LOUALOUAT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LOUALOUAT BAHRIN.jpeg"
+  },
+  {
+    "name": "LOVE DELIGHT",
+    "price": 1550,
+    "brand": "LOVE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LOVE DELIGHT.avif"
+  },
+  {
+    "name": "LOVE FEST",
+    "price": 1550,
+    "brand": "LOVE",
+    "imagePath": null
+  },
+  {
+    "name": "LOVE FEST CHERRY",
+    "price": 1650,
+    "brand": "LOVE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LOVE FEST CHERRY.avif"
+  },
+  {
+    "name": "LOVE FESTIVAL",
+    "price": 1450,
+    "brand": "LOVE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LOVE FESTIVAL.avif"
+  },
+  {
+    "name": "LOVE IN PARIS",
+    "price": 1350,
+    "brand": "LOVE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LOVE IN PARIS.avif"
+  },
+  {
+    "name": "LOVE IS HEVENLY",
+    "price": 1400,
+    "brand": "Other",
+    "imagePath": null
+  },
+  {
+    "name": "LOVELY",
+    "price": 1450,
+    "brand": "LOVELY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LOVELY.avif"
+  },
+  {
+    "name": "LOVE SPELL",
+    "price": 1350,
+    "brand": "LOVE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LOVE SPELL.avif"
+  },
+  {
+    "name": "LOVE STORY",
+    "price": 1350,
+    "brand": "LOVE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LOVE STORY.avif"
+  },
+  {
+    "name": "LOVLY",
+    "price": 1350,
+    "brand": "LOVLY",
+    "imagePath": null
+  },
+  {
+    "name": "LUNA ROSA",
+    "price": 1600,
+    "brand": "LUNA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LUNA ROSA.avif"
+  },
+  {
+    "name": "LV LOVERS",
+    "price": 2500,
+    "brand": "LV",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\LV LOVERS.avif"
+  },
+  {
+    "name": "MA3CHOUKA",
+    "price": 1450,
+    "brand": "MA3CHOUKA",
+    "imagePath": null
+  },
+  {
+    "name": "MADAME",
+    "price": 1350,
+    "brand": "MADAME",
+    "imagePath": null
+  },
+  {
+    "name": "MADAME IN LOVE",
+    "price": 1400,
+    "brand": "MADAME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MADAME IN LOVE.avif"
+  },
+  {
+    "name": "MADEMOISELLE RICCI",
+    "price": 1450,
+    "brand": "MADEMOISELLE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MADEMOISELLE RICCI.avif"
+  },
+  {
+    "name": "MALDIVES INA BOTTLE",
+    "price": 1450,
+    "brand": "MALDIVES",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MALDIVES INA BOTTLE.avif"
+  },
+  {
+    "name": "MAN BLACK ORIENT",
+    "price": 1350,
+    "brand": "MAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MAN BLACK ORIENT.avif"
+  },
+  {
+    "name": "MAN EAU FRAICHE",
+    "price": 1350,
+    "brand": "MAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MAN EAU FRAICHE.avif"
+  },
+  {
+    "name": "MANIFESTO",
+    "price": 1350,
+    "brand": "MANIFESTO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MANIFESTO.avif"
+  },
+  {
+    "name": "MAN IN BLACK",
+    "price": 1750,
+    "brand": "MAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MAN IN BLACK.avif"
+  },
+  {
+    "name": "MAN WOOD",
+    "price": 1350,
+    "brand": "MAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MAN WOOD.avif"
+  },
+  {
+    "name": "MARRY ME",
+    "price": 1350,
+    "brand": "MARRY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MARRY ME.avif"
+  },
+  {
+    "name": "MARSHMALLOW",
+    "price": 1750,
+    "brand": "MARSHMALLOW",
+    "imagePath": null
+  },
+  {
+    "name": "MARSHMALLOW BLUSH",
+    "price": 1500,
+    "brand": "MARSHMALLOW",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MARSHMALLOW BLUSH.avif"
+  },
+  {
+    "name": "MATCH POINT",
+    "price": 1500,
+    "brand": "MATCH",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MATCH POINT.avif"
+  },
+  {
+    "name": "MATIERE NOIR",
+    "price": 1600,
+    "brand": "MATIERE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MATIERE NOIR.avif"
+  },
+  {
+    "name": "MAZAAJI",
+    "price": 1400,
+    "brand": "MAZAAJI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MAZAAJI.avif"
+  },
+  {
+    "name": "MEGAMARE BANAFA3",
+    "price": 5000,
+    "brand": "MEGAMARE",
+    "imagePath": null
+  },
+  {
+    "name": "MEGAMARE H",
+    "price": 3000,
+    "brand": "MEGAMARE",
+    "imagePath": null
+  },
+  {
+    "name": "MEGAMARE P+",
+    "price": 4600,
+    "brand": "MEGAMARE",
+    "imagePath": null
+  },
+  {
+    "name": "MEGAMARE TQ",
+    "price": 4600,
+    "brand": "MEGAMARE",
+    "imagePath": null
+  },
+  {
+    "name": "MELIORA",
+    "price": 1600,
+    "brand": "MELIORA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MELIORA.avif"
+  },
+  {
+    "name": "MELODY OF SUN",
+    "price": 1500,
+    "brand": "MELODY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MELODY OF SUN.avif"
+  },
+  {
+    "name": "MERCEDES BENZ TQ",
+    "price": 1750,
+    "brand": "MERCEDES",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MERCEDES BENZ TQ.avif"
+  },
+  {
+    "name": "MERIEM",
+    "price": 1350,
+    "brand": "MERIEM",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MERIEM.jpg"
+  },
+  {
+    "name": "METEORE",
+    "price": 1750,
+    "brand": "METEORE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\METEORE.avif"
+  },
+  {
+    "name": "MIAMI BLOSOOM",
+    "price": 1350,
+    "brand": "MIAMI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MIAMI BLOSOOM.avif"
+  },
+  {
+    "name": "MIDE NIGHT KINDI",
+    "price": 1750,
+    "brand": "MIDE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MIDE NIGHT KINDI.avif"
+  },
+  {
+    "name": "MIDNIGHT BLOOM",
+    "price": 1350,
+    "brand": "MIDNIGHT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MIDNIGHT BLOOM.avif"
+  },
+  {
+    "name": "MIDNIGHT FANTASY",
+    "price": 1550,
+    "brand": "MIDNIGHT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MIDNIGHT FANTASY.avif"
+  },
+  {
+    "name": "MIGNON BLACK",
+    "price": 1550,
+    "brand": "MIGNON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MIGNON BLACK.avif"
+  },
+  {
+    "name": "MILLION LUCKY TQ",
+    "price": 2500,
+    "brand": "MILLION",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MILLION LUCKY TQ.avif"
+  },
+  {
+    "name": "MIRACLE",
+    "price": 1350,
+    "brand": "MIRACLE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MIRACLE.avif"
+  },
+  {
+    "name": "MISS DIOR CHERIE",
+    "price": 1600,
+    "brand": "MISS DIOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MISS DIOR CHERIE.avif"
+  },
+  {
+    "name": "MISS DIOR PARFUM",
+    "price": 1500,
+    "brand": "MISS DIOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MISS DIOR PARFUM.avif"
+  },
+  {
+    "name": "MISS FRANK",
+    "price": 1350,
+    "brand": "MISS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MISS FRANK.avif"
+  },
+  {
+    "name": "MIUSK TAHARA",
+    "price": 1800,
+    "brand": "MIUSK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MIUSK TAHARA.avif"
+  },
+  {
+    "name": "MODERNE PRINCESSE",
+    "price": 1350,
+    "brand": "MODERNE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MODERNE PRINCESSE.avif"
+  },
+  {
+    "name": "MOD NOIR",
+    "price": 1350,
+    "brand": "MOD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MOD NOIR.avif"
+  },
+  {
+    "name": "MOMENT",
+    "price": 1450,
+    "brand": "MOMENT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MOMENT.avif"
+  },
+  {
+    "name": "MOMMENT DE BONHEUR",
+    "price": 1500,
+    "brand": "MOMMENT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MOMMENT DE BONHEUR.avif"
+  },
+  {
+    "name": "MON EVIDENSE",
+    "price": 1350,
+    "brand": "MON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MON EVIDENSE.avif"
+  },
+  {
+    "name": "MON GUERLAIN",
+    "price": 1350,
+    "brand": "MON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MON GUERLAIN.avif"
+  },
+  {
+    "name": "MON PARIS",
+    "price": 1350,
+    "brand": "MON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MON PARIS.avif"
+  },
+  {
+    "name": "MON PARIS FLORAL",
+    "price": 1350,
+    "brand": "MON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MON PARIS FLORAL.avif"
+  },
+  {
+    "name": "MON PARIS LUMIERE",
+    "price": 1450,
+    "brand": "MON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MON PARIS LUMIERE.avif"
+  },
+  {
+    "name": "MONSTRE DE LUNA",
+    "price": 1400,
+    "brand": "MONSTRE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MONSTRE DE LUNA.avif"
+  },
+  {
+    "name": "MOON LIGHT TQ",
+    "price": 2500,
+    "brand": "MOON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MOON LIGHT TQ.avif"
+  },
+  {
+    "name": "MOON SPARKLE",
+    "price": 1450,
+    "brand": "MOON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MOON SPARKLE.avif"
+  },
+  {
+    "name": "MOST WANTED",
+    "price": 1500,
+    "brand": "MOST",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MOST WANTED.avif"
+  },
+  {
+    "name": "MOST WANTED TQ",
+    "price": 1850,
+    "brand": "MOST",
+    "imagePath": null
+  },
+  {
+    "name": "MOUDHHILA",
+    "price": 2200,
+    "brand": "MOUDHHILA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MOUDHHILA.avif"
+  },
+  {
+    "name": "MUSK BLANC",
+    "price": 1800,
+    "brand": "MUSK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MUSK BLANC.avif"
+  },
+  {
+    "name": "MUSK CHOCO",
+    "price": 1450,
+    "brand": "MUSK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MUSK CHOCO.avif"
+  },
+  {
+    "name": "MUSKCRISTAL",
+    "price": 1350,
+    "brand": "MUSKCRISTAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MUSKCRISTAL.jpg"
+  },
+  {
+    "name": "MUSK EL OUD",
+    "price": 1500,
+    "brand": "MUSK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MUSK EL OUD.jpg"
+  },
+  {
+    "name": "MUSK FRAMBOISE",
+    "price": 1400,
+    "brand": "MUSK",
+    "imagePath": null
+  },
+  {
+    "name": "MUSKGHAZEL",
+    "price": 1800,
+    "brand": "MUSKGHAZEL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MUSKGHAZEL.avif"
+  },
+  {
+    "name": "MUSK HAJARA",
+    "price": 1350,
+    "brand": "MUSK",
+    "imagePath": null
+  },
+  {
+    "name": "MUSKNAIM",
+    "price": 1350,
+    "brand": "MUSKNAIM",
+    "imagePath": null
+  },
+  {
+    "name": "MUSK NOIR",
+    "price": 1800,
+    "brand": "MUSK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MUSK NOIR.avif"
+  },
+  {
+    "name": "MUSK ROMANNE",
+    "price": 1400,
+    "brand": "MUSK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MUSK ROMANNE.jpg"
+  },
+  {
+    "name": "MUSK TOUT",
+    "price": 1400,
+    "brand": "MUSK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MUSK TOUT.webp"
+  },
+  {
+    "name": "MUSKWAJDAN",
+    "price": 1450,
+    "brand": "MUSKWAJDAN",
+    "imagePath": null
+  },
+  {
+    "name": "MY BURBERRY",
+    "price": 1550,
+    "brand": "MY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MY BURBERRY.avif"
+  },
+  {
+    "name": "MYRRHE MYSTERE",
+    "price": 1700,
+    "brand": "MYRRHE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MYRRHE MYSTERE.avif"
+  },
+  {
+    "name": "MY SLF",
+    "price": 1350,
+    "brand": "MY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MY SLF.avif"
+  },
+  {
+    "name": "MY SLF LABSOLU",
+    "price": 1450,
+    "brand": "Other",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MY SLF LABSOLU.avif"
+  },
+  {
+    "name": "MYSTIRIOUS NIGHT",
+    "price": 1600,
+    "brand": "MYSTIRIOUS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MYSTIRIOUS NIGHT.avif"
+  },
+  {
+    "name": "MY WAY",
+    "price": 1350,
+    "brand": "MY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MY WAY.avif"
+  },
+  {
+    "name": "MY WAY FLORAL",
+    "price": 1400,
+    "brand": "MY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MY WAY FLORAL.avif"
+  },
+  {
+    "name": "MY WAY ILANG",
+    "price": 1450,
+    "brand": "MY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MY WAY ILANG.avif"
+  },
+  {
+    "name": "MY WAY LE PARFUM",
+    "price": 1400,
+    "brand": "MY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MY WAY LE PARFUM.jpg"
+  },
+  {
+    "name": "MY WAY NACRE",
+    "price": 1400,
+    "brand": "MY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MY WAY NACRE.avif"
+  },
+  {
+    "name": "MY WAY NECTAR",
+    "price": 1550,
+    "brand": "MY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\MY WAY NECTAR.avif"
+  },
+  {
+    "name": "MY WAY TQ",
+    "price": 1600,
+    "brand": "MY",
+    "imagePath": null
+  },
+  {
+    "name": "NARCISO AMBREE",
+    "price": 1350,
+    "brand": "NARCISO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NARCISO AMBREE.webp"
+  },
+  {
+    "name": "NARCISO FOR HER",
+    "price": 1500,
+    "brand": "NARCISO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NARCISO FOR HER.avif"
+  },
+  {
+    "name": "NARCISO FOR HIM",
+    "price": 1350,
+    "brand": "NARCISO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NARCISO FOR HIM.jpg"
+  },
+  {
+    "name": "NARCISO NUDE",
+    "price": 1350,
+    "brand": "NARCISO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NARCISO NUDE.avif"
+  },
+  {
+    "name": "NARCISO POUDREE TQ",
+    "price": 2500,
+    "brand": "NARCISO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NARCISO POUDREE TQ.avif"
+  },
+  {
+    "name": "NASHEET",
+    "price": 1800,
+    "brand": "NASHEET",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NASHEET.avif"
+  },
+  {
+    "name": "NATURE",
+    "price": 1500,
+    "brand": "NATURE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NATURE.avif"
+  },
+  {
+    "name": "NAUTICA VOYAGE",
+    "price": 1500,
+    "brand": "NAUTICA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NAUTICA VOYAGE.avif"
+  },
+  {
+    "name": "NAXOS TQ",
+    "price": 2500,
+    "brand": "NAXOS",
+    "imagePath": null
+  },
+  {
+    "name": "NEBRAS",
+    "price": 1350,
+    "brand": "NEBRAS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NEBRAS.avif"
+  },
+  {
+    "name": "NEW LOOK",
+    "price": 1750,
+    "brand": "NEW",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NEW LOOK.avif"
+  },
+  {
+    "name": "NIGHT FLIGHT",
+    "price": 1350,
+    "brand": "NIGHT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NIGHT FLIGHT.avif"
+  },
+  {
+    "name": "NIGHT FLIGHT TQ",
+    "price": 2500,
+    "brand": "NIGHT",
+    "imagePath": null
+  },
+  {
+    "name": "NINA",
+    "price": 1350,
+    "brand": "NINA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NINA.avif"
+  },
+  {
+    "name": "NINA ROSE",
+    "price": 1350,
+    "brand": "NINA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NINA ROSE.avif"
+  },
+  {
+    "name": "NINA ROUGE",
+    "price": 1350,
+    "brand": "NINA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NINA ROUGE.avif"
+  },
+  {
+    "name": "NISHAN",
+    "price": 1600,
+    "brand": "NISHAN",
+    "imagePath": null
+  },
+  {
+    "name": "NIVEASUN",
+    "price": 1400,
+    "brand": "NIVEASUN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NIVEASUN.avif"
+  },
+  {
+    "name": "NOA",
+    "price": 1550,
+    "brand": "NOA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NOA.avif"
+  },
+  {
+    "name": "NOIR GENTILLE",
+    "price": 1650,
+    "brand": "NOIR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NOIR GENTILLE.png"
+  },
+  {
+    "name": "NOMADE",
+    "price": 1350,
+    "brand": "NOMADE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\NOMADE.avif"
+  },
+  {
+    "name": "OBSESSED",
+    "price": 1350,
+    "brand": "OBSESSED",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OBSESSED.avif"
+  },
+  {
+    "name": "OCEAN BLEU",
+    "price": 1450,
+    "brand": "OCEAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OCEAN BLEU.jpg"
+  },
+  {
+    "name": "OLYMPEA",
+    "price": 1400,
+    "brand": "OLYMPEA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OLYMPEA.avif"
+  },
+  {
+    "name": "OLYMPEA AQUA",
+    "price": 1350,
+    "brand": "OLYMPEA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OLYMPEA AQUA.avif"
+  },
+  {
+    "name": "OLYMPEA BLOSSOOM",
+    "price": 1350,
+    "brand": "OLYMPEA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OLYMPEA BLOSSOOM.avif"
+  },
+  {
+    "name": "OLYMPEA LEGENDE",
+    "price": 1350,
+    "brand": "OLYMPEA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OLYMPEA LEGENDE.avif"
+  },
+  {
+    "name": "OLYMPEA PARFUM",
+    "price": 1400,
+    "brand": "OLYMPEA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OLYMPEA PARFUM.avif"
+  },
+  {
+    "name": "OLYMPEA SOLAR",
+    "price": 1400,
+    "brand": "OLYMPEA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OLYMPEA SOLAR.avif"
+  },
+  {
+    "name": "OMBRE MERVEILLE",
+    "price": 1350,
+    "brand": "OMBRE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OMBRE MERVEILLE.avif"
+  },
+  {
+    "name": "OMBRE NOMADE",
+    "price": 1650,
+    "brand": "OMBRE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OMBRE NOMADE.avif"
+  },
+  {
+    "name": "ONE DESIR",
+    "price": 1350,
+    "brand": "ONE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ONE DESIR.avif"
+  },
+  {
+    "name": "ONE GOLD",
+    "price": 1600,
+    "brand": "ONE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ONE GOLD.avif"
+  },
+  {
+    "name": "ONE LUMINOUS",
+    "price": 1600,
+    "brand": "ONE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ONE LUMINOUS.avif"
+  },
+  {
+    "name": "ONE MILLION ELIXIR",
+    "price": 1450,
+    "brand": "ONE MILLION",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ONE MILLION ELIXIR.webp"
+  },
+  {
+    "name": "ONE MILLION GOLD",
+    "price": 1500,
+    "brand": "ONE MILLION",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ONE MILLION GOLD.jpg"
+  },
+  {
+    "name": "ONE MILLION PRIVE",
+    "price": 1350,
+    "brand": "ONE MILLION",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ONE MILLION PRIVE.avif"
+  },
+  {
+    "name": "ONE MILLION ROYAL",
+    "price": 1750,
+    "brand": "ONE MILLION",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ONE MILLION ROYAL.jpg"
+  },
+  {
+    "name": "ONLY ABSOLU",
+    "price": 1350,
+    "brand": "ONLY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ONLY ABSOLU.avif"
+  },
+  {
+    "name": "ONLY ABSOLU",
+    "price": 1350,
+    "brand": "ONLY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ONLY ABSOLU.avif"
+  },
+  {
+    "name": "ONLY THE BRAVE",
+    "price": 1450,
+    "brand": "ONLY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ONLY THE BRAVE.avif"
+  },
+  {
+    "name": "ONLY THE ONE",
+    "price": 1350,
+    "brand": "ONLY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ONLY THE ONE.jpg"
+  },
+  {
+    "name": "ON THE BEACH",
+    "price": 2500,
+    "brand": "ON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ON THE BEACH.avif"
+  },
+  {
+    "name": "OPULENT DUBAI",
+    "price": 1650,
+    "brand": "OPULENT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OPULENT DUBAI.avif"
+  },
+  {
+    "name": "ORAGE",
+    "price": 3000,
+    "brand": "ORAGE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ORAGE.avif"
+  },
+  {
+    "name": "ORANGE",
+    "price": 1550,
+    "brand": "ORANGE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ORANGE.avif"
+  },
+  {
+    "name": "ORGANZA",
+    "price": 1600,
+    "brand": "ORGANZA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ORGANZA.avif"
+  },
+  {
+    "name": "ORGANZA",
+    "price": 1600,
+    "brand": "ORGANZA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ORGANZA.avif"
+  },
+  {
+    "name": "ORIANA",
+    "price": 1600,
+    "brand": "ORIANA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ORIANA.avif"
+  },
+  {
+    "name": "ORZA",
+    "price": 2500,
+    "brand": "ORZA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ORZA.avif"
+  },
+  {
+    "name": "OUD ABIADH",
+    "price": 3800,
+    "brand": "OUD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD ABIADH.avif"
+  },
+  {
+    "name": "OUD BOUQUET",
+    "price": 2500,
+    "brand": "OUD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD BOUQUET.avif"
+  },
+  {
+    "name": "OUD IMMORTEL",
+    "price": 1500,
+    "brand": "OUD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD IMMORTEL.avif"
+  },
+  {
+    "name": "OUD ISPHAHAN",
+    "price": 1850,
+    "brand": "OUD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD ISPHAHAN.avif"
+  },
+  {
+    "name": "OUD MENIRALE",
+    "price": 1450,
+    "brand": "OUD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD MENIRALE.avif"
+  },
+  {
+    "name": "OUD NOIR",
+    "price": 1750,
+    "brand": "OUD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD NOIR.avif"
+  },
+  {
+    "name": "OUD ORCHID",
+    "price": 1350,
+    "brand": "OUD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD ORCHID.avif"
+  },
+  {
+    "name": "OUD ROYALE",
+    "price": 1600,
+    "brand": "OUD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD ROYALE.avif"
+  },
+  {
+    "name": "OUD SATIN",
+    "price": 2500,
+    "brand": "OUD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD SATIN.avif"
+  },
+  {
+    "name": "OUD TOUCH",
+    "price": 1600,
+    "brand": "OUD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD TOUCH.avif"
+  },
+  {
+    "name": "OUD VOYAGER",
+    "price": 1600,
+    "brand": "Other",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD VOYAGER.avif"
+  },
+  {
+    "name": "OUD WOOD",
+    "price": 4500,
+    "brand": "OUD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUD WOOD.avif"
+  },
+  {
+    "name": "OUI A L'AMOUR",
+    "price": 1350,
+    "brand": "OUI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUI A L'AMOUR.avif"
+  },
+  {
+    "name": "OUI LA VIE EST BELLE",
+    "price": 1400,
+    "brand": "OUI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUI LA VIE EST BELLE.avif"
+  },
+  {
+    "name": "OUVERTURE",
+    "price": 1650,
+    "brand": "OUVERTURE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\OUVERTURE.avif"
+  },
+  {
+    "name": "PACIFIC CHILL",
+    "price": 1500,
+    "brand": "PACIFIC",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PACIFIC CHILL.avif"
+  },
+  {
+    "name": "PACIFIC PARADISE",
+    "price": 1350,
+    "brand": "PACIFIC",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PACIFIC PARADISE.jpg"
+  },
+  {
+    "name": "PADIGME",
+    "price": 1550,
+    "brand": "PADIGME",
+    "imagePath": null
+  },
+  {
+    "name": "PALMOLIVE",
+    "price": 1450,
+    "brand": "PALMOLIVE",
+    "imagePath": null
+  },
+  {
+    "name": "PARADIGME",
+    "price": 1550,
+    "brand": "PARADIGME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PARADIGME.avif"
+  },
+  {
+    "name": "PARADOXE",
+    "price": 1350,
+    "brand": "PARADOXE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PARADOXE.avif"
+  },
+  {
+    "name": "PARFUM BRIDAL",
+    "price": 1350,
+    "brand": "PARFUM",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PARFUM BRIDAL.avif"
+  },
+  {
+    "name": "PARFUM D'EAU",
+    "price": 1350,
+    "brand": "PARFUM",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PARFUM D'EAU.avif"
+  },
+  {
+    "name": "PARFUM ROYAL",
+    "price": 1350,
+    "brand": "PARFUM",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PARFUM ROYAL.avif"
+  },
+  {
+    "name": "PARISIENNE",
+    "price": 1350,
+    "brand": "PARISIENNE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PARISIENNE.avif"
+  },
+  {
+    "name": "PARIS PARIS",
+    "price": 1450,
+    "brand": "PARIS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PARIS PARIS.avif"
+  },
+  {
+    "name": "PARIS VENUS",
+    "price": 1450,
+    "brand": "PARIS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PARIS VENUS.avif"
+  },
+  {
+    "name": "PASSION MAN",
+    "price": 1350,
+    "brand": "PASSION",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PASSION MAN.avif"
+  },
+  {
+    "name": "PATCHOULI NOIR EXTRAIT PARFUM",
+    "price": 1600,
+    "brand": "PATCHOULI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PATCHOULI NOIR EXTRAIT PARFUM.avif"
+  },
+  {
+    "name": "PEGASUS",
+    "price": 2500,
+    "brand": "PEGASUS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PEGASUS.avif"
+  },
+  {
+    "name": "PERCIVAL",
+    "price": 1650,
+    "brand": "PERCIVAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PERCIVAL.avif"
+  },
+  {
+    "name": "PEUT ETRE",
+    "price": 1550,
+    "brand": "PEUT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PEUT ETRE.avif"
+  },
+  {
+    "name": "PHANTOM",
+    "price": 1350,
+    "brand": "PHANTOM",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PHANTOM.avif"
+  },
+  {
+    "name": "PHANTOM ELIXIR",
+    "price": 1500,
+    "brand": "PHANTOM",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PHANTOM ELIXIR.avif"
+  },
+  {
+    "name": "PHANTOM PARFUM",
+    "price": 1500,
+    "brand": "PHANTOM",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PHANTOM PARFUM.avif"
+  },
+  {
+    "name": "PINEAPPLE",
+    "price": 1600,
+    "brand": "PINEAPPLE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PINEAPPLE.avif"
+  },
+  {
+    "name": "POISON GIRL TQ",
+    "price": 1750,
+    "brand": "POISON",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\POISON GIRL TQ.avif"
+  },
+  {
+    "name": "POLO BLUE",
+    "price": 1650,
+    "brand": "POLO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\POLO BLUE.avif"
+  },
+  {
+    "name": "POLO FEMME",
+    "price": 1550,
+    "brand": "POLO",
+    "imagePath": null
+  },
+  {
+    "name": "POLO RED",
+    "price": 1650,
+    "brand": "POLO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\POLO RED.avif"
+  },
+  {
+    "name": "POLO RED INTENSE",
+    "price": 1650,
+    "brand": "POLO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\POLO RED INTENSE.avif"
+  },
+  {
+    "name": "POLO SPORT",
+    "price": 1350,
+    "brand": "POLO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\POLO SPORT.avif"
+  },
+  {
+    "name": "POP STELLA",
+    "price": 1450,
+    "brand": "POP",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\POP STELLA.avif"
+  },
+  {
+    "name": "PRADA FEMME",
+    "price": 1350,
+    "brand": "PRADA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PRADA FEMME.avif"
+  },
+  {
+    "name": "PRADA HOMME",
+    "price": 2500,
+    "brand": "PRADA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PRADA HOMME.avif"
+  },
+  {
+    "name": "PREMIER JOUR",
+    "price": 1350,
+    "brand": "PREMIER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PREMIER JOUR.avif"
+  },
+  {
+    "name": "PRINCESSE CANDY",
+    "price": 1450,
+    "brand": "PRINCESSE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PRINCESSE CANDY.avif"
+  },
+  {
+    "name": "PROFUMO",
+    "price": 1600,
+    "brand": "PROFUMO",
+    "imagePath": null
+  },
+  {
+    "name": "PROMISE",
+    "price": 1650,
+    "brand": "PROMISE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PROMISE.avif"
+  },
+  {
+    "name": "PURE SEDUCTION",
+    "price": 1350,
+    "brand": "PURE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PURE SEDUCTION.avif"
+  },
+  {
+    "name": "PURE XS FEMME",
+    "price": 1350,
+    "brand": "PURE XS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PURE XS FEMME.webp"
+  },
+  {
+    "name": "PURE XS HOMME",
+    "price": 1350,
+    "brand": "PURE XS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PURE XS HOMME.avif"
+  },
+  {
+    "name": "PURFECT",
+    "price": 1350,
+    "brand": "PURFECT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PURFECT.avif"
+  },
+  {
+    "name": "PURPLE OUD",
+    "price": 2500,
+    "brand": "PURPLE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\PURPLE OUD.avif"
+  },
+  {
+    "name": "QIMMAH",
+    "price": 1500,
+    "brand": "QIMMAH",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\QIMMAH.avif"
+  },
+  {
+    "name": "QUEEN",
+    "price": 1450,
+    "brand": "QUEEN",
+    "imagePath": null
+  },
+  {
+    "name": "QUEEN PARFUM INTENS",
+    "price": 1350,
+    "brand": "QUEEN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\QUEEN PARFUM INTENS.webp"
+  },
+  {
+    "name": "QUELQUE NOTE D'AMOUR",
+    "price": 1650,
+    "brand": "QUELQUE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\QUELQUE NOTE D'AMOUR.jpg"
+  },
+  {
+    "name": "RAIN BOY",
+    "price": 1450,
+    "brand": "RAIN",
+    "imagePath": null
+  },
+  {
+    "name": "RAIN ESSENSE",
+    "price": 1350,
+    "brand": "RAIN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\RAIN ESSENSE.avif"
+  },
+  {
+    "name": "RALPH'S CLUB",
+    "price": 1400,
+    "brand": "RALPH'S",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\RALPH'S CLUB.avif"
+  },
+  {
+    "name": "RANDEZ VOUS A PARIS",
+    "price": 1400,
+    "brand": "RANDEZ",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\RANDEZ VOUS A PARIS.avif"
+  },
+  {
+    "name": "RAVISHING LOVE",
+    "price": 1500,
+    "brand": "RAVISHING",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\RAVISHING LOVE.avif"
+  },
+  {
+    "name": "R DE PACORABANNE",
+    "price": 1350,
+    "brand": "R",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\R DE PACORABANNE.jpg"
+  },
+  {
+    "name": "RED KISS",
+    "price": 1600,
+    "brand": "RED",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\RED KISS.webp"
+  },
+  {
+    "name": "REDROSE",
+    "price": 1350,
+    "brand": "REDROSE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\REDROSE.avif"
+  },
+  {
+    "name": "REFLECTION MAN",
+    "price": 2500,
+    "brand": "REFLECTION",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\REFLECTION MAN.avif"
+  },
+  {
+    "name": "R.E.M",
+    "price": 1350,
+    "brand": "R.E.M",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\R.E.M.avif"
+  },
+  {
+    "name": "RENDEZ VOUS A PARIS",
+    "price": 1400,
+    "brand": "RENDEZ",
+    "imagePath": null
+  },
+  {
+    "name": "REVAL",
+    "price": 1350,
+    "brand": "REVAL",
+    "imagePath": null
+  },
+  {
+    "name": "REVE D'OR",
+    "price": 1650,
+    "brand": "REVE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\REVE D'OR.avif"
+  },
+  {
+    "name": "RHAPSODY",
+    "price": 1750,
+    "brand": "RHAPSODY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\RHAPSODY.avif"
+  },
+  {
+    "name": "RISSALA",
+    "price": 2200,
+    "brand": "RISSALA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\RISSALA.avif"
+  },
+  {
+    "name": "ROCHAS",
+    "price": 1350,
+    "brand": "ROCHAS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROCHAS.avif"
+  },
+  {
+    "name": "ROCHAS COUTURE",
+    "price": 1350,
+    "brand": "ROCHAS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROCHAS COUTURE.webp"
+  },
+  {
+    "name": "ROCHAS IN BLACK",
+    "price": 1350,
+    "brand": "ROCHAS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROCHAS IN BLACK.avif"
+  },
+  {
+    "name": "ROCK IN RIO",
+    "price": 1350,
+    "brand": "ROCK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROCK IN RIO.avif"
+  },
+  {
+    "name": "ROMA",
+    "price": 1600,
+    "brand": "ROMA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROMA.avif"
+  },
+  {
+    "name": "ROMANE",
+    "price": 1400,
+    "brand": "ROMANE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROMANE.jpg"
+  },
+  {
+    "name": "ROSE DES VENTS",
+    "price": 2500,
+    "brand": "ROSE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROSE DES VENTS.avif"
+  },
+  {
+    "name": "ROSE N'ROSES",
+    "price": 1350,
+    "brand": "ROSE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROSE N'ROSES.avif"
+  },
+  {
+    "name": "ROSE PASSION",
+    "price": 1350,
+    "brand": "ROSE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROSE PASSION.avif"
+  },
+  {
+    "name": "ROSE TANGUERINE",
+    "price": 1350,
+    "brand": "ROSE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROSE TANGUERINE.avif"
+  },
+  {
+    "name": "ROSE VANILLE",
+    "price": 1350,
+    "brand": "ROSE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROSE VANILLE.avif"
+  },
+  {
+    "name": "ROUGE MALACHIT TQ",
+    "price": 2500,
+    "brand": "ROUGE",
+    "imagePath": null
+  },
+  {
+    "name": "ROUGE TRAFALGAR",
+    "price": 1500,
+    "brand": "ROUGE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ROUGE TRAFALGAR.avif"
+  },
+  {
+    "name": "RUN WILD",
+    "price": 1500,
+    "brand": "RUN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\RUN WILD.avif"
+  },
+  {
+    "name": "SABAYA",
+    "price": 1450,
+    "brand": "SABAYA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SABAYA.avif"
+  },
+  {
+    "name": "SAHARA",
+    "price": 1500,
+    "brand": "SAHARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SAHARA.avif"
+  },
+  {
+    "name": "SAHRA",
+    "price": 1450,
+    "brand": "SAHRA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SAHRA.avif"
+  },
+  {
+    "name": "SAKURA",
+    "price": 2500,
+    "brand": "SAKURA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SAKURA.avif"
+  },
+  {
+    "name": "SAMSARA",
+    "price": 1600,
+    "brand": "SAMSARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SAMSARA.avif"
+  },
+  {
+    "name": "SANTAL DAN SHA",
+    "price": 3200,
+    "brand": "SANTAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SANTAL DAN SHA.avif"
+  },
+  {
+    "name": "SANTAL ROYALE TQ",
+    "price": 2500,
+    "brand": "SANTAL",
+    "imagePath": null
+  },
+  {
+    "name": "SAUVAGE BALADE TQ",
+    "price": 2500,
+    "brand": "SAUVAGE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SAUVAGE BALADE TQ.avif"
+  },
+  {
+    "name": "SAUVAGE DIOR",
+    "price": 1500,
+    "brand": "SAUVAGE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SAUVAGE DIOR.avif"
+  },
+  {
+    "name": "SAUVAGE EAU FORTE",
+    "price": 2500,
+    "brand": "SAUVAGE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SAUVAGE EAU FORTE.avif"
+  },
+  {
+    "name": "SAUVAGE ELIXIR",
+    "price": 1500,
+    "brand": "SAUVAGE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SAUVAGE ELIXIR.avif"
+  },
+  {
+    "name": "SAUVAGE ELIXIR TQ",
+    "price": 2500,
+    "brand": "SAUVAGE",
+    "imagePath": null
+  },
+  {
+    "name": "SAUVAGE TQ",
+    "price": 2500,
+    "brand": "SAUVAGE",
+    "imagePath": null
+  },
+  {
+    "name": "SCANDAL ABSOLU",
+    "price": 1450,
+    "brand": "SCANDAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SCANDAL ABSOLU.avif"
+  },
+  {
+    "name": "SCANDAL ABSOLU FEMME",
+    "price": 1450,
+    "brand": "SCANDAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SCANDAL ABSOLU FEMME.avif"
+  },
+  {
+    "name": "SCANDAL A PARIS",
+    "price": 1350,
+    "brand": "SCANDAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SCANDAL A PARIS.avif"
+  },
+  {
+    "name": "SCANDAL BY NIGHT",
+    "price": 1600,
+    "brand": "SCANDAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SCANDAL BY NIGHT.avif"
+  },
+  {
+    "name": "SCANDAL FEMME TQ",
+    "price": 2500,
+    "brand": "SCANDAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SCANDAL FEMME TQ.avif"
+  },
+  {
+    "name": "SCANDAL HOMME",
+    "price": 1400,
+    "brand": "SCANDAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SCANDAL HOMME.avif"
+  },
+  {
+    "name": "SCANDAL INTENSE",
+    "price": 1450,
+    "brand": "SCANDAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SCANDAL INTENSE.avif"
+  },
+  {
+    "name": "SCANDALOUS",
+    "price": 1500,
+    "brand": "SCANDAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SCANDALOUS.avif"
+  },
+  {
+    "name": "SCANDAL TQ",
+    "price": 2500,
+    "brand": "SCANDAL",
+    "imagePath": null
+  },
+  {
+    "name": "SCULPTURE",
+    "price": 1350,
+    "brand": "SCULPTURE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SCULPTURE.avif"
+  },
+  {
+    "name": "SECRET NIGHT",
+    "price": 1350,
+    "brand": "SECRET",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SECRET NIGHT.avif"
+  },
+  {
+    "name": "SEMINALIS TQ",
+    "price": 1950,
+    "brand": "SEMINALIS",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SEMINALIS TQ.avif"
+  },
+  {
+    "name": "SENSUEL BLUSH",
+    "price": 1350,
+    "brand": "SENSUEL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SENSUEL BLUSH.avif"
+  },
+  {
+    "name": "SHOCK IN SCENT",
+    "price": 1450,
+    "brand": "SHOCK",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SHOCK IN SCENT.avif"
+  },
+  {
+    "name": "SI FIORI",
+    "price": 1350,
+    "brand": "SI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SI FIORI.avif"
+  },
+  {
+    "name": "SIGNATURE",
+    "price": 1350,
+    "brand": "SI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SIGNATURE.avif"
+  },
+  {
+    "name": "SI INTENSE",
+    "price": 1350,
+    "brand": "SI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SI INTENSE.avif"
+  },
+  {
+    "name": "SILVER BLACK",
+    "price": 1500,
+    "brand": "SI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SILVER BLACK.avif"
+  },
+  {
+    "name": "SILVER GREY",
+    "price": 1500,
+    "brand": "SI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SILVER GREY.avif"
+  },
+  {
+    "name": "SILVER MOUNTAIN",
+    "price": 1550,
+    "brand": "SI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SILVER MOUNTAIN.avif"
+  },
+  {
+    "name": "SILVER SCENT",
+    "price": 1500,
+    "brand": "SI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SILVER SCENT.avif"
+  },
+  {
+    "name": "SI PASSION",
+    "price": 1600,
+    "brand": "SI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SI PASSION.avif"
+  },
+  {
+    "name": "SIUN JAVA BLEU",
+    "price": 1450,
+    "brand": "SI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SIUN JAVA BLEU.avif"
+  },
+  {
+    "name": "SIWAK",
+    "price": 270,
+    "brand": "SI",
+    "imagePath": null
+  },
+  {
+    "name": "SMOKING HOT",
+    "price": 2500,
+    "brand": "SMOKING",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SMOKING HOT.avif"
+  },
+  {
+    "name": "SO ELIXIR",
+    "price": 1650,
+    "brand": "SO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SO ELIXIR.avif"
+  },
+  {
+    "name": "SOFT",
+    "price": 1350,
+    "brand": "SOFT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SOFT.avif"
+  },
+  {
+    "name": "SOLEIL",
+    "price": 1350,
+    "brand": "SOLEIL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SOLEIL.avif"
+  },
+  {
+    "name": "SOLEIL BLANC",
+    "price": 2500,
+    "brand": "SOLEIL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SOLEIL BLANC.avif"
+  },
+  {
+    "name": "SOLTANE EL KHALIJ",
+    "price": 1650,
+    "brand": "SOLTANE",
+    "imagePath": null
+  },
+  {
+    "name": "SOPRANO",
+    "price": 1650,
+    "brand": "SOPRANO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SOPRANO.avif"
+  },
+  {
+    "name": "SO SEXY",
+    "price": 1350,
+    "brand": "SO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SO SEXY.avif"
+  },
+  {
+    "name": "SOUFLE DE SOIE",
+    "price": 3000,
+    "brand": "SOUFLE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SOUFLE DE SOIE.avif"
+  },
+  {
+    "name": "SPICE BLEND TQ",
+    "price": 3000,
+    "brand": "SPICE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SPICE BLEND TQ.avif"
+  },
+  {
+    "name": "SPICE BOMB INFRARED",
+    "price": 2500,
+    "brand": "SPICE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SPICE BOMB INFRARED.avif"
+  },
+  {
+    "name": "SPICE BOMB TQ",
+    "price": 2500,
+    "brand": "SPICE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SPICE BOMB TQ.avif"
+  },
+  {
+    "name": "SPIRIT",
+    "price": 1650,
+    "brand": "SPIRIT",
+    "imagePath": null
+  },
+  {
+    "name": "SPIRITED ROMANCE",
+    "price": 1500,
+    "brand": "SPIRITED",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SPIRITED ROMANCE.avif"
+  },
+  {
+    "name": "STAG ESTIARA",
+    "price": 1350,
+    "brand": "STAG",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\STAG ESTIARA.avif"
+  },
+  {
+    "name": "STAR LIGHT",
+    "price": 2200,
+    "brand": "STAR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\STAR LIGHT.avif"
+  },
+  {
+    "name": "STRONGER INTENSLY",
+    "price": 1600,
+    "brand": "STRONGER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\STRONGER INTENSLY.avif"
+  },
+  {
+    "name": "STRONGER OUD",
+    "price": 1600,
+    "brand": "STRONGER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\STRONGER OUD.avif"
+  },
+  {
+    "name": "STRONGER TOBACCO",
+    "price": 2500,
+    "brand": "STRONGER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\STRONGER TOBACCO.avif"
+  },
+  {
+    "name": "STRONGER WITH YOU",
+    "price": 1350,
+    "brand": "STRONGER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\STRONGER WITH YOU.avif"
+  },
+  {
+    "name": "STRONGER WITH YOU LEATHER",
+    "price": 2500,
+    "brand": "STRONGER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\STRONGER WITH YOU LEATHER.avif"
+  },
+  {
+    "name": "STRONGER WITH YOU TQ",
+    "price": 2500,
+    "brand": "STRONGER",
+    "imagePath": null
+  },
+  {
+    "name": "STRONG ME",
+    "price": 1500,
+    "brand": "STRONG",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\STRONG ME.avif"
+  },
+  {
+    "name": "SUMMER COLECTION",
+    "price": 1350,
+    "brand": "SUMMER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SUMMER COLECTION.avif"
+  },
+  {
+    "name": "SUN JAVA BLANC",
+    "price": 1350,
+    "brand": "SUN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SUN JAVA BLANC.avif"
+  },
+  {
+    "name": "SUN JAVA FEMME",
+    "price": 1350,
+    "brand": "SUN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SUN JAVA FEMME.avif"
+  },
+  {
+    "name": "SUN JAVA NOIR",
+    "price": 1350,
+    "brand": "SUN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SUN JAVA NOIR.jpg"
+  },
+  {
+    "name": "SUPREME BOUQUET",
+    "price": 1350,
+    "brand": "SUPREME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SUPREME BOUQUET.avif"
+  },
+  {
+    "name": "SUPREME BOUQUET TQ",
+    "price": 2500,
+    "brand": "SUPREME",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SUPREME BOUQUET TQ.avif"
+  },
+  {
+    "name": "SWEET BANNANA 37",
+    "price": 1500,
+    "brand": "SWEET",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\SWEET BANNANA 37.avif"
+  },
+  {
+    "name": "TABACOLOR",
+    "price": 2500,
+    "brand": "TABACOLOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TABACOLOR.avif"
+  },
+  {
+    "name": "TADJ",
+    "price": 1350,
+    "brand": "TADJ",
+    "imagePath": null
+  },
+  {
+    "name": "TERRE D'HERMES",
+    "price": 1550,
+    "brand": "TERRE D'HERMES",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TERRE D'HERMES.avif"
+  },
+  {
+    "name": "TERRE D'HERMES INTENSE",
+    "price": 1450,
+    "brand": "TERRE D'HERMES",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TERRE D'HERMES INTENSE.avif"
+  },
+  {
+    "name": "TERRE D'HERMES TQ",
+    "price": 2800,
+    "brand": "TERRE D'HERMES",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TERRE D'HERMES TQ.avif"
+  },
+  {
+    "name": "TERRONI",
+    "price": 6000,
+    "brand": "TERRONI",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TERRONI.avif"
+  },
+  {
+    "name": "THE ONE FEMME TQ",
+    "price": 2500,
+    "brand": "THE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\THE ONE FEMME TQ.avif"
+  },
+  {
+    "name": "THE ONE TQ",
+    "price": 2500,
+    "brand": "THE",
+    "imagePath": null
+  },
+  {
+    "name": "THE SCENT",
+    "price": 1600,
+    "brand": "THE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\THE SCENT.avif"
+  },
+  {
+    "name": "THE SCENT LE PARFUM",
+    "price": 1450,
+    "brand": "THE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\THE SCENT LE PARFUM.avif"
+  },
+  {
+    "name": "THE SCENT TQ",
+    "price": 2500,
+    "brand": "THE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\THE SCENT TQ.avif"
+  },
+  {
+    "name": "TIB YAMANI",
+    "price": 1450,
+    "brand": "TIB",
+    "imagePath": null
+  },
+  {
+    "name": "TIGER LILY",
+    "price": 1650,
+    "brand": "TIGER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TIGER LILY.avif"
+  },
+  {
+    "name": "TOBACCO RED",
+    "price": 1400,
+    "brand": "TOBACCO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TOBACCO RED.avif"
+  },
+  {
+    "name": "TOBACCO VANILLE",
+    "price": 2500,
+    "brand": "TOBACCO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TOBACCO VANILLE.avif"
+  },
+  {
+    "name": "TOM FORD NOIR TQ",
+    "price": 1750,
+    "brand": "TOM FORD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TOM FORD NOIR TQ.avif"
+  },
+  {
+    "name": "TOMMY SUMMER",
+    "price": 1450,
+    "brand": "TOMMY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TOMMY SUMMER.avif"
+  },
+  {
+    "name": "TORINO23",
+    "price": 1650,
+    "brand": "TORINO23",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TORINO23.avif"
+  },
+  {
+    "name": "TOUCH OF PINK",
+    "price": 1350,
+    "brand": "TOUCH",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TOUCH OF PINK.avif"
+  },
+  {
+    "name": "TRESOR MIDNIGHT ROSE",
+    "price": 1350,
+    "brand": "TRESOR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TRESOR MIDNIGHT ROSE.avif"
+  },
+  {
+    "name": "TROPICAL BOOST",
+    "price": 1450,
+    "brand": "TROPICAL",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TROPICAL BOOST.avif"
+  },
+  {
+    "name": "TURBULENCES",
+    "price": 3500,
+    "brand": "TURBULENCES",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TURBULENCES.avif"
+  },
+  {
+    "name": "TURQUOISE SUMMER",
+    "price": 1350,
+    "brand": "TURQUOISE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TURQUOISE SUMMER.avif"
+  },
+  {
+    "name": "TWILLY",
+    "price": 1350,
+    "brand": "TWILLY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TWILLY.avif"
+  },
+  {
+    "name": "TYGAR TQ",
+    "price": 2500,
+    "brand": "TYGAR",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\TYGAR TQ.avif"
+  },
+  {
+    "name": "ULTRA BLUE",
+    "price": 1550,
+    "brand": "ULTRA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ULTRA BLUE.avif"
+  },
+  {
+    "name": "ULTRA MALE",
+    "price": 1350,
+    "brand": "ULTRA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ULTRA MALE.avif"
+  },
+  {
+    "name": "ULTRA MALE TQ",
+    "price": 2500,
+    "brand": "ULTRA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ULTRA MALE TQ.avif"
+  },
+  {
+    "name": "ULTRA VIOLET",
+    "price": 1500,
+    "brand": "ULTRA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ULTRA VIOLET.avif"
+  },
+  {
+    "name": "UNLIMITED",
+    "price": 1350,
+    "brand": "UNLIMITED",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\UNLIMITED.avif"
+  },
+  {
+    "name": "URBAN",
+    "price": 1350,
+    "brand": "URBAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\URBAN.avif"
+  },
+  {
+    "name": "URBAN HERO",
+    "price": 1350,
+    "brand": "URBAN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\URBAN HERO.avif"
+  },
+  {
+    "name": "VAIN NAIVE TQ",
+    "price": 2800,
+    "brand": "VAIN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VAIN NAIVE TQ.avif"
+  },
+  {
+    "name": "VALAYA PARFUM",
+    "price": 2500,
+    "brand": "VALAYA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VALAYA PARFUM.avif"
+  },
+  {
+    "name": "VALENTINA 2025",
+    "price": 1500,
+    "brand": "VALENTINA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VALENTINA 2025.avif"
+  },
+  {
+    "name": "VALENTINO",
+    "price": 1350,
+    "brand": "VALENTINO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VALENTINO.avif"
+  },
+  {
+    "name": "VALENTINO UOMO",
+    "price": 1650,
+    "brand": "VALENTINO",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VALENTINO UOMO.avif"
+  },
+  {
+    "name": "VANILLA CANDY ROCK",
+    "price": 1950,
+    "brand": "VANILLA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VANILLA CANDY ROCK.avif"
+  },
+  {
+    "name": "VANILLA DIORAMA",
+    "price": 2500,
+    "brand": "VANILLA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VANILLA DIORAMA.avif"
+  },
+  {
+    "name": "VANILLA POWDER",
+    "price": 2500,
+    "brand": "VANILLA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VANILLA POWDER.avif"
+  },
+  {
+    "name": "VANILLA SEX",
+    "price": 2500,
+    "brand": "VANILLA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VANILLA SEX.avif"
+  },
+  {
+    "name": "VANILLE FATALE",
+    "price": 1500,
+    "brand": "VANILLE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VANILLE FATALE.avif"
+  },
+  {
+    "name": "VANILLE NOIR",
+    "price": 1500,
+    "brand": "VANILLE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VANILLE NOIR.avif"
+  },
+  {
+    "name": "VELVET DESERT OUD",
+    "price": 2500,
+    "brand": "VELVET",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VELVET DESERT OUD.avif"
+  },
+  {
+    "name": "VELVET VANILLE",
+    "price": 1350,
+    "brand": "VELVET",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VELVET VANILLE.avif"
+  },
+  {
+    "name": "VERT MALACHIT",
+    "price": 2500,
+    "brand": "VERT",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VERT MALACHIT.avif"
+  },
+  {
+    "name": "VERY GOOD GIRL",
+    "price": 1350,
+    "brand": "VERY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VERY GOOD GIRL.avif"
+  },
+  {
+    "name": "VERY SEXY",
+    "price": 1350,
+    "brand": "VERY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VERY SEXY.avif"
+  },
+  {
+    "name": "VERY SEXY NOW",
+    "price": 1400,
+    "brand": "VERY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VERY SEXY NOW.avif"
+  },
+  {
+    "name": "VERY SEXY ORCHID",
+    "price": 1350,
+    "brand": "VERY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VERY SEXY ORCHID.avif"
+  },
+  {
+    "name": "VETIVER GOLD VANILLA",
+    "price": 1750,
+    "brand": "VETIVER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VETIVER GOLD VANILLA.jpg"
+  },
+  {
+    "name": "VETIVER HERMES",
+    "price": 1350,
+    "brand": "VETIVER",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VETIVER HERMES.avif"
+  },
+  {
+    "name": "VICTORIA SEA",
+    "price": 1350,
+    "brand": "VICTORIA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VICTORIA SEA.jpg"
+  },
+  {
+    "name": "VICTORY ELIXIR",
+    "price": 1550,
+    "brand": "VICTORY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VICTORY ELIXIR.avif"
+  },
+  {
+    "name": "VIRGIN ISLAND WATER",
+    "price": 2500,
+    "brand": "VIRGIN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VIRGIN ISLAND WATER.avif"
+  },
+  {
+    "name": "VOCE VIVA",
+    "price": 1550,
+    "brand": "VOCE",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VOCE VIVA.avif"
+  },
+  {
+    "name": "VODKA WILD",
+    "price": 1650,
+    "brand": "VODKA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\VODKA WILD.avif"
+  },
+  {
+    "name": "WANTED",
+    "price": 1350,
+    "brand": "WANTED",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\WANTED.avif"
+  },
+  {
+    "name": "WANTED EAU PARFUM",
+    "price": 1350,
+    "brand": "WANTED",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\WANTED EAU PARFUM.avif"
+  },
+  {
+    "name": "WANTED EAU PARFUM TQ",
+    "price": 2500,
+    "brand": "WANTED",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\WANTED EAU PARFUM TQ.avif"
+  },
+  {
+    "name": "WANTED TQ",
+    "price": 2500,
+    "brand": "WANTED",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\WANTED TQ.avif"
+  },
+  {
+    "name": "WARD ABIADH",
+    "price": 1800,
+    "brand": "WARD",
+    "imagePath": null
+  },
+  {
+    "name": "WEEKEND",
+    "price": 1350,
+    "brand": "WEEKEND",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\WEEKEND.avif"
+  },
+  {
+    "name": "WEEKEND HOMME",
+    "price": 1350,
+    "brand": "WEEKEND",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\WEEKEND HOMME.avif"
+  },
+  {
+    "name": "WICKED",
+    "price": 1500,
+    "brand": "WICKED",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\WICKED.avif"
+  },
+  {
+    "name": "WISKY SILVER",
+    "price": 1350,
+    "brand": "WISKY",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\WISKY SILVER.avif"
+  },
+  {
+    "name": "WITH LOVE",
+    "price": 1650,
+    "brand": "WITH",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\WITH LOVE.avif"
+  },
+  {
+    "name": "WORLD FANTASY",
+    "price": 1450,
+    "brand": "WORLD",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\WORLD FANTASY.avif"
+  },
+  {
+    "name": "XERJOFF MEFISTO",
+    "price": 1400,
+    "brand": "XERJOFF",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\XERJOFF MEFISTO.avif"
+  },
+  {
+    "name": "XO VICTORIA",
+    "price": 1500,
+    "brand": "XO",
+    "imagePath": null
+  },
+  {
+    "name": "YARA",
+    "price": 1550,
+    "brand": "YARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\YARA.avif"
+  },
+  {
+    "name": "YARA CANDY",
+    "price": 1700,
+    "brand": "YARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\YARA CANDY.avif"
+  },
+  {
+    "name": "YASMIN",
+    "price": 1200,
+    "brand": "YASMIN",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\YASMIN.avif"
+  },
+  {
+    "name": "Y DE YSL",
+    "price": 1650,
+    "brand": "Y",
+    "imagePath": null
+  },
+  {
+    "name": "Y EAU DE PARFUM",
+    "price": 1500,
+    "brand": "Y",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\Y EAU DE PARFUM.avif"
+  },
+  {
+    "name": "Y EAU DE PARFUM INTENS",
+    "price": 1400,
+    "brand": "Y",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\Y EAU DE PARFUM INTENS.avif"
+  },
+  {
+    "name": "Y ELIXIR",
+    "price": 1450,
+    "brand": "Y",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\Y ELIXIR.avif"
+  },
+  {
+    "name": "YES IAM",
+    "price": 1350,
+    "brand": "YES",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\YES IAM.avif"
+  },
+  {
+    "name": "YES IAM BLOOM UP",
+    "price": 1350,
+    "brand": "YES",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\YES IAM BLOOM UP.avif"
+  },
+  {
+    "name": "ZAHRAT EL ARAB",
+    "price": 1350,
+    "brand": "ZAHRAT",
+    "imagePath": null
+  },
+  {
+    "name": "ZARA 9.0",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA 9.0.avif"
+  },
+  {
+    "name": "ZARA ADDICT",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA ADDICT.avif"
+  },
+  {
+    "name": "ZARA AMALFI",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA AMALFI.avif"
+  },
+  {
+    "name": "ZARA AMBER VANILLA",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA AMBER VANILLA.avif"
+  },
+  {
+    "name": "ZARA APPLE JUICE",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA APPLE JUICE.avif"
+  },
+  {
+    "name": "ZARA BLACK",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA BLACK.avif"
+  },
+  {
+    "name": "ZARA BLACK AMBER",
+    "price": 1600,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA BLACK AMBER.avif"
+  },
+  {
+    "name": "ZARA BLUE SPIRIT",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA BLUE SPIRIT.avif"
+  },
+  {
+    "name": "ZARA BRIGHT ROSE",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA BRIGHT ROSE.avif"
+  },
+  {
+    "name": "ZARA FEMME",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA FEMME.avif"
+  },
+  {
+    "name": "ZARA FRUITY",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA FRUITY.avif"
+  },
+  {
+    "name": "ZARA GOLD",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA GOLD.avif"
+  },
+  {
+    "name": "ZARA GOURMAND",
+    "price": 1500,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA GOURMAND.avif"
+  },
+  {
+    "name": "ZARA HOMME",
+    "price": 1500,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA HOMME.avif"
+  },
+  {
+    "name": "ZARA INTENSE",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA INTENSE.avif"
+  },
+  {
+    "name": "ZARA LISBOA",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA LISBOA.avif"
+  },
+  {
+    "name": "ZARA MAN GOLD",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA MAN GOLD.avif"
+  },
+  {
+    "name": "ZARA MAN SILVER",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA MAN SILVER.avif"
+  },
+  {
+    "name": "ZARA NIGHT",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA NIGHT.avif"
+  },
+  {
+    "name": "ZARA NUDE BOUQUET",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA NUDE BOUQUET.avif"
+  },
+  {
+    "name": "ZARA NUDE CASHMERE",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA NUDE CASHMERE.avif"
+  },
+  {
+    "name": "ZARA NUIT",
+    "price": 1450,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA NUIT.avif"
+  },
+  {
+    "name": "ZARA OBSESSION",
+    "price": 1500,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA OBSESSION.avif"
+  },
+  {
+    "name": "ZARA ORCHID",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA ORCHID.avif"
+  },
+  {
+    "name": "ZARA PINK",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA PINK.avif"
+  },
+  {
+    "name": "ZARA PINK FLAMBE",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA PINK FLAMBE.avif"
+  },
+  {
+    "name": "ZARA RED VANILLE",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA RED VANILLE.avif"
+  },
+  {
+    "name": "ZARA RICH LEATHER",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA RICH LEATHER.avif"
+  },
+  {
+    "name": "ZARA ROSE",
+    "price": 1450,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA ROSE.avif"
+  },
+  {
+    "name": "ZARA ROSE GOLD",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA ROSE GOLD.avif"
+  },
+  {
+    "name": "ZARA SEOUL",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA SEOUL.avif"
+  },
+  {
+    "name": "ZARA SOIR",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA SOIR.avif"
+  },
+  {
+    "name": "ZARA SPORT",
+    "price": 1500,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA SPORT.avif"
+  },
+  {
+    "name": "ZARA TOBACCO",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA TOBACCO.jpg"
+  },
+  {
+    "name": "ZARA TUBE ROSE",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA TUBE ROSE.avif"
+  },
+  {
+    "name": "ZARA VENICE",
+    "price": 1450,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA VENICE.avif"
+  },
+  {
+    "name": "ZARA VIOLET BLOSSOOM",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA VIOLET BLOSSOOM.avif"
+  },
+  {
+    "name": "ZARA W END",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA W END.avif"
+  },
+  {
+    "name": "ZARA WHITE",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA WHITE.avif"
+  },
+  {
+    "name": "ZARA WILD ROSE",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA WILD ROSE.avif"
+  },
+  {
+    "name": "ZARA WINTER",
+    "price": 1500,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA WINTER.avif"
+  },
+  {
+    "name": "ZARA WONDER ROSE",
+    "price": 1350,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA WONDER ROSE.avif"
+  },
+  {
+    "name": "ZARA Y COLLECTION",
+    "price": 1500,
+    "brand": "ZARA",
+    "imagePath": "C:\\Users\\fares\\Desktop\\LPS_Setif\\latafa\\ZARA Y COLLECTION.avif"
+  }
+]

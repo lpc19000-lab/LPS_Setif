@@ -60,7 +60,7 @@ export const createOrder = async (input: CreateOrderInput) => {
     );
 
     const productsMap = new Map<string, any>();
-    productDocs.forEach(doc => {
+    productDocs.forEach((doc: any) => {
         if (!doc.exists) throw Errors.invalidInput(`Product not found: ${doc.id}`);
         productsMap.set(doc.id, { id: doc.id, ...doc.data() });
     });
@@ -99,7 +99,7 @@ export const createOrder = async (input: CreateOrderInput) => {
         });
     }
 
-    const order = await adminDb.runTransaction(async (t) => {
+    const order = await adminDb.runTransaction(async (t: any) => {
         for (const item of orderItemsData) {
             const productRef = adminDb.collection("products").doc(item.productId);
             const productDoc = await t.get(productRef);

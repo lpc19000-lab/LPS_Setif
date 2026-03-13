@@ -53,7 +53,7 @@ export const markAllAsRead = async () => {
         .where("isRead", "==", false)
         .get();
     const batch = adminDb.batch();
-    unread.docs.forEach(doc => batch.update(doc.ref, { isRead: true }));
+    unread.docs.forEach((doc: any) => batch.update(doc.ref, { isRead: true }));
     await batch.commit();
     return { count: unread.size };
 };

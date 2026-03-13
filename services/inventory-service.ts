@@ -5,7 +5,7 @@ import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 export const decrementStock = async (productId: string, quantity: number, weight: number = 100) => {
     const totalWeight = quantity * weight;
     
-    return await adminDb.runTransaction(async (t) => {
+    return await adminDb.runTransaction(async (t: any) => {
         const productRef = adminDb.collection("products").doc(productId);
         const productDoc = await t.get(productRef);
         
@@ -25,7 +25,7 @@ export const decrementStock = async (productId: string, quantity: number, weight
 
 export const incrementStock = async (productId: string, quantity: number, weight: number = 100) => {
     const totalWeight = quantity * weight;
-    return await adminDb.runTransaction(async (t) => {
+    return await adminDb.runTransaction(async (t: any) => {
         const productRef = adminDb.collection("products").doc(productId);
         const productDoc = await t.get(productRef);
         
@@ -56,7 +56,7 @@ export const adjustStock = async (
     weightAmount: number, // can be positive or negative
     reason: string
 ) => {
-    return await adminDb.runTransaction(async (t) => {
+    return await adminDb.runTransaction(async (t: any) => {
         const productRef = adminDb.collection("products").doc(productId);
         const productDoc = await t.get(productRef);
         
@@ -119,5 +119,5 @@ export const getInventoryHistory = async (filters?: { productId?: string; change
         };
     }));
     
-    return logs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return logs.sort((a: any, b: any) => b.createdAt.getTime() - a.createdAt.getTime());
 };

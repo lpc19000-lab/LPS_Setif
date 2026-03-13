@@ -262,7 +262,7 @@ export const getBestSellers = (limit = 8) => {
                 });
 
                 return products
-                    .sort((a, b) => b.unitsSold - a.unitsSold)
+                    .sort((a: any, b: any) => b.unitsSold - a.unitsSold)
                     .slice(0, limit)
                     .map(({ unitsSold, ...rest }: any) => rest as Product);
             } catch (err) {

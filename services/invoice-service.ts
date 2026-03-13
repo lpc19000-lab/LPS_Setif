@@ -7,7 +7,7 @@ export const getInvoices = async () => {
     const query = await adminDb.collection("orders").where("invoice.invoiceNumber", "!=", null).orderBy("issueDate", "desc").get();
     
     // In our schema, invoices are inside orders: order.invoice = { invoiceNumber, issueDate, totalAmount }
-    const invoices = await Promise.all(query.docs.map(async (doc) => {
+    const invoices = await Promise.all(query.docs.map(async (doc: any) => {
         const orderData = doc.data();
         
         let customerInfo = null;

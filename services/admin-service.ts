@@ -54,7 +54,7 @@ export const getAdminStats = async () => {
         } catch(aggErr) {
             // Fallback for older SDKs: Limit query to avoid crashing the server on huge datasets
             const ordersQuery = await adminDb.collection("orders").orderBy("createdAt", "desc").limit(1000).get();
-            ordersQuery.forEach(doc => {
+            ordersQuery.docs.forEach((doc: any) => {
                 const data = doc.data();
                 totalRevenue += parseFloat(data.totalPrice || 0);
             });

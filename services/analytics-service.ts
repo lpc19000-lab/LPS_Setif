@@ -14,7 +14,7 @@ export const getProductAnalytics = async () => {
             imageUrl: p.imageUrl || p.image || "",
             sales: p.sales || { unitsSold: 0, revenue: 0 }
         };
-    }).sort((a, b) => b.sales.revenue - a.sales.revenue);
+    }).sort((a: any, b: any) => b.sales.revenue - a.sales.revenue);
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -42,7 +42,7 @@ export const getProductAnalytics = async () => {
         return "Low Demand";
     };
 
-    return productsWithSales.map(p => {
+    return productsWithSales.map((p: any) => {
         const recentQty = recentDemandMap.get(p.id) || 0;
         return {
             id: p.id,
@@ -77,8 +77,8 @@ export const getRevenueMetrics = async () => {
 
     const monthlyMap = new Map<string, number>();
 
-    validOrdersQuery.docs.forEach(doc => {
-        const order = doc.data();
+    validOrdersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+        const order = doc.data() as any;
         const createdAt = order.createdAt?.toDate ? order.createdAt.toDate() : new Date(order.createdAt);
         
         const dStr = createdAt.toISOString().split('T')[0];
@@ -105,7 +105,7 @@ export const getRevenueMetrics = async () => {
         month,
         revenue
     }))
-    .sort((a, b) => a.month.localeCompare(b.month))
+    .sort((a: any, b: any) => a.month.localeCompare(b.month))
     .slice(-12);
 
     return {
@@ -124,8 +124,8 @@ export const getTopCustomers = async (limit = 10) => {
         
     const customerSpentMap = new Map<string, { totalSpent: number, count: number }>();
     
-    validOrdersQuery.docs.forEach(doc => {
-        const order = doc.data();
+    validOrdersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+        const order = doc.data() as any;
         if (order.customerId) {
             const current = customerSpentMap.get(order.customerId) || { totalSpent: 0, count: 0 };
             customerSpentMap.set(order.customerId, {
@@ -147,8 +147,8 @@ export const getTopCustomers = async (limit = 10) => {
             totalSpent: stats.totalSpent
         };
     })
-    .filter(c => c.totalSpent > 0)
-    .sort((a, b) => b.totalSpent - a.totalSpent)
+    .filter((c: any) => c.totalSpent > 0)
+    .sort((a: any, b: any) => b.totalSpent - a.totalSpent)
     .slice(0, limit);
 
     return customerLTV;

@@ -15,8 +15,8 @@ export const getRestockSuggestions = async () => {
         .get();
 
     const recentDemandMap = new Map<string, number>();
-    recentOrdersQuery.docs.forEach(doc => {
-        const order = doc.data();
+    recentOrdersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+        const order = doc.data() as any;
         if (order.items && Array.isArray(order.items)) {
             order.items.forEach((item: any) => {
                 // Approximate weight since we don't eager load volume here
@@ -66,7 +66,7 @@ export const getRestockSuggestions = async () => {
             recommendation,
             status
         };
-    }).sort((a, b) => a.estimatedDaysLeft - b.estimatedDaysLeft);
+    }).sort((a: any, b: any) => a.estimatedDaysLeft - b.estimatedDaysLeft);
 };
 
 // ── DEAD STOCK DETECTION ──────────────────────────────────────────────────
@@ -80,8 +80,8 @@ export const getDeadStock = async () => {
         .get();
 
     const activeProductIds = new Set<string>();
-    recentOrdersQuery.docs.forEach(doc => {
-        const order = doc.data();
+    recentOrdersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+        const order = doc.data() as any;
         if (order.items && Array.isArray(order.items)) {
             order.items.forEach((item: any) => activeProductIds.add(item.productId));
         }
@@ -91,7 +91,7 @@ export const getDeadStock = async () => {
     
     const deadProducts = productsQuery.docs
         .map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }))
-        .filter(p => !activeProductIds.has(p.id));
+        .filter((p: any) => !activeProductIds.has(p.id));
 
     return deadProducts.map((p: any) => {
         const basePrice = Number(p.basePrice || 0);
@@ -104,8 +104,8 @@ export const getDeadStock = async () => {
             valueTieUp,
             daysSinceAdded: Math.floor((new Date().getTime() - createdAt.getTime()) / (1000 * 3600 * 24))
         };
-    }).filter(p => p.daysSinceAdded > 60) 
-        .sort((a, b) => b.valueTieUp - a.valueTieUp);
+    }).filter((p: any) => p.daysSinceAdded > 60) 
+        .sort((a: any, b: any) => b.valueTieUp - a.valueTieUp);
 };
 
 // ── PROFIT ANALYTICS ──────────────────────────────────────────────────────
@@ -130,8 +130,8 @@ export const getProfitAnalytics = async () => {
     let overallCost = 0; 
 
     // Compute on all orders for global margin
-    validOrdersQuery.docs.forEach(doc => {
-        const order = doc.data();
+    validOrdersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+        const order = doc.data() as any;
         const createdAt = order.createdAt?.toDate ? order.createdAt.toDate() : new Date(order.createdAt);
         const dStr = createdAt.toISOString().split('T')[0];
 
@@ -191,7 +191,7 @@ export const getProfitAnalytics = async () => {
             marginPercent,
             unitsSold: sales.unitsSold
         };
-    }).sort((a, b) => b.totalProfit - a.totalProfit).slice(0, 10);
+    }).sort((a: any, b: any) => b.totalProfit - a.totalProfit).slice(0, 10);
 
     return {
         dailyProfit,
@@ -208,13 +208,13 @@ export const getInventoryHealthScore = async () => {
     const productsQuery = await adminDb.collection("products").get();
     const products = productsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => doc.data());
 
-    const lowStockCount = products.filter(p => (p.stockWeight || 0) <= (p.lowStockThreshold || 500)).length;
+    const lowStockCount = products.filter((p: any) => (p.stockWeight || 0) <= (p.lowStockThreshold || 500)).length;
     score -= (lowStockCount * 2); 
 
     const deadStock = await getDeadStock();
     score -= (deadStock.length * 5); 
 
-    const oosCount = products.filter(p => (p.stockWeight || 0) === 0).length;
+    const oosCount = products.filter((p: any) => (p.stockWeight || 0) === 0).length;
     score -= (oosCount * 5); 
 
     return Math.max(0, score);
@@ -230,12 +230,12 @@ export const getSmartAlerts = async () => {
     }
 
     const restock = await getRestockSuggestions();
-    const urgentRestock = restock.filter(r => r.status === "CRITICAL");
+    const urgentRestock = restock.filter((r: any) => r.status === "CRITICAL");
     if (urgentRestock.length > 0) {
         alerts.push({ type: "WARNING", message: `${urgentRestock.length} products are out of stock and need immediate restocking.` });
     }
 
-    const warningRestock = restock.filter(r => r.status === "WARNING" && r.currentStockWeight > 0);
+    const warningRestock = restock.filter((r: any) => r.status === "WARNING" && r.currentStockWeight > 0);
     if (warningRestock.length > 0) {
         alerts.push({ type: "INFO", message: `${warningRestock.length} products are running low and will stock out within 7 days.` });
     }
