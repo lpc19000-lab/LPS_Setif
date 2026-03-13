@@ -20,13 +20,29 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
     // ... (rest of the code)
 
     // Fetch all data from Firebase
-    const [productsSnap, customersSnap, ordersSnap, notificationsSnap, inventoryHealthScore] = await Promise.all([
-        adminDb.collection("products").get(),
-        adminDb.collection("customers").count().get(),
-        adminDb.collection("orders").get(),
-        adminDb.collection("notifications").where("isRead", "==", false).count().get(),
-        getInventoryHealthScore(),
-    ]);
+    let productsSnap: any, customersSnap: any, ordersSnap: any, notificationsSnap: any, inventoryHealthScore: number = 0;
+    
+    try {
+        [productsSnap, customersSnap, ordersSnap, notificationsSnap, inventoryHealthScore] = await Promise.all([
+            adminDb.collection("products").get(),
+            adminDb.collection("customers").count().get(),
+            adminDb.collection("orders").get(),
+            adminDb.collection("notifications").where("isRead", "==", false).count().get(),
+            getInventoryHealthScore(),
+        ]);
+    } catch (error) {
+        console.error("[Dashboard] Critical data fetching error:", error);
+        return (
+            <div className="p-8 text-center bg-white rounded-3xl border border-red-100 shadow-sm">
+                <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Impossible de charger le tableau de bord</h2>
+                <p className="text-gray-500 mb-6">Une erreur s'est produite lors de la récupération des données. Veuillez réessayer plus tard.</p>
+                <Link href={`/${locale}/admin/dashboard`} className="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">
+                    Actualiser
+                </Link>
+            </div>
+        );
+    }
 
     const totalProducts = productsSnap.size;
     const totalCustomers = customersSnap.data().count;
