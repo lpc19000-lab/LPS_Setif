@@ -23,9 +23,9 @@ export default async function AdminOrdersPage({ params }: { params: Promise<{ lo
                 basePrice: Number((i.product as any).basePrice || (i.product as any).price || 0),
             } : null
         })),
-        invoice: o.invoice ? {
-            ...o.invoice,
-            totalAmount: Number(o.invoice.totalAmount || 0)
+        invoice: (o.data() as any).invoice ? {
+            ...(o.data() as any).invoice,
+            totalAmount: Number((o.data() as any).invoice.totalAmount || 0)
         } : null
     }));
 
