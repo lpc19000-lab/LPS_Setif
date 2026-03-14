@@ -1,6 +1,7 @@
 import { Search, FileText, ExternalLink } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -93,13 +94,13 @@ export default async function AdminInvoicesPage({ params }: { params: Promise<{ 
                                         {formatCurrency(Number(invoice.totalAmount))}
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <a
-                                            href={`/${locale}/invoice/${invoice.id}`}
+                                        <Link
+                                            href={`/${locale}/admin/invoices/${invoice.orderId}/print`}
                                             target="_blank"
                                             className="px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600/20 hover:border-transparent rounded-lg transition-colors inline-flex items-center gap-1.5"
                                         >
                                             <ExternalLink className="w-3.5 h-3.5" /> {t("view_output")}
-                                        </a>
+                                        </Link>
                                     </td>
                                 </tr>
                             ))}
