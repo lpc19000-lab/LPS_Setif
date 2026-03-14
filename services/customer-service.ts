@@ -11,6 +11,7 @@ export interface Customer {
     commune: string;
     address: string;
     role: string;
+    status?: string;
     createdAt: Date;
     ordersCount?: number;
     orders?: any[];
@@ -100,6 +101,7 @@ export const getCustomerById = async (id: string): Promise<Customer | null> => {
             commune: customer.commune || "",
             address: customer.address || "",
             role: customer.role || "TRADER",
+            status: customer.status || "ACTIVE",
             createdAt: new Date(customer.created_at),
             ordersCount: orders?.length || 0,
             orders: orders || []
@@ -129,6 +131,7 @@ export const getCustomerByPhone = async (phone: string): Promise<Customer | null
             commune: customer.commune || "",
             address: customer.address || "",
             role: customer.role || "TRADER",
+            status: customer.status || "ACTIVE",
             passwordHash: customer.password_hash,
             createdAt: new Date(customer.created_at),
         };
@@ -161,6 +164,7 @@ export const getCustomers = async (limit = 100, startAfterStr?: string): Promise
             commune: customer.commune || "",
             address: customer.address || "",
             role: customer.role || "TRADER",
+            status: customer.status || "ACTIVE",
             createdAt: new Date(customer.created_at),
             ordersCount: (customer as any).orders?.length || 0,
             _count: { orders: (customer as any).orders?.length || 0 }

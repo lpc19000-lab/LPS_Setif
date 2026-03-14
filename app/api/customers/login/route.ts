@@ -31,6 +31,13 @@ export async function POST(request: Request) {
             );
         }
 
+        if (customer.status === "SUSPENDED") {
+            return NextResponse.json(
+                { success: false, error_code: "ACCOUNT_SUSPENDED", message: "Your account has been suspended by an administrator." },
+                { status: 403 }
+            );
+        }
+
         // Verify password
         if (customer.passwordHash) {
             const isPasswordValid = await bcrypt.compare(password, customer.passwordHash);

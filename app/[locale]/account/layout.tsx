@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { Package, User, RefreshCcw, LogOut, ChevronRight } from "lucide-react";
+import LogoutButton from "@/components/shop/LogoutButton";
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
     const navItems = [
@@ -37,10 +38,7 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
                                     </Link>
                                 ))}
                                 <div className="mt-4 pt-4 border-t border-gray-50">
-                                    <button className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-red-500 hover:bg-red-50 w-full transition-all font-semibold text-sm">
-                                        <LogOut className="w-5 h-5" />
-                                        Log Out
-                                    </button>
+                                    <LogoutButton variant="trader" />
                                 </div>
                             </nav>
                         </div>
