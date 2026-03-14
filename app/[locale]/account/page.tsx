@@ -120,7 +120,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                                 </span>
                             </div>
                             <div className="space-y-4 mb-6">
-                                {enrichedCartItems.slice(0, 3).map((item) => (
+                                {enrichedCartItems.slice(0, 3).map((item: any) => (
                                     <div key={item.id} className={`flex items-center gap-3 ${locale === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                                         <div className="w-10 h-10 bg-gray-50 rounded-lg border border-gray-100 p-1 flex-shrink-0 relative overflow-hidden">
                                             <SafeImage src={item.product.imageUrl} alt={item.product.name} fill className="object-contain" />
@@ -180,7 +180,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                 <div className="lg:col-span-2 space-y-8">
                     {/* Stats Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {stats.map((stat) => (
+                        {stats.map((stat: any) => (
                             <div key={stat.label} className={`bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
                                 <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
