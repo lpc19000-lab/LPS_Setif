@@ -3,23 +3,14 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export async function GET() {
     try {
-        // Fetch unique brands from the products table
-        // In PostgreSQL, we can use distinct or a separate brands table if it exists.
-        // For now, let's fetch distinct brands from the products table as originally intended.
         const { data, error } = await supabaseAdmin
-            .from("products")
-            .select("brand")
-            .not("brand", "is", null);
+            .from("brands")
+            .select("name")
+            .order("name", { ascending: true });
 
         if (error) throw error;
 
-        // Extract unique brands and sort them
-        const brandSet = new Set<string>();
-        data.forEach(item => {
-            if (item.brand) brandSet.add(item.brand);
-        });
-        
-        const sortedBrands = Array.from(brandSet).sort();
+        const sortedBrands = data.map(b => b.name);
         
         const response = NextResponse.json({ 
             success: true, 

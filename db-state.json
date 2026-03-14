@@ -1,0 +1,59 @@
+{
+  "categories": [
+    {
+      "id": "1bd2d144-a1ab-4b2a-ab85-459253075574",
+      "name": "LPS Royal Gold ",
+      "slug": "lps-royal-gold",
+      "description": "",
+      "parent_id": null,
+      "image_url": null,
+      "created_at": "2026-03-14T02:31:08.768013+00:00"
+    },
+    {
+      "id": "eb49ebe7-0411-4991-9680-335e6036efc9",
+      "name": "LPS Royal Gold 2",
+      "slug": "lps-royal-gold-2",
+      "description": "lps",
+      "parent_id": null,
+      "image_url": null,
+      "created_at": "2026-03-14T17:05:22.637659+00:00"
+    },
+    {
+      "id": "526cbbac-c667-4ea8-a928-b31614fa367d",
+      "name": "UNISEX",
+      "slug": "unisex",
+      "description": "UNISEX fragrances",
+      "parent_id": null,
+      "image_url": null,
+      "created_at": "2026-03-14T18:36:00.980657+00:00"
+    },
+    {
+      "id": "aa5d560b-bd13-463b-8611-8d7c8c3fb81f",
+      "name": "MEN",
+      "slug": "men",
+      "description": "MEN fragrances",
+      "parent_id": null,
+      "image_url": null,
+      "created_at": "2026-03-14T05:43:18.345589+00:00"
+    },
+    {
+      "id": "34632737-b0e5-44b8-8d38-9d6c0f726a33",
+      "name": "NICHE",
+      "slug": "niche",
+      "description": "NICHE fragrances",
+      "parent_id": null,
+      "image_url": null,
+      "created_at": "2026-03-14T18:36:00.980657+00:00"
+    },
+    {
+      "id": "b68b738e-e8b4-4e68-a01b-5c9f3a6f1c16",
+      "name": "WOMEN",
+      "slug": "women",
+      "description": "WOMEN fragrances",
+      "parent_id": null,
+      "image_url": null,
+      "created_at": "2026-03-14T18:36:00.980657+00:00"
+    }
+  ],
+  "brands": []
+}

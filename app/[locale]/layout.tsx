@@ -35,6 +35,10 @@ export const metadata: Metadata = {
     viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
 };
 
+import Footer from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import { getSiteSettings } from "@/services/settings-service";
+
 export default async function RootLayout(props: {
     children: React.ReactNode;
     params: Promise<{ locale: string }>;
@@ -49,6 +53,7 @@ export default async function RootLayout(props: {
 
     const messages = await getMessages();
     const customer = await getCustomerSession();
+    const settings = await getSiteSettings();
     const direction = locale === 'ar' ? 'rtl' : 'ltr';
 
     return (
@@ -58,10 +63,12 @@ export default async function RootLayout(props: {
             >
                 <NextIntlClientProvider messages={messages}>
                     <CartProvider>
-                        <Navbar customerName={customer?.name} />
+                        <Navbar customerName={customer?.name} settings={settings} />
                         <main className="min-h-screen">
                             {children}
                         </main>
+                        <Footer settings={settings} />
+                        <WhatsAppButton phoneNumber={settings.whatsapp_number} />
                         <ToastContainer />
                     </CartProvider>
                 </NextIntlClientProvider>

@@ -18,9 +18,11 @@ function getFrameSrc(index: number): string {
 // We will now handle storyBeats dynamically inside the component to use translations
 
 /* ── Error Boundary Fallback ────────────────────────────────── */
-function StaticHeroFallback() {
+function StaticHeroFallback({ logoUrl }: { logoUrl?: string }) {
     const t = useTranslations("home.hero");
     const locale = useLocale();
+    const tNav = useTranslations("common.nav");
+
     return (
         <div className="relative h-screen w-full bg-[#121212] flex items-center justify-center overflow-hidden">
             <NextImage
@@ -31,10 +33,18 @@ function StaticHeroFallback() {
                 className="object-cover opacity-60"
             />
             <div className="text-center z-10 px-6">
-                <h1 className="text-[#D4AF37] text-5xl md:text-7xl font-serif font-bold tracking-wide mb-6">
-                    {useTranslations("common.nav")("lps")}
-                </h1>
-                <p className="text-white/60 text-xl font-sans font-light max-w-xl mx-auto mb-10">
+                {logoUrl ? (
+                    <div className="mb-6 flex justify-center">
+                        <div className="relative w-32 h-32 sm:w-48 sm:h-48 overflow-hidden rounded-full border-2 border-[#D4AF37]/30 shadow-2xl bg-black/20 backdrop-blur-sm p-1">
+                            <img src={logoUrl} alt="LPS Logo" className="w-full h-full object-cover rounded-full" />
+                        </div>
+                    </div>
+                ) : (
+                    <h1 className="text-[#D4AF37] text-5xl md:text-7xl font-serif font-bold tracking-wide mb-6">
+                        {tNav("lps")}
+                    </h1>
+                )}
+                <p className="text-white/60 text-base sm:text-xl font-sans font-light max-w-xl mx-auto mb-10 tracking-widest uppercase">
                     {t("subtitle")}
                 </p>
                 <Link
@@ -51,7 +61,7 @@ function StaticHeroFallback() {
 }
 
 /* ── Main Component ────────────────────────────────────────── */
-export default function FragranceScroll() {
+export default function FragranceScroll({ logoUrl }: { logoUrl?: string }) {
     const t = useTranslations("home.hero");
     const tNav = useTranslations("common.nav");
     const locale = useLocale();
@@ -164,7 +174,7 @@ export default function FragranceScroll() {
     const textOpacities = [opacity0, opacity1, opacity2, opacity3];
     const scrollIndicatorOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
 
-    if (hasError) return <StaticHeroFallback />;
+    if (hasError) return <StaticHeroFallback logoUrl={logoUrl} />;
 
     return (
         <div ref={containerRef} className="relative h-[500vh] hero-section">
@@ -173,15 +183,32 @@ export default function FragranceScroll() {
                 {/* Loading screen */}
                 {!isLoaded && (
                     <div className="absolute inset-0 z-30 bg-[#121212] flex flex-col items-center justify-center gap-6">
-                        <div className="relative">
-                            <motion.div
-                                animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.7, 0.3] }}
-                                transition={{ duration: 3, repeat: Infinity }}
-                                className="absolute -inset-4 bg-primary/20 blur-xl rounded-full"
-                            />
-                            <p className="relative text-[#D4AF37] font-serif text-2xl tracking-[0.4em] uppercase">
-                                {tNav("lps")} {tNav("perfume")}
-                            </p>
+                        <div className="relative flex flex-col items-center">
+                            {logoUrl ? (
+                                 <motion.div
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="relative w-32 h-32 mb-6"
+                                 >
+                                    <motion.div
+                                        animate={{ scale: [1, 1.05, 1], rotate: [0, 5, 0] }}
+                                        transition={{ duration: 4, repeat: Infinity }}
+                                        className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full"
+                                    />
+                                    <img src={logoUrl} alt="Logo" className="relative w-full h-full object-cover rounded-full border border-primary/30 shadow-2xl" />
+                                 </motion.div>
+                            ) : (
+                                <>
+                                    <motion.div
+                                        animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.7, 0.3] }}
+                                        transition={{ duration: 3, repeat: Infinity }}
+                                        className="absolute -inset-4 bg-primary/20 blur-xl rounded-full"
+                                    />
+                                    <p className="relative text-[#D4AF37] font-serif text-2xl tracking-[0.4em] uppercase">
+                                        {tNav("lps")} {tNav("perfume")}
+                                    </p>
+                                </>
+                            )}
                         </div>
                         <div className="w-72 h-[1px] bg-white/10 relative overflow-hidden">
                             <motion.div

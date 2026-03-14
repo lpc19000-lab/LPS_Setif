@@ -5,6 +5,8 @@ import { getNewArrivals, getBestSellers, getFeaturedProducts } from "@/services/
 import { ProductSection, FeaturesSection, CTASection } from "@/components/HomeClient";
 import { getTranslations } from "next-intl/server";
 
+import { getSiteSettings } from "@/services/settings-service";
+
 const FragranceScroll = dynamic(() => import("@/components/FragranceScroll"), {
     loading: () => <div className="h-screen bg-[#121212] animate-pulse" />,
 });
@@ -43,11 +45,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "home" });
     const tc = await getTranslations({ locale, namespace: "common" });
+    const settings = await getSiteSettings();
 
     return (
         <main className={locale === 'ar' ? 'rtl' : 'ltr'}>
             {/* ── Cinematic Hero ──── */}
-            <FragranceScroll />
+            <FragranceScroll logoUrl={settings.logo_url} />
 
             {/* ── Product Sections (server-fetched, streamed) ──── */}
             <Suspense
@@ -83,23 +86,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             {/* ── CTA Section ──── */}
             <CTASection />
 
-            {/* ── Footer ──── */}
-            <footer className="py-12 bg-[#0a0a0a] border-t border-white/5">
-                <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-2">
-                        <span className="font-serif text-xl font-bold text-[#D4AF37]">{tc('nav.lps')}</span>
-                        <span className="text-white/30 text-xs tracking-[0.3em] uppercase">{tc('nav.perfume')}</span>
-                    </div>
-                    <div className="flex gap-8 text-white/40 text-sm">
-                        <Link href={`/${locale}/catalog`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">{tc('nav.boutique')}</Link>
-                        <Link href={`/${locale}/register`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">{tc('buttons.register')}</Link>
-                        <Link href={`/${locale}/login`} prefetch={true} className="hover:text-[#D4AF37] transition-colors">{tc('buttons.sign_in')}</Link>
-                    </div>
-                    <p className="text-white/20 text-xs">
-                        © {new Date().getFullYear()} {tc('nav.lps')} {tc('nav.perfume')}. {t("footer_rights")}.
-                    </p>
-                </div>
-            </footer>
         </main>
     );
 }

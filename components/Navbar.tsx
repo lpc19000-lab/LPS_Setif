@@ -24,7 +24,7 @@ function getLinkClass(isActive: boolean, isHero: boolean): string {
     return isHero ? "text-white/70 hover:text-white" : "text-gray-500 hover:text-primary";
 }
 
-export default function Navbar({ customerName }: Readonly<NavbarProps>) {
+export default function Navbar({ customerName, settings }: Readonly<NavbarProps & { settings?: any }>) {
     const pathname = usePathname();
     const locale = useLocale();
     const t = useTranslations('common.nav');
@@ -53,18 +53,37 @@ export default function Navbar({ customerName }: Readonly<NavbarProps>) {
             <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
                 {/* Logo */}
                 <Link href={`/${locale}`} className="flex items-center gap-2" prefetch={true}>
-                    <span
-                        className={`font-serif text-2xl font-bold tracking-wider ${isHeroPage ? "text-[#D4AF37]" : "text-primary-dark"
-                            }`}
-                    >
-                        {t('lps')}
-                    </span>
-                    <span
-                        className={`text-xs uppercase tracking-[0.3em] ${isHeroPage ? "text-white/60" : "text-gray-400"
-                            }`}
-                    >
-                        {t('perfume')}
-                    </span>
+                    {settings?.logo_url ? (
+                        <div className="relative w-10 h-10 sm:w-12 sm:h-12 overflow-hidden rounded-full border border-primary/20 shadow-sm bg-white/10 backdrop-blur-md">
+                            <img 
+                                src={settings.logo_url} 
+                                alt="LPS Logo" 
+                                className={`w-full h-full object-cover transition-all ${isHeroPage ? 'brightness-125' : ''}`}
+                            />
+                        </div>
+                    ) : (
+                        <span
+                            className={`font-serif text-2xl font-bold tracking-wider ${isHeroPage ? "text-[#D4AF37]" : "text-primary-dark"
+                                }`}
+                        >
+                            {t('lps')}
+                        </span>
+                    )}
+                    <div className="flex flex-col">
+                        {!settings?.logo_url && (
+                             <span
+                                className={`text-xs uppercase tracking-[0.3em] font-serif font-bold ${isHeroPage ? "text-[#D4AF37]" : "text-primary-dark"}`}
+                            >
+                                {t('lps')}
+                            </span>
+                        )}
+                        <span
+                            className={`text-[9px] uppercase tracking-[0.3em] ${isHeroPage ? "text-white/60" : "text-gray-400"
+                                }`}
+                        >
+                            {t('perfume')}
+                        </span>
+                    </div>
                 </Link>
 
                 {/* Desktop Links */}

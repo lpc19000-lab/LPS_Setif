@@ -444,6 +444,22 @@
                 "save": "Enregistrer la Collection"
             }
         },
+        "settings": {
+            "title": "Configuration Système",
+            "subtitle": "Gérez les paramètres globaux de votre boutique et la sécurité du compte.",
+            "site": {
+                "title": "Informations de la Boutique",
+                "description": "Configurez les coordonnées, les réseaux sociaux et l'identité visuelle.",
+                "save": "Enregistrer les modifications",
+                "saving": "Enregistrement en cours...",
+                "save_success": "Paramètres mis à jour avec succès",
+                "save_error": "Échec de la mise à jour des paramètres"
+            },
+            "security": {
+                "title": "Sécurité de l'Accès",
+                "description": "Mettez à jour votre mot de passe administrateur pour sécuriser l'accès."
+            }
+        },
         "tags": {
             "title": "Tags",
             "subtitle": "Gérez les étiquettes pour filtrer les produits.",
@@ -640,21 +656,20 @@
             "hide_stack_trace": "Masquer la Trace d'Empilement"
         },
         "sidebar": {
-            "portal": "Portail d'Administration",
+            "portal": "Portail de Gestion",
             "overview": "Tableau de Bord",
             "products": "Produits",
             "categories": "Catégories",
+            "brands": "Marques",
             "collections": "Collections",
-            "tags": "Tags",
+            "tags": "Étiquettes",
             "orders": "Commandes",
             "customers": "Clients",
             "restock": "Réapprovisionnement",
-            "inventory": "Inventaire",
-            "invoices": "Factures",
+            "inventory": "Gestion de Stock",
+            "invoices": "Facturation",
             "analytics": "Business Intelligence",
             "reports": "Rapports",
-            "logs": "Journaux d'audit",
-            "system": "Santé Système",
             "notifications": "Notifications"
         },
         "notifications": {
