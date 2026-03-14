@@ -8,6 +8,7 @@ export interface Customer {
     name: string;
     shopName: string;
     wilaya: string;
+    commune: string;
     address: string;
     role: string;
     createdAt: Date;
@@ -66,6 +67,7 @@ export const registerCustomer = async (data: {
         phone: newCustomer.phone,
         shopName: newCustomer.shop_name,
         wilaya: newCustomer.wilaya,
+        commune: newCustomer.commune,
         address: newCustomer.address,
         role: newCustomer.role 
     };
@@ -95,6 +97,7 @@ export const getCustomerById = async (id: string): Promise<Customer | null> => {
             name: customer.name || "Unknown",
             shopName: customer.shop_name || "Customer",
             wilaya: customer.wilaya || "",
+            commune: customer.commune || "",
             address: customer.address || "",
             role: customer.role || "TRADER",
             createdAt: new Date(customer.created_at),
@@ -123,6 +126,7 @@ export const getCustomerByPhone = async (phone: string): Promise<Customer | null
             name: customer.name || "Unknown",
             shopName: customer.shop_name || "Customer",
             wilaya: customer.wilaya || "",
+            commune: customer.commune || "",
             address: customer.address || "",
             role: customer.role || "TRADER",
             passwordHash: customer.password_hash,
@@ -154,6 +158,7 @@ export const getCustomers = async (limit = 100, startAfterStr?: string): Promise
             name: customer.name || "Unknown",
             shopName: customer.shop_name || "Customer",
             wilaya: customer.wilaya || "",
+            commune: customer.commune || "",
             address: customer.address || "",
             role: customer.role || "TRADER",
             createdAt: new Date(customer.created_at),
@@ -174,6 +179,7 @@ export const updateCustomer = async (
         phone: string;
         wilayaNumber: string;
         wilayaName: string;
+        commune: string;
         address: string;
         shopName: string;
     }>
@@ -183,6 +189,7 @@ export const updateCustomer = async (
     if (data.phone) updateObj.phone = data.phone;
     if (data.address) updateObj.address = data.address;
     if (data.shopName) updateObj.shop_name = data.shopName;
+    if (data.commune) updateObj.commune = data.commune;
     if (data.wilayaNumber && data.wilayaName) {
         updateObj.wilaya = `${data.wilayaNumber} - ${data.wilayaName}`;
         updateObj.wilaya_id = Number(data.wilayaNumber);
