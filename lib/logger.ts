@@ -15,6 +15,9 @@ export type LogEventType =
   | "PRODUCT_DELETED"
   | "CATEGORY_CREATED"
   | "CATEGORY_DELETED"
+  | "BRAND_CREATED"
+  | "BRAND_DELETED"
+  | "SITESETTINGS_UPDATED"
   | "ERROR";
 
 // ── Logger ─────────────────────────────────────────────────────────────────
