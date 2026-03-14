@@ -1,35 +1,32 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase-admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export async function GET() {
     try {
-        // We can get brands from the products themselves to ensure we only show brands that have products
-        // For performance with many products, a separate 'brands' or 'manufacturers' collection is better
-        // Let's check manufacturers first
-        const manufacturersSnap = await adminDb.collection("manufacturers").get();
-        let brands: string[] = [];
-        
-        if (!manufacturersSnap.empty) {
-            brands = manufacturersSnap.docs.map(doc => doc.data().name).filter(Boolean);
-        } else {
-            // Fallback to scanning products (less efficient but works if manufacturers collection is empty)
-            const productsSnap = await adminDb.collection("products").select("brand").get();
-            const brandSet = new Set<string>();
-            productsSnap.forEach(doc => {
-                const b = doc.data().brand;
-                if (b) brandSet.add(b);
-            });
-            brands = Array.from(brandSet);
-        }
+        // Fetch unique brands from the products table
+        // In PostgreSQL, we can use distinct or a separate brands table if it exists.
+        // For now, let's fetch distinct brands from the products table as originally intended.
+        const { data, error } = await supabaseAdmin
+            .from("products")
+            .select("brand")
+            .not("brand", "is", null);
 
-        const sortedBrands = brands.sort();
+        if (error) throw error;
+
+        // Extract unique brands and sort them
+        const brandSet = new Set<string>();
+        data.forEach(item => {
+            if (item.brand) brandSet.add(item.brand);
+        });
+        
+        const sortedBrands = Array.from(brandSet).sort();
         
         const response = NextResponse.json({ 
             success: true, 
             data: sortedBrands 
         });
 
-        // Cache for 1 hour as brands don't change often
+        // Cache for 1 hour
         response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=600');
         
         return response;

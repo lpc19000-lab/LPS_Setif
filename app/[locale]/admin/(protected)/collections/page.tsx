@@ -1,7 +1,6 @@
 import CollectionClientView from "@/components/admin/CollectionClientView";
 import { getTranslations } from "next-intl/server";
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -9,10 +8,29 @@ export default async function AdminCollectionsPage({ params }: { params: Promise
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.collections" });
 
-    const collectionsSnap = await adminDb.collection("collections").orderBy("name", "asc").get();
-    const collections = await Promise.all(collectionsSnap.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
-        const productsCount = await adminDb.collection("products").where("collectionIds", "array-contains", doc.id).count().get();
-        return { id: doc.id, ...doc.data() as any, products: Array(productsCount.data().count).fill({ id: '' }) };
+    // Fetch collections and join with products that contain this collection ID
+    // Since collection_ids is a TEXT[], we filter after or use a more complex join.
+    // For simplicity and correctness with the existing UI expectations:
+    const { data: collectionsData, error } = await supabaseAdmin
+        .from("collections")
+        .select("*")
+        .order("name", { ascending: true });
+
+    if (error) {
+        console.error("Collections fetch error:", error);
+    }
+
+    // Get product counts for each collection
+    const collections = await Promise.all((collectionsData || []).map(async (col) => {
+        const { count, error: countError } = await supabaseAdmin
+            .from("products")
+            .select("id", { count: 'exact', head: true })
+            .contains('collection_ids', [col.id]);
+        
+        return { 
+            ...col, 
+            products: Array(count || 0).fill({ id: '' }) // Matching original UI's expected format
+        };
     }));
 
     return (

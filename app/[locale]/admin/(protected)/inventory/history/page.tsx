@@ -1,6 +1,5 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
-import { History, Package, ArrowLeft, Filter, Search } from "lucide-react";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import { History, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
@@ -18,42 +17,40 @@ export default async function InventoryHistoryPage({
     const t = await getTranslations({ locale, namespace: "admin.inventory_history" });
     const sParams = await searchParams;
 
-    const filters: any = {};
-    if (sParams.productId) filters.productId = sParams.productId;
-    if (sParams.changeType) filters.changeType = sParams.changeType;
-    if (sParams.source) filters.source = sParams.source;
+    let query = supabaseAdmin
+        .from("inventory_logs")
+        .select(`
+            *,
+            products (name, image_url)
+        `)
+        .order("created_at", { ascending: false })
+        .limit(100);
 
-    let logsQuery = adminDb.collection("inventory_logs").orderBy("createdAt", "desc").limit(100) as any;
-    if (sParams.productId) logsQuery = logsQuery.where("productId", "==", sParams.productId);
-    if (sParams.changeType) logsQuery = logsQuery.where("changeType", "==", sParams.changeType);
-    if (sParams.source) logsQuery = logsQuery.where("source", "==", sParams.source);
-    const logsSnap = await logsQuery.get();
+    if (sParams.productId) query = query.eq("product_id", sParams.productId);
+    if (sParams.changeType) query = query.eq("change_type", sParams.changeType);
+    if (sParams.source) query = query.eq("source", sParams.source);
 
-    // Get product data for each log
-    const productIds = Array.from(new Set(logsSnap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => d.data().productId))).filter(Boolean);
-    const productDocsMap = new Map();
-
-    if (productIds.length > 0) {
-        await Promise.all(productIds.map(async (pid) => {
-            const pDoc = await adminDb.collection("products").doc(pid as string).get();
-            if (pDoc.exists) {
-                productDocsMap.set(pid, { id: pDoc.id, ...pDoc.data() as any });
-            }
-        }));
+    const { data: logsData, error } = await query;
+    if (error) {
+        console.error("Inventory logs fetch error:", error);
     }
 
-    const logs = logsSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
-        const d = doc.data();
-        return {
-            id: doc.id,
-            ...d,
-            createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
-            product: productDocsMap.get(d.productId) || { name: "Unknown", imageUrl: "" },
-        };
-    });
+    const logs = (logsData || []).map((log: any) => ({
+        id: log.id,
+        productId: log.product_id,
+        changeType: log.change_type,
+        quantity: Number(log.quantity),
+        source: log.source,
+        reason: log.reason,
+        createdAt: new Date(log.created_at),
+        product: {
+            name: log.products?.name || "Unknown",
+            imageUrl: log.products?.image_url || ""
+        },
+    }));
 
-    const productsSnap = await adminDb.collection("products").get();
-    const products = productsSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, name: doc.data().name }));
+    const { data: productsData } = await supabaseAdmin.from("products").select("id, name").order("name");
+    const products = productsData || [];
 
     const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-DZ' : 'fr-FR', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
@@ -89,7 +86,6 @@ export default async function InventoryHistoryPage({
                 </div>
             </div>
 
-            {/* Simple Server-Side Filter Form */}
             <form className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-end">
                 <div className="flex-1 w-full space-y-1.5">
                     <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">{t("filter_product")}</label>

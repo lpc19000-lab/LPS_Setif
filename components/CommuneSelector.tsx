@@ -21,16 +21,35 @@ interface CommuneItem {
 export default function CommuneSelector({ wilayaId, value, onChange, error, label }: CommuneSelectorProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [communes, setCommunes] = useState<CommuneItem[]>([]);
+    const [loading, setLoading] = useState(false);
     const t = useTranslations("common.labels");
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const communes = useMemo((): CommuneItem[] => {
-        if (!wilayaId) return [];
-        const wilaya = algeriaLocations.find((w: WilayaData) => String(w.id) === String(wilayaId));
-        return wilaya ? wilaya.communes.map((name: string, index: number) => ({ id: `${wilayaId}-${index}`, name })) : [];
+    useEffect(() => {
+        if (!wilayaId) {
+            setCommunes([]);
+            return;
+        }
+
+        const fetchCommunes = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch(`/api/communes?wilayaId=${wilayaId}`);
+                const data = await response.json();
+                if (data.success) {
+                    setCommunes(data.data.map((c: any) => ({ id: c.id, name: c.name })));
+                }
+            } catch (err) {
+                console.error("Fetch communes error:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCommunes();
     }, [wilayaId]);
 
-    const selectedCommune = communes.find((c: CommuneItem) => c.name === value);
+    const selectedCommune = communes.find((c: CommuneItem) => c.name === value || c.id === value);
 
     const filteredCommunes = communes.filter((c: CommuneItem) =>
         c.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -49,10 +68,10 @@ export default function CommuneSelector({ wilayaId, value, onChange, error, labe
     // Reset when wilaya changes
     useEffect(() => {
         if (!wilayaId) return;
+        // Search by both name and id because 'value' might be either depending on the parent
         const stillValid = communes.find((c: CommuneItem) => c.name === value || c.id === value);
-        if (!stillValid && value) {
-            // Signal a reset to parent without causing infinite loops (only if there was an old value)
-             onChange({ id: "", name: "" });
+        if (communes.length > 0 && !stillValid && value && value !== "") {
+            onChange({ id: "", name: "" });
         }
     }, [wilayaId, communes, value, onChange]);
 
@@ -69,7 +88,7 @@ export default function CommuneSelector({ wilayaId, value, onChange, error, labe
                 }`}
             >
                 <span className={selectedCommune ? "text-gray-900" : "text-gray-400"}>
-                    {selectedCommune ? `${selectedCommune.name}` : t("select_commune")}
+                    {loading ? "..." : selectedCommune ? `${selectedCommune.name}` : t("select_commune")}
                 </span>
                 <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </button>

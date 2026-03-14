@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminStorage } from "@/lib/firebase-admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export async function POST(request: NextRequest) {
     try {
@@ -10,23 +10,24 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 });
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
+        const buffer = await file.arrayBuffer();
         const fileExt = file.name.split(".").pop() || "png";
-        const fileName = `products/images/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `products/${fileName}`;
 
-        const bucket = adminStorage.bucket();
-        const fileRef = bucket.file(fileName);
-
-        await fileRef.save(buffer, {
-            metadata: {
+        const { data, error } = await supabaseAdmin.storage
+            .from("images")
+            .upload(filePath, buffer, {
                 contentType: file.type,
-            },
-        });
+                upsert: true
+            });
 
-        // Make the file publicly accessible
-        await fileRef.makePublic();
+        if (error) throw error;
 
-        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+        // Get public URL
+        const { data: { publicUrl } } = supabaseAdmin.storage
+            .from("images")
+            .getPublicUrl(filePath);
 
         return NextResponse.json({ url: publicUrl });
     } catch (error) {

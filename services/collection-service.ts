@@ -1,5 +1,4 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { unstable_cache, revalidateTag } from "next/cache";
 
 function generateSlug(name: string): string {
@@ -11,15 +10,19 @@ export const getCollections = () => {
     return unstable_cache(
         async () => {
             try {
-                const query = await adminDb.collection("collections").orderBy("name", "asc").get();
-                return Promise.all(query.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
-                    const c = doc.data();
-                    // Products associated with this collection
-                    const productsQuery = await adminDb.collection("products")
-                        .where("collectionIds", "array-contains", doc.id)
-                        .get();
-                    const products = productsQuery.docs.map((p: QueryDocumentSnapshot<DocumentData>) => ({ id: p.id }));
-                    return { id: doc.id, ...c, products };
+                const { data, error } = await supabaseAdmin
+                    .from('collections')
+                    .select('*, products(id)')
+                    .order('name', { ascending: true });
+
+                if (error) throw error;
+
+                return (data || []).map(c => ({
+                    id: c.id,
+                    name: c.name,
+                    slug: c.slug,
+                    createdAt: new Date(c.created_at),
+                    products: c.products || []
                 }));
             } catch (err) {
                 console.error("Collections fetch error (getCollections):", err);
@@ -33,43 +36,32 @@ export const getCollections = () => {
 
 export const getCollectionBySlug = async (slug: string) => {
     try {
-        const collQuery = await adminDb.collection("collections").where("slug", "==", slug).limit(1).get();
-        if (collQuery.empty) return null;
-        
-        const collectionDoc = collQuery.docs[0];
-        const collection = { id: collectionDoc.id, ...collectionDoc.data() };
+        const { data: collection, error: cError } = await supabaseAdmin
+            .from('collections')
+            .select('*')
+            .eq('slug', slug)
+            .single();
 
-        const productsQuery = await adminDb.collection("products")
-            .where("collectionIds", "array-contains", collectionDoc.id)
-            .where("status", "==", "ACTIVE")
-            .get();
+        if (cError || !collection) return null;
 
-        const products = productsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
-            const pData = doc.data();
-            let images = [];
-            if (pData.images && Array.isArray(pData.images)) {
-                images = pData.images.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1);
+        const { data: products, error: pError } = await supabaseAdmin
+            .from('products')
+            .select('*, categories(id, name)')
+            .contains('collection_ids', [collection.id])
+            .eq('status', 'ACTIVE');
+
+        if (pError) throw pError;
+
+        const mappedProducts = (products || []).map(p => ({
+            product: {
+                id: p.id,
+                ...p,
+                createdAt: new Date(p.created_at),
+                category: p.categories ? { id: p.categories.id, name: p.categories.name } : null
             }
-            
-            let categoryInfo = null;
-            if (pData.categoryId) {
-                // we'll just return categoryId, the full category usually needs another fetch 
-                // but for a listing page we might just need basic info.
-                categoryInfo = { id: pData.categoryId };
-            }
+        }));
 
-            // Match the legacy expected shape: `product: { ... }`
-            return {
-                product: {
-                    id: doc.id,
-                    ...pData,
-                    images,
-                    category: categoryInfo
-                }
-            };
-        });
-
-        return { ...collection, products };
+        return { ...collection, products: mappedProducts };
     } catch (err) {
         console.error("Collection fetch error (getCollectionBySlug):", err);
         return null;
@@ -79,23 +71,41 @@ export const getCollectionBySlug = async (slug: string) => {
 // ── CREATE ────────────────────────────────────────────────────────────────
 export const createCollection = async (data: { name: string }) => {
     const slug = generateSlug(data.name);
-    const docRef = await adminDb.collection("collections").add({ name: data.name, slug, createdAt: new Date() });
-    const result = { id: docRef.id, name: data.name, slug };
+    const { data: newColl, error } = await supabaseAdmin
+        .from('collections')
+        .insert([{ name: data.name, slug }])
+        .select()
+        .single();
+
+    if (error) throw error;
     (revalidateTag as any)('collections');
-    return result;
+    return { ...newColl, id: newColl.id };
 };
 
 // ── UPDATE ────────────────────────────────────────────────────────────────
 export const updateCollection = async (id: string, data: { name: string }) => {
     const slug = generateSlug(data.name);
-    await adminDb.collection("collections").doc(id).update({ name: data.name, slug });
+    const { data: updated, error } = await supabaseAdmin
+        .from('collections')
+        .update({ name: data.name, slug })
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (error) throw error;
     (revalidateTag as any)('collections');
-    return { id, name: data.name, slug };
+    return { ...updated, id: updated.id };
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteCollection = async (id: string) => {
-    await adminDb.collection("collections").doc(id).delete();
+    const { error } = await supabaseAdmin
+        .from('collections')
+        .delete()
+        .eq('id', id);
+
+    if (error) throw error;
     (revalidateTag as any)('collections');
     return { id };
 };
+

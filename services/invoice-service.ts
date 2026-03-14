@@ -1,92 +1,92 @@
-import { adminDb } from "@/lib/firebase-admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // ── READ ──────────────────────────────────────────────────────────────────
 export const getInvoices = async () => {
-    // We assume invoices are embedded in orders or in a separate collection
-    // Let's use separate 'invoices' collection for querying if they exist, or fetch orders that have invoices.
-    const query = await adminDb.collection("orders").where("invoice.invoiceNumber", "!=", null).orderBy("issueDate", "desc").get();
-    
-    // In our schema, invoices are inside orders: order.invoice = { invoiceNumber, issueDate, totalAmount }
-    const invoices = await Promise.all(query.docs.map(async (doc: any) => {
-        const orderData = doc.data();
-        
-        let customerInfo = null;
-        if (orderData.customerId) {
-            const customerDoc = await adminDb.collection("customers").doc(orderData.customerId).get();
-            customerInfo = { id: customerDoc.id, ...customerDoc.data() };
+    // Invoices are embedded in the 'orders' table in Supabase (JSONB)
+    const { data, error } = await supabaseAdmin
+        .from('orders')
+        .select('*, customers(*)')
+        .not('invoice', 'is', null)
+        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return (data || []).map(order => ({
+        id: order.invoice?.invoiceNumber || order.id,
+        orderId: order.id,
+        invoiceNumber: order.invoice?.invoiceNumber,
+        issueDate: order.invoice?.issueDate ? new Date(order.invoice.issueDate) : null,
+        totalAmount: order.invoice?.totalAmount,
+        order: {
+            id: order.id,
+            ...order,
+            customer: order.customers,
+            items: order.order_items || []
         }
-        
-        // Items logic could be detailed, simplified here
-        const items = (orderData.items || []).map((i: any) => ({ ...i, product: { id: i.productId } }));
-
-        return {
-            id: orderData.invoice?.invoiceNumber || doc.id,
-            orderId: doc.id,
-            invoiceNumber: orderData.invoice?.invoiceNumber,
-            issueDate: orderData.invoice?.issueDate?.toDate(),
-            totalAmount: orderData.invoice?.totalAmount,
-            order: {
-                id: doc.id,
-                ...orderData,
-                customer: customerInfo,
-                items
-            }
-        };
     }));
-
-    return invoices;
 };
 
 export const getInvoiceById = async (id: string) => {
-    return null; // Not typically used alone if invoice ID == invoiceNumber
-};
+    // Search within orders for the specific invoice number
+    const { data, error } = await supabaseAdmin
+        .from('orders')
+        .select('*, customers(*)')
+        .eq('invoice->>invoiceNumber', id)
+        .maybeSingle();
 
-export const getInvoiceByOrderId = async (orderId: string) => {
-    const doc = await adminDb.collection("orders").doc(orderId).get();
-    if (!doc.exists) return null;
-    
-    const orderData = doc.data();
-    if (!orderData?.invoice) return null;
-    
-    let customerInfo = null;
-    if (orderData.customerId) {
-        const customerDoc = await adminDb.collection("customers").doc(orderData.customerId).get();
-        customerInfo = { id: customerDoc.id, ...customerDoc.data() };
-    }
-    
-    // Items logic could be detailed, simplified here
-    const items = (orderData.items || []).map((i: any) => ({ ...i, product: { id: i.productId } }));
+    if (error || !data) return null;
 
     return {
-        id: orderData.invoice.invoiceNumber || doc.id,
-        orderId: doc.id,
-        invoiceNumber: orderData.invoice.invoiceNumber,
-        issueDate: orderData.invoice.issueDate?.toDate(),
-        totalAmount: orderData.invoice.totalAmount,
+        id: data.invoice?.invoiceNumber || data.id,
+        orderId: data.id,
+        invoiceNumber: data.invoice?.invoiceNumber,
+        issueDate: data.invoice?.issueDate ? new Date(data.invoice.issueDate) : null,
+        totalAmount: data.invoice?.totalAmount,
         order: {
-            id: doc.id,
-            ...orderData,
-            customer: customerInfo,
-            items
+            id: data.id,
+            ...data,
+            customer: data.customers,
+            items: data.order_items || []
         }
     };
 };
 
-// ── CREATE (used internally by OrderService transaction) ──────────────────
-export const createInvoice = async (orderId: string, amount: number) => {
-    // Handled usually by updating the order document
-    const invoiceCount = (await adminDb.collection("orders").where("invoice.invoiceNumber", "!=", null).count().get()).data().count;
-    const invoiceNumber = `INV-${new Date().getFullYear()}-${(invoiceCount + 1)
-        .toString()
-        .padStart(4, "0")}`;
+export const getInvoiceByOrderId = async (orderId: string) => {
+    const { data, error } = await supabaseAdmin
+        .from('orders')
+        .select('*, customers(*)')
+        .eq('id', orderId)
+        .single();
 
-    const invoiceObj = {
-        invoiceNumber,
-        issueDate: new Date(),
-        totalAmount: amount,
+    if (error || !data || !data.invoice) return null;
+
+    return {
+        id: data.invoice.invoiceNumber || data.id,
+        orderId: data.id,
+        invoiceNumber: data.invoice.invoiceNumber,
+        issueDate: data.invoice.issueDate ? new Date(data.invoice.issueDate) : null,
+        totalAmount: data.invoice.totalAmount,
+        order: {
+            id: data.id,
+            ...data,
+            customer: data.customers,
+            items: data.order_items || []
+        }
     };
+};
 
-    await adminDb.collection("orders").doc(orderId).update({ invoice: invoiceObj });
+// ── CREATE ────────────────────────────────────────────────────────────────
+export const createInvoice = async (orderId: string, amount: number) => {
+    const { data, error } = await supabaseAdmin.functions.invoke('generate-invoice', {
+        body: { orderId }
+    });
 
-    return { id: invoiceNumber, orderId, ...invoiceObj };
+    if (error) throw error;
+    if (!data.success) throw new Error(data.error || "Failed to generate invoice");
+
+    return { 
+        id: data.invoice.invoiceNumber, 
+        orderId, 
+        ...data.invoice 
+    };
 };

@@ -294,7 +294,10 @@
             "unpaid_balance": "الرصيد غير المدفوع",
             "unpaid_note": "يتضمن {count} طلبات مدفوعة جزئياً",
             "daily_revenue": "الإيرادات اليومية",
-            "monthly_revenue": "الإيرادات الشهرية",
+            "monthly_revenue": "إيرادات الشهر",
+            "total_profit": "إجمالي الأرباح",
+            "avg_margin": "متوسط الهامش",
+            "profit": "الأرباح",
             "health_score": "درجة الصحة",
             "total_orders": "إجمالي الطلبات",
             "pending": "قيد الانتظار",
@@ -317,6 +320,18 @@
             },
             "inventory_alerts": {
                 "low_stock": "{count} تنبيه(ات) انخفاض المخزون"
+            },
+            "stock_forecast": {
+                "title": "توقعات نفاد المخزون",
+                "action": "مطلوب إجراء",
+                "days_remaining": "بقي {count} أيام",
+                "critical": "حرج",
+                "restock": "إعادة تموين",
+                "table": {
+                    "product": "المنتج",
+                    "current": "المخزون الحالي",
+                    "forecast": "توقعات النفاد"
+                }
             }
         },
         "products": {
@@ -352,7 +367,8 @@
                 "category_label": "الفئة",
                 "status_label": "الحالة",
                 "image_label": "رابط الصورة الأساسية",
-                "price_label": "السعر الأساسي (لكل 100غ) (دج)",
+                "price_label": "سعر البيع (لكل 100غ) (دج)",
+                "purchase_price_label": "سعر الشراء (التكلفة) (لكل 100غ) (دج)",
                 "stock_label": "إجمالي المخزون (غرام)",
                 "pricing_note": "ملاحظة: ستتوفر المنتجات تلقائياً بأحجام 200غ، 250غ، 500غ، و 1كغ بناءً على السعر الأساسي.",
                 "collections_label": "المجموعات",

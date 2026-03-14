@@ -1,6 +1,4 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
-import { getOrders } from "@/services/order-service";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import OrderClientView from "@/components/admin/OrderClientView";
 import RealtimeReloader from "@/components/admin/RealtimeReloader";
 import { getTranslations } from "next-intl/server";
@@ -10,44 +8,41 @@ export const dynamic = "force-dynamic";
 export default async function AdminOrdersPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.orders" });
-    const ordersSnap = await adminDb.collection("orders").orderBy("createdAt", "desc").get();
-    const orders = ordersSnap.docs.map((o: QueryDocumentSnapshot<DocumentData>) => {
-        const data = o.data() as any;
-        return {
-            id: o.id,
-            ...data,
-            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
-            items: (data.items || []).map((i: any) => ({
-                ...i,
-                price: Number(i.price || 0),
-                product: i.product ? {
-                    ...i.product,
-                    basePrice: Number(i.product.basePrice || i.product.price || 0),
-                } : null
-            })),
-            invoice: data.invoice ? {
-                ...data.invoice,
-                totalAmount: Number(data.invoice.totalAmount || 0)
-            } : null
-        };
-    });
 
-    // Serialize Decimal amounts for the Client Component
-    const serializedOrders = orders.map((o: any) => ({
-        ...o,
-        totalPrice: Number(o.totalPrice),
-        items: o.items.map((i: any) => ({
+    // Fetch data from Supabase
+    // We join with customers to get shop_name
+    const { data: ordersData, error } = await supabaseAdmin
+        .from("orders")
+        .select(`
+            *,
+            customers (shop_name)
+        `)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error("Orders fetch error:", error);
+    }
+
+    const serializedOrders = (ordersData || []).map((o: any) => ({
+        id: o.id,
+        customerId: o.customer_id,
+        shopName: o.customers?.shop_name || "",
+        status: o.status,
+        totalPrice: Number(o.total_price),
+        amountPaid: Number(o.amount_paid || 0),
+        paymentStatus: o.payment_status,
+        createdAt: new Date(o.created_at),
+        updatedAt: new Date(o.updated_at),
+        items: (o.items || []).map((i: any) => ({
             ...i,
             price: Number(i.price || 0),
             product: i.product ? {
                 ...i.product,
-                basePrice: Number((i.product as any).basePrice || (i.product as any).price || 0),
+                basePrice: Number(i.product.basePrice || i.product.price || 0),
             } : null
         })),
-        invoice: o.invoice ? {
-            ...o.invoice,
-            totalAmount: Number(o.invoice.totalAmount || 0)
-        } : null
+        shippingAddress: o.shipping_address,
+        notes: o.notes
     }));
 
     return (

@@ -1,9 +1,14 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { unstable_cache, revalidateTag } from "next/cache";
-import { Category, Product } from "@/types/firebase";
 
-export type { Category };
+export interface Category {
+    id: string;
+    name: string;
+    slug: string;
+    description?: string;
+    createdAt: Date;
+    products?: any[];
+}
 
 function generateSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -14,13 +19,20 @@ export const getCategories = () => {
     return unstable_cache(
         async () => {
             try {
-                const categoriesQuery = await adminDb.collection("categories").orderBy("name", "asc").get();
-                return Promise.all(categoriesQuery.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
-                    const cat = doc.data();
-                    // Fetch products count/ids for the category
-                    const productsQuery = await adminDb.collection("products").where("categoryId", "==", doc.id).get();
-                    const products = productsQuery.docs.map((p: QueryDocumentSnapshot<DocumentData>) => ({ id: p.id }));
-                    return { id: doc.id, ...cat, products };
+                const { data, error } = await supabaseAdmin
+                    .from('categories')
+                    .select('*, products(id)')
+                    .order('name', { ascending: true });
+
+                if (error) throw error;
+
+                return (data || []).map(cat => ({
+                    id: cat.id,
+                    name: cat.name,
+                    slug: cat.slug,
+                    description: cat.description,
+                    createdAt: new Date(cat.created_at),
+                    products: cat.products || []
                 }));
             } catch (err) {
                 console.error("Categories fetch error (getCategories):", err);
@@ -34,25 +46,33 @@ export const getCategories = () => {
 
 export const getCategoryById = async (id: string) => {
     try {
-        const doc = await adminDb.collection("categories").doc(id).get();
-        if (!doc.exists) return null;
+        const { data: category, error: catError } = await supabaseAdmin
+            .from('categories')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (catError || !category) return null;
         
-        const productsQuery = await adminDb.collection("products")
-            .where("categoryId", "==", id)
-            .where("status", "==", "ACTIVE")
-            .orderBy("createdAt", "desc")
-            .get();
+        const { data: products, error: prodError } = await supabaseAdmin
+            .from('products')
+            .select('*')
+            .eq('category_id', id)
+            .eq('status', 'ACTIVE')
+            .order('created_at', { ascending: false });
 
-        const products = productsQuery.docs.map((p: QueryDocumentSnapshot<DocumentData>) => {
-            const pData = p.data();
-            let images = [];
-            if (pData.images && Array.isArray(pData.images)) {
-                images = pData.images.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1);
-            }
-            return { id: p.id, ...pData, images, category: { id: doc.id, ...doc.data() } };
-        });
+        if (prodError) throw prodError;
 
-        return { id: doc.id, ...doc.data(), products };
+        return { 
+            id: category.id, 
+            ...category, 
+            createdAt: new Date(category.created_at),
+            products: (products || []).map(p => ({
+                ...p,
+                createdAt: new Date(p.created_at),
+                category: { id: category.id, name: category.name }
+            }))
+        };
     } catch (err) {
         console.error("Category fetch error (getCategoryById):", err);
         return null;
@@ -61,34 +81,32 @@ export const getCategoryById = async (id: string) => {
 
 export const getCategoryBySlug = async (slug: string) => {
     try {
-        const query = await adminDb.collection("categories").where("slug", "==", slug).limit(1).get();
-        if (query.empty) return null;
-        
-        const doc = query.docs[0];
-        const category = { id: doc.id, ...doc.data() };
-        
-        // Fallback if querying doesn't work out due to lacking composite index in FB immediately
-        const productsQuery = await adminDb.collection("products")
-            .where("categoryId", "==", doc.id)
-            .where("status", "==", "ACTIVE")
-            .get(); // Sorting happens in JS to avoid immediate index requirement for migration
+        const { data: category, error: catError } = await supabaseAdmin
+            .from('categories')
+            .select('*')
+            .eq('slug', slug)
+            .single();
 
-        const products = productsQuery.docs.map((p: QueryDocumentSnapshot<DocumentData>) => {
-            const pData = p.data();
-            let images = [];
-            if (pData.images && Array.isArray(pData.images)) {
-                images = pData.images.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).slice(0, 1);
-            }
-            return { 
-                id: p.id, 
-                ...pData, 
-                createdAt: pData.createdAt?.toDate() || new Date(),
-                images, 
-                category 
-            };
-        }).sort((a: any, b: any) => b.createdAt.getTime() - a.createdAt.getTime());
+        if (catError || !category) return null;
+        
+        const { data: products, error: prodError } = await supabaseAdmin
+            .from('products')
+            .select('*')
+            .eq('category_id', category.id)
+            .eq('status', 'ACTIVE')
+            .order('created_at', { ascending: false });
 
-        return { ...category, products };
+        if (prodError) throw prodError;
+
+        return { 
+            ...category, 
+            createdAt: new Date(category.created_at),
+            products: (products || []).map(p => ({
+                ...p,
+                createdAt: new Date(p.created_at),
+                category: { id: category.id, name: category.name }
+            }))
+        };
     } catch (err) {
         console.error("Category fetch error (getCategoryBySlug):", err);
         return null;
@@ -101,10 +119,19 @@ export const createCategory = async (data: {
     description?: string;
 }) => {
     const slug = generateSlug(data.name);
-    const docRef = await adminDb.collection("categories").add({ ...data, slug, createdAt: new Date() });
-    const result = { id: docRef.id, ...data, slug };
-    (revalidateTag as any)('categories');
-    return result;
+    const { data: newCategory, error } = await supabaseAdmin
+        .from('categories')
+        .insert([{
+            name: data.name,
+            description: data.description,
+            slug
+        }])
+        .select()
+        .single();
+
+    if (error) throw error;
+    revalidateTag('categories');
+    return { ...newCategory, id: newCategory.id };
 };
 
 // ── UPDATE ────────────────────────────────────────────────────────────────
@@ -112,18 +139,31 @@ export const updateCategory = async (
     id: string,
     data: Partial<{ name: string; description: string }>
 ) => {
-    const updateData: Record<string, unknown> = { ...data };
+    const updateData: Record<string, any> = { ...data };
     if (data.name) {
         updateData.slug = generateSlug(data.name);
     }
-    await adminDb.collection("categories").doc(id).update(updateData);
-    (revalidateTag as any)('categories');
-    return { id, ...updateData };
+    
+    const { data: updatedCategory, error } = await supabaseAdmin
+        .from('categories')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (error) throw error;
+    revalidateTag('categories');
+    return { ...updatedCategory, id: updatedCategory.id };
 };
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 export const deleteCategory = async (id: string) => {
-    await adminDb.collection("categories").doc(id).delete();
-    (revalidateTag as any)('categories');
+    const { error } = await supabaseAdmin
+        .from('categories')
+        .delete()
+        .eq('id', id);
+
+    if (error) throw error;
+    revalidateTag('categories');
     return { id };
 };

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyJwtToken } from "@/lib/auth";
-import { adminDb } from "@/lib/firebase-admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: "Invalid token" }, { status: 401 });
         }
 
-        const adminId = payload.sub as string;
+        const adminPhone = payload.sub as string; // We used phone as sub for admins
 
         const body = await request.json();
         const { currentPassword, newPassword } = body;
@@ -27,14 +27,18 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: "Current and new password are required" }, { status: 400 });
         }
 
-        const adminDoc = await adminDb.collection("admins").doc(adminId).get();
+        // Fetch admin by phone
+        const { data: admin, error: fetchError } = await supabaseAdmin
+            .from("admins")
+            .select("*")
+            .eq("phone", adminPhone)
+            .single();
 
-        if (!adminDoc.exists) {
+        if (fetchError || !admin) {
             return NextResponse.json({ success: false, error: "Admin not found" }, { status: 404 });
         }
 
-        const admin = adminDoc.data()!;
-        const isPasswordValid = await bcrypt.compare(currentPassword, admin.passwordHash);
+        const isPasswordValid = await bcrypt.compare(currentPassword, admin.password_hash);
 
         if (!isPasswordValid) {
             return NextResponse.json({ success: false, error: "Incorrect current password" }, { status: 400 });
@@ -42,7 +46,12 @@ export async function POST(request: Request) {
 
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
-        await adminDb.collection("admins").doc(adminId).update({ passwordHash: hashedNewPassword });
+        const { error: updateError } = await supabaseAdmin
+            .from("admins")
+            .update({ password_hash: hashedNewPassword })
+            .eq("phone", adminPhone);
+
+        if (updateError) throw updateError;
 
         return NextResponse.json({ success: true, message: "Password updated successfully" }, { status: 200 });
 

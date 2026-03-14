@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase-admin";
+import { getCustomerByPhone } from "@/services/customer-service";
 import { signJwtToken } from "@/lib/auth";
 import { customerLoginSchema, formatZodErrors } from "@/lib/validation";
 import { Errors } from "@/lib/errors";
@@ -22,19 +22,16 @@ export async function POST(request: Request) {
 
         const { phone, password } = parsed.data;
 
-        const customerQuery = await adminDb.collection("customers").where("phone", "==", phone).limit(1).get();
-        const customerDoc = customerQuery.empty ? null : customerQuery.docs[0];
+        const customer = await getCustomerByPhone(phone);
 
-        if (!customerDoc) {
+        if (!customer) {
             return NextResponse.json(
                 { success: false, error_code: "NOT_FOUND", message: "Trader account not found with this phone number" },
                 { status: 401 }
             );
         }
 
-        const customer = { id: customerDoc.id, ...customerDoc.data() as any };
-
-        // Verify password – require passwordHash for accounts that have it
+        // Verify password
         if (customer.passwordHash) {
             const isPasswordValid = await bcrypt.compare(password, customer.passwordHash);
             if (!isPasswordValid) {
@@ -43,6 +40,12 @@ export async function POST(request: Request) {
                     { status: 401 }
                 );
             }
+        } else {
+            // If no passwordHash is found, this account might be incomplete or legacy
+            return NextResponse.json(
+                { success: false, error_code: "INVALID_ACCOUNT", message: "Account setup incomplete" },
+                { status: 401 }
+            );
         }
 
         const token = await signJwtToken({

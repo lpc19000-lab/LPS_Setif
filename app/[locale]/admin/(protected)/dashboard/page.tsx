@@ -1,5 +1,4 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { DollarSign, Package, Users, ShoppingCart, Clock, Trophy, AlertTriangle, Bell, Activity } from "lucide-react";
 import { getInventoryHealthScore } from "@/services/intelligence-service";
 import SafeImage from "@/components/SafeImage";
@@ -14,32 +13,50 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
     const t = await getTranslations({ locale, namespace: "admin.dashboard" });
     const tc = await getTranslations({ locale, namespace: "common" });
     const ts = await getTranslations({ locale, namespace: "common.status" });
-    const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    // ... (rest of the code)
-
-    // Fetch all data from Firebase
-    // Fetch all data from Firebase
-    let productsSnap: any, productsCountSnap: any, customersSnap: any, ordersSnap: any, notificationsSnap: any, inventoryHealthScore: number = 0;
     
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+
+    let productsCount: number = 0, 
+        customersCount: number = 0, 
+        unreadNotifications: number = 0, 
+        inventoryHealthScore: number = 0;
+    
+    let allOrders: any[] = [];
+    let productsList: any[] = [];
+
     try {
-        [productsCountSnap, productsSnap, customersSnap, ordersSnap, notificationsSnap, inventoryHealthScore] = await Promise.all([
-            adminDb.collection("products").count().get(),
-            adminDb.collection("products").limit(500).get(), // Capped for summary analysis
-            adminDb.collection("customers").count().get(),
-            adminDb.collection("orders").orderBy("createdAt", "desc").limit(100).get(), 
-            adminDb.collection("notifications").where("isRead", "==", false).count().get(),
+        const [
+            { count: pCount },
+            { data: pData },
+            { count: cCount },
+            { data: oData },
+            { count: nCount },
+            healthScore
+        ] = await Promise.all([
+            supabaseAdmin.from("products").select("id", { count: 'exact', head: true }),
+            supabaseAdmin.from("products").select("*").limit(500),
+            supabaseAdmin.from("customers").select("id", { count: 'exact', head: true }),
+            supabaseAdmin.from("orders").select("*, customers(shop_name, name)").order("created_at", { ascending: false }).limit(200),
+            supabaseAdmin.from("notifications").select("id", { count: 'exact', head: true }).eq("is_read", false),
             getInventoryHealthScore(),
         ]);
+
+        productsCount = pCount || 0;
+        productsList = pData || [];
+        customersCount = cCount || 0;
+        allOrders = oData || [];
+        unreadNotifications = nCount || 0;
+        inventoryHealthScore = healthScore;
+
     } catch (err) {
         console.error("Dashboard data fetch error:", err);
         return (
             <div className="p-8 text-center bg-white rounded-3xl border border-red-100 shadow-sm">
                 <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
                 <h2 className="text-xl font-bold text-gray-900 mb-2">Impossible de charger le tableau de bord</h2>
-                <p className="text-gray-500 mb-6">Une erreur s'est produite lors de la récupération des données. Veuillez réessayer plus tard.</p>
+                <p className="text-gray-500 mb-6">Une erreur s'est produite lors de la récupération des données.</p>
                 <Link href={`/${locale}/admin/dashboard`} className="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">
                     Actualiser
                 </Link>
@@ -47,78 +64,72 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
         );
     }
 
-    const totalProducts = productsCountSnap.data().count;
-    const totalCustomers = customersSnap.data().count;
-    const unreadNotifications = notificationsSnap.data().count;
-
-    // Process orders data
-    const allOrders = ordersSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
     const totalOrders = allOrders.length;
     const pendingOrders = allOrders.filter((o: any) => o.status === "PENDING").length;
     const nonCancelled = allOrders.filter((o: any) => o.status !== "CANCELLED");
 
-    const revenue = nonCancelled.reduce((sum: number, o: any) => sum + Number(o.totalPrice || 0), 0);
-
-    const unpaidOrders = nonCancelled.filter((o: any) => o.paymentStatus === "UNPAID" || o.paymentStatus === "PARTIALLY_PAID");
-    const unpaidBalance = unpaidOrders.reduce((sum: number, o: any) => sum + Number(o.totalPrice || 0) - Number(o.amountPaid || 0), 0);
-    const partiallyPaidOrders = allOrders.filter((o: any) => o.paymentStatus === "PARTIALLY_PAID").length;
+    const revenue = nonCancelled.reduce((sum: number, o: any) => sum + Number(o.total_price || 0), 0);
+    const unpaidBalance = nonCancelled
+        .filter((o: any) => o.payment_status === "UNPAID" || o.payment_status === "PARTIALLY_PAID")
+        .reduce((sum: number, o: any) => sum + (Number(o.total_price || 0) - Number(o.amount_paid || 0)), 0);
+    
+    const partiallyPaidCount = allOrders.filter((o: any) => o.payment_status === "PARTIALLY_PAID").length;
 
     const dailyRevenue = nonCancelled
-        .filter((o: any) => {
-            const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
-            return d >= startOfDay;
-        })
-        .reduce((sum: number, o: any) => sum + Number(o.totalPrice || 0), 0);
+        .filter((o: any) => o.created_at >= startOfDay)
+        .reduce((sum: number, o: any) => sum + Number(o.total_price || 0), 0);
 
     const monthlyRevenue = nonCancelled
-        .filter((o: any) => {
-            const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
-            return d >= startOfMonth;
-        })
-        .reduce((sum: number, o: any) => sum + Number(o.totalPrice || 0), 0);
+        .filter((o: any) => o.created_at >= startOfMonth)
+        .reduce((sum: number, o: any) => sum + Number(o.total_price || 0), 0);
 
-    const lowStockProducts = productsSnap.docs.filter((doc: QueryDocumentSnapshot<DocumentData>) => {
-        const d = doc.data();
-        return (d.stockWeight || 0) <= (d.lowStockThreshold || 500) && (d.stockWeight || 0) > 0;
+    const lowStockProducts = productsList.filter((p: any) => {
+        return (Number(p.stock_weight || 0) <= Number(p.low_stock_threshold || 500)) && (Number(p.stock_weight || 0) > 0);
     }).length;
 
-    // Best sellers from product sales data
-    const bestSellers = productsSnap.docs
-        .map((doc: QueryDocumentSnapshot<DocumentData>) => {
-            const d = doc.data();
-            return {
-                id: doc.id,
-                unitsSold: d.sales?.unitsSold || 0,
-                revenue: d.sales?.revenue || 0,
-                product: { id: doc.id, name: d.name, imageUrl: d.imageUrl, category: d.categoryId ? { name: d.categoryName || '' } : null }
-            };
+    const totalCost = productsList.reduce((sum: number, p: any) => sum + (Number(p.purchase_price || 0) * Number(p.sales_units_sold || 0)), 0);
+    const totalProfit = revenue - totalCost;
+    const profitMargin = revenue > 0 ? (totalProfit / revenue) * 100 : 0;
+
+    const stockForecast = productsList
+        .filter((p: any) => Number(p.sales_units_sold || 0) > 0 && Number(p.stock_weight || 0) > 0)
+        .map((p: any) => {
+            const dailyVelocity = Number(p.sales_units_sold) / 30; // 30-day average assumption
+            // Simplification: Assume average unit is 100g if not specified
+            const unitsLeft = Number(p.stock_weight) / 100; 
+            const daysLeft = Math.round(unitsLeft / (dailyVelocity || 0.1));
+            return { ...p, daysLeft };
         })
-        .filter((p: any) => p.unitsSold > 0)
-        .sort((a: any, b: any) => b.unitsSold - a.unitsSold)
+        .filter(p => p.daysLeft < 14)
+        .sort((a, b) => a.daysLeft - b.daysLeft)
         .slice(0, 5);
 
-    // Recent orders
-    const recentOrders = await Promise.all(
-        allOrders
-            .sort((a: any, b: any) => {
-                const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.createdAt).getTime();
-                const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.createdAt).getTime();
-                return bTime - aTime;
-            })
-            .slice(0, 5)
-            .map(async (order: any) => {
-                let customer = { shopName: "Unknown", name: "" };
-                if (order.customerId) {
-                    const custDoc = await adminDb.collection("customers").doc(order.customerId).get();
-                    if (custDoc.exists) customer = custDoc.data() as any;
-                }
-                return {
-                    ...order,
-                    createdAt: order.createdAt?.toDate ? order.createdAt.toDate() : new Date(order.createdAt),
-                    customer,
-                };
-            })
-    );
+    const bestSellers = productsList
+        .filter((p: any) => Number(p.sales_units_sold || 0) > 0)
+        .sort((a: any, b: any) => Number(b.sales_units_sold) - Number(a.sales_units_sold))
+        .slice(0, 5)
+        .map((p: any) => ({
+            id: p.id,
+            unitsSold: Number(p.sales_units_sold),
+            revenue: Number(p.sales_revenue),
+            profit: (Number(p.base_price) - Number(p.purchase_price || 0)) * Number(p.sales_units_sold),
+            product: { 
+                id: p.id, 
+                name: p.name, 
+                imageUrl: p.image_url, 
+            }
+        }));
+
+    const recentOrders = allOrders.slice(0, 5).map((o: any) => ({
+        ...o,
+        totalPrice: Number(o.total_price),
+        paymentStatus: o.payment_status,
+        createdAt: new Date(o.created_at),
+        customer: {
+            shopName: o.customers?.shop_name || "Unknown",
+            name: o.customers?.name || ""
+        }
+    }));
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat(locale === "ar" ? "ar-DZ" : "fr-FR", {
@@ -159,9 +170,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                 <p className="text-gray-500 mt-1 tracking-wide">{t("subtitle")}</p>
             </div>
 
-            {/* Financial Overview Grid (Phase 6) */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Total Revenue */}
                 <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-300">
                         <DollarSign className="w-16 h-16 text-[#D4AF37]" strokeWidth={1} />
@@ -175,7 +184,6 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{formatCurrency(revenue)}</p>
                 </div>
 
-                {/* Unpaid Balance */}
                 <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-300">
                         <AlertTriangle className="w-16 h-16 text-red-500" strokeWidth={1} />
@@ -187,10 +195,9 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("unpaid_balance")}</h3>
                     </div>
                     <p className="text-2xl font-bold text-red-600 relative z-10">{formatCurrency(unpaidBalance)}</p>
-                    <p className="text-xs text-gray-400 mt-2 font-medium">{t("unpaid_note", { count: partiallyPaidOrders })}</p>
+                    <p className="text-xs text-gray-400 mt-2 font-medium">{t("unpaid_note", { count: partiallyPaidCount })}</p>
                 </div>
 
-                {/* Daily Revenue */}
                 <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
@@ -201,7 +208,6 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{formatCurrency(dailyRevenue)}</p>
                 </div>
 
-                {/* Monthly Revenue */}
                 <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
@@ -211,11 +217,20 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                     </div>
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{formatCurrency(monthlyRevenue)}</p>
                 </div>
+
+                <div className="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm relative overflow-hidden group">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                            <Trophy className="w-5 h-5" />
+                        </div>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("total_profit")}</h3>
+                    </div>
+                    <p className="text-2xl font-bold text-emerald-600 relative z-10">{formatCurrency(totalProfit)}</p>
+                    <p className="text-xs text-gray-400 mt-2 font-medium">{t("avg_margin")}: {profitMargin.toFixed(1)}%</p>
+                </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                {/* Inventory Health Score */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
                 <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group flex flex-col justify-between">
                     <div className="flex items-center gap-4 mb-4">
                         <div className={`p-3 rounded-xl ${inventoryHealthScore >= 90 ? "bg-emerald-50 text-emerald-600" :
@@ -234,7 +249,6 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                     </p>
                 </div>
 
-                {/* Orders */}
                 <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-300">
                         <ShoppingCart className="w-16 h-16 text-[#D4AF37]" strokeWidth={1} />
@@ -248,7 +262,6 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{totalOrders}</p>
                 </div>
 
-                {/* Pending Orders */}
                 <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-300">
                         <Clock className="w-16 h-16 text-[#D4AF37]" strokeWidth={1} />
@@ -262,7 +275,6 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                     <p className="text-2xl font-bold text-primary-dark relative z-10">{pendingOrders}</p>
                 </div>
 
-                {/* Customers */}
                 <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-300">
                         <Users className="w-16 h-16 text-[#D4AF37]" strokeWidth={1} />
@@ -273,10 +285,9 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         </div>
                         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("customers")}</h3>
                     </div>
-                    <p className="text-2xl font-bold text-primary-dark relative z-10">{totalCustomers}</p>
+                    <p className="text-2xl font-bold text-primary-dark relative z-10">{customersCount}</p>
                 </div>
 
-                {/* Products */}
                 <div className="bg-white p-6 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-300">
                         <Package className="w-16 h-16 text-[#D4AF37]" strokeWidth={1} />
@@ -287,11 +298,10 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         </div>
                         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("products")}</h3>
                     </div>
-                    <p className="text-2xl font-bold text-primary-dark relative z-10">{totalProducts}</p>
+                    <p className="text-2xl font-bold text-primary-dark relative z-10">{productsCount}</p>
                 </div>
             </div>
 
-            {/* Recent Orders Table */}
             <div className="bg-white rounded-2xl border border-primary/10 shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                     <h2 className="text-lg font-bold text-primary-dark">{t("recent_orders")}</h2>
@@ -349,7 +359,6 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                 </div>
             </div>
 
-            {/* Alert Badges */}
             {(unreadNotifications > 0 || lowStockProducts > 0) && (
                 <div className="flex gap-4">
                     {unreadNotifications > 0 && (
@@ -367,7 +376,6 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                 </div>
             )}
 
-            {/* Best Sellers */}
             {bestSellers.length > 0 && (
                 <div className="bg-white rounded-2xl border border-primary/10 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-gray-100 flex items-center gap-3">
@@ -380,9 +388,9 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                                 <tr>
                                     <th className="px-6 py-4 font-medium">#</th>
                                     <th className="px-6 py-4 font-medium">{t("products")}</th>
-                                    <th className="px-6 py-4 font-medium">{tc("nav.categories") || "Category"}</th>
                                     <th className="px-6 py-4 font-medium">{t("units_sold")}</th>
                                     <th className="px-6 py-4 font-medium">{t("revenue")}</th>
+                                    <th className="px-6 py-4 font-medium">{t("profit")}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
@@ -405,9 +413,9 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                                                 <div className="font-medium text-gray-900">{sale.product.name}</div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-500">{sale.product.category?.name}</td>
                                         <td className="px-6 py-4 font-semibold text-primary-dark">{sale.unitsSold}</td>
                                         <td className="px-6 py-4 font-semibold text-emerald-600">{formatCurrency(Number(sale.revenue))}</td>
+                                        <td className="px-6 py-4 font-semibold text-indigo-600">{formatCurrency(Number(sale.profit))}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -415,6 +423,53 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                     </div>
                 </div>
             )}
+
+            {stockForecast.length > 0 && (
+                <div className="bg-white rounded-2xl border border-red-100 shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-gray-100 flex items-center gap-3">
+                        <Clock className="w-5 h-5 text-red-500" />
+                        <h2 className="text-lg font-bold text-gray-900">{t("stock_forecast.title")}</h2>
+                        <span className="px-2 py-0.5 bg-red-50 text-red-600 text-[10px] font-bold rounded-full uppercase">{t("stock_forecast.action")}</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="text-xs text-gray-500 uppercase tracking-wider bg-gray-50/50">
+                                <tr>
+                                    <th className="px-6 py-4 font-medium">{t("stock_forecast.table.product")}</th>
+                                    <th className="px-6 py-4 font-medium">{t("stock_forecast.table.current")}</th>
+                                    <th className="px-6 py-4 font-medium">{t("stock_forecast.table.forecast")}</th>
+                                    <th className="px-6 py-4 font-medium text-right">{t("status")}</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {stockForecast.map((p: any) => (
+                                    <tr key={p.id} className="hover:bg-red-50/20 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="font-medium text-gray-900">{p.name}</div>
+                                        </td>
+                                        <td className="px-6 py-4 font-medium text-gray-700">
+                                            {p.stock_weight >= 1000 ? `${(p.stock_weight / 1000).toFixed(1)}kg` : `${p.stock_weight}g`}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <span className={`font-bold ${p.daysLeft < 3 ? 'text-red-600' : 'text-amber-600'}`}>
+                                                    {t("stock_forecast.days_remaining", { count: p.daysLeft })}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${p.daysLeft < 3 ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'}`}>
+                                                {p.daysLeft < 3 ? t("stock_forecast.critical") : t("stock_forecast.restock")}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+            <RealtimeReloader />
         </div>
     );
 }

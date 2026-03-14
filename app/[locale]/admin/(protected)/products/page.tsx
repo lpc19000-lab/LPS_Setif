@@ -1,5 +1,4 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import ProductClientView from "@/components/admin/ProductClientView";
 import RealtimeReloader from "@/components/admin/RealtimeReloader";
 import { getTranslations } from "next-intl/server";
@@ -9,33 +8,43 @@ export const dynamic = "force-dynamic";
 export default async function AdminProductsPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.products" });
-    const [productsSnap, categoriesSnap, collectionsSnap, tagsSnap] = await Promise.all([
-        adminDb.collection("products").orderBy("createdAt", "desc").limit(100).get(),
-        adminDb.collection("categories").orderBy("name", "asc").get(),
-        adminDb.collection("collections").orderBy("name", "asc").get(),
-        adminDb.collection("tags").orderBy("name", "asc").get(),
+
+    // Fetch data from Supabase
+    const [
+        { data: productsData },
+        { data: categories },
+        { data: brands },
+        { data: collections },
+        { data: tags }
+    ] = await Promise.all([
+        supabaseAdmin.from("products").select("*, category:categories(name), brand_rel:brands(name)").order("created_at", { ascending: false }).limit(100),
+        supabaseAdmin.from("categories").select("*").order("name", { ascending: true }),
+        supabaseAdmin.from("brands").select("*").order("name", { ascending: true }),
+        supabaseAdmin.from("collections").select("*").order("name", { ascending: true }),
+        supabaseAdmin.from("tags").select("*").order("name", { ascending: true })
     ]);
 
-    const products = productsSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
-        const d: any = doc.data();
-        return {
-            id: doc.id,
-            ...d,
-            category: d.categoryId ? { id: d.categoryId, name: d.categoryName || '' } : null,
-            collections: (d.collectionIds || []).map((cid: string) => ({ collection: { id: cid } })),
-            tags: (d.tagIds || []).map((tid: string) => ({ tag: { id: tid } })),
-            volumes: d.volumes || [],
-            images: d.images || [],
-        };
-    });
-    const categories = categoriesSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
-    const collections = collectionsSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
-    const tags = tagsSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
-
-    const serializedProducts = products.map((p: any) => ({
-        ...p,
-        basePrice: Number(p.basePrice),
-        stockWeight: Number(p.stockWeight || 0),
+    const serializedProducts = (productsData || []).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        brand: p.brand,
+        brandId: p.brand_id,
+        slug: p.slug,
+        description: p.description,
+        categoryId: p.category_id,
+        imageUrl: p.image_url,
+        basePrice: Number(p.base_price),
+        stockWeight: Number(p.stock_weight || 0),
+        lowStockThreshold: p.low_stock_threshold,
+        status: p.status,
+        createdAt: new Date(p.created_at),
+        updatedAt: new Date(p.updated_at),
+        category: p.category || (p.category_id ? { id: p.category_id, name: "..." } : null),
+        brandName: p.brand_rel?.name || p.brand,
+        collections: (p.collection_ids || []).map((cid: string) => ({ collection: { id: cid } })),
+        tags: (p.tag_ids || []).map((tid: string) => ({ tag: { id: tid } })),
+        volumes: p.volumes || [],
+        images: p.images || [],
     }));
 
     return (
@@ -49,9 +58,10 @@ export default async function AdminProductsPage({ params }: { params: Promise<{ 
 
             <ProductClientView
                 products={serializedProducts}
-                categories={categories}
-                collections={collections}
-                tags={tags}
+                categories={categories || []}
+                brands={brands || []}
+                collections={collections || []}
+                tags={tags || []}
             />
             <RealtimeReloader />
         </div>

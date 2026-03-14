@@ -1,5 +1,4 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // ── LOGGING ─────────────────────────────────────────────────────────────────
 export const logAdminAction = async (data: {
@@ -10,14 +9,13 @@ export const logAdminAction = async (data: {
     metadata?: Record<string, unknown>;
 }) => {
     try {
-        await adminDb.collection("admin_logs").add({
-            adminId: data.adminId,
+        await supabaseAdmin.from('admin_logs').insert([{
+            admin_id: data.adminId,
             action: data.action,
-            targetType: data.targetType,
-            targetId: data.targetId || null,
-            metadata: data.metadata ? JSON.stringify(data.metadata) : null,
-            createdAt: new Date(),
-        });
+            target_type: data.targetType,
+            target_id: data.targetId || null,
+            metadata: data.metadata || null
+        }]);
     } catch (e) {
         console.error("Failed to log admin action:", e);
     }
@@ -31,14 +29,13 @@ export const logSystemError = async (data: {
     metadata?: Record<string, unknown>;
 }) => {
     try {
-        await adminDb.collection("system_errors").add({
+        await supabaseAdmin.from('system_errors').insert([{
             message: data.message,
             path: data.path || null,
             method: data.method || null,
-            stackTrace: data.stackTrace || null,
-            metadata: data.metadata ? JSON.stringify(data.metadata) : null,
-            createdAt: new Date(),
-        });
+            stack_trace: data.stackTrace || null,
+            metadata: data.metadata || null
+        }]);
     } catch (e) {
         console.error("Failed to log system error:", e);
     }
@@ -46,42 +43,40 @@ export const logSystemError = async (data: {
 
 // ── READ LOGS ─────────────────────────────────────────────────────────────
 export const getAdminLogs = async (limit = 100) => {
-    const logsQuery = await adminDb.collection("admin_logs")
-        .orderBy("createdAt", "desc")
-        .limit(limit)
-        .get();
+    const { data, error } = await supabaseAdmin
+        .from('admin_logs')
+        .select('*, admins(name, email)')
+        .order('created_at', { ascending: false })
+        .limit(limit);
 
-    const logs = [];
-    for (const doc of logsQuery.docs) {
-        const logData = doc.data();
-        let adminInfo = null;
-        if (logData.adminId) {
-            const adminDoc = await adminDb.collection("admins").doc(logData.adminId).get();
-            if (adminDoc.exists) {
-                const aData = adminDoc.data();
-                adminInfo = { name: aData?.name, email: aData?.email };
-            }
-        }
-        logs.push({
-            id: doc.id,
-            ...logData,
-            createdAt: logData.createdAt?.toDate ? logData.createdAt.toDate() : new Date(logData.createdAt),
-            admin: adminInfo
-        });
-    }
-    return logs;
+    if (error) throw error;
+
+    return (data || []).map(log => ({
+        id: log.id,
+        adminId: log.admin_id,
+        action: log.action,
+        targetType: log.target_type,
+        targetId: log.target_id,
+        metadata: log.metadata,
+        createdAt: new Date(log.created_at),
+        admin: log.admins ? { name: log.admins.name, email: log.admins.email } : null
+    }));
 };
 
 export const getSystemErrors = async (limit = 100) => {
-    const errsQuery = await adminDb.collection("system_errors")
-        .orderBy("createdAt", "desc")
-        .limit(limit)
-        .get();
+    const { data, error } = await supabaseAdmin
+        .from('system_errors')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
 
-    return errsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
-        id: doc.id,
-        ...doc.data() as any,
-        createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : new Date(doc.data().createdAt)
+    if (error) throw error;
+
+    return (data || []).map(err => ({
+        id: err.id,
+        ...err,
+        createdAt: new Date(err.created_at),
+        stackTrace: err.stack_trace
     }));
 };
 
@@ -97,48 +92,46 @@ export const getSystemHealth = async () => {
             productsCount,
             customersCount,
             ordersCount,
-            ordersTodayQuery,
-            recentErrorsQuery
+            ordersToday,
+            recentErrors
         ] = await Promise.all([
-            adminDb.collection("products").count().get(),
-            adminDb.collection("customers").count().get(),
-            adminDb.collection("orders").count().get(),
-            adminDb.collection("orders").where("createdAt", ">=", today).count().get(),
-            adminDb.collection("system_errors").where("createdAt", ">=", yesterday).count().get()
+            supabaseAdmin.from('products').select('id', { count: 'exact', head: true }),
+            supabaseAdmin.from('customers').select('id', { count: 'exact', head: true }),
+            supabaseAdmin.from('orders').select('id', { count: 'exact', head: true }),
+            supabaseAdmin.from('orders').select('id', { count: 'exact', head: true }).gte('created_at', today.toISOString()),
+            supabaseAdmin.from('system_errors').select('id', { count: 'exact', head: true }).gte('created_at', yesterday.toISOString())
         ]);
+
+        const { data: inventoryHealth } = await supabaseAdmin
+            .from('products')
+            .select('stock_weight, sales')
+            .gt('stock_weight', 0);
 
         let lowStockProducts = 0;
         let deadProducts = 0;
         
-        try {
-            const lowStockQuery = await adminDb.collection("products").where("stockWeight", ">", 0).get();
-            lowStockQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-                const data = doc.data();
-                if (data.stockWeight <= (data.lowStockThreshold || 500)) {
-                    lowStockProducts++;
-                }
-                if (!data.sales || (data.sales && data.sales.unitsSold === 0)) {
-                    deadProducts++;
-                }
-            });
-        } catch(e) { console.error("Could not fetch inventory health", e); }
+        inventoryHealth?.forEach((p: any) => {
+            if (p.stock_weight <= 500) lowStockProducts++;
+            const sales = p.sales || { unitsSold: 0 };
+            if (sales.unitsSold === 0) deadProducts++;
+        });
 
-        const recentErrors = recentErrorsQuery.data().count;
+        const errorCount = recentErrors.count || 0;
 
         return {
             metrics: {
-                totalProducts: productsCount.data().count,
-                totalCustomers: customersCount.data().count,
-                totalOrders: ordersCount.data().count,
-                ordersToday: ordersTodayQuery.data().count,
+                totalProducts: productsCount.count || 0,
+                totalCustomers: customersCount.count || 0,
+                totalOrders: ordersCount.count || 0,
+                ordersToday: ordersToday.count || 0,
             },
             inventory: {
                 lowStockProducts,
                 deadProducts,
             },
             stability: {
-                recentErrors24h: recentErrors,
-                status: recentErrors > 10 ? "DEGRADED" : recentErrors > 0 ? "WARNING" : "HEALTHY",
+                recentErrors24h: errorCount,
+                status: errorCount > 10 ? "DEGRADED" : errorCount > 0 ? "WARNING" : "HEALTHY",
             }
         };
     } catch (e) {

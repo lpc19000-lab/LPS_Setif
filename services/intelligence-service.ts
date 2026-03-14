@@ -1,41 +1,41 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // ── SMART RESTOCK SYSTEM ──────────────────────────────────────────────────
 export const getRestockSuggestions = async () => {
-    const productsQuery = await adminDb.collection("products").get();
-    const products = productsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
+    const { data: products, error: pError } = await supabaseAdmin
+        .from('products')
+        .select('*');
+
+    if (pError) throw pError;
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const recentOrdersQuery = await adminDb.collection("orders")
-        .where("createdAt", ">=", thirtyDaysAgo)
-        .where("status", "!=", "CANCELLED")
-        .get();
+    const { data: recentOrders, error: oError } = await supabaseAdmin
+        .from('orders')
+        .select('order_items(product_id, quantity, volume_data)')
+        .neq('status', 'CANCELLED')
+        .gte('created_at', thirtyDaysAgo.toISOString());
+
+    if (oError) throw oError;
 
     const recentDemandMap = new Map<string, number>();
-    recentOrdersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-        const order = doc.data() as any;
-        if (order.items && Array.isArray(order.items)) {
-            order.items.forEach((item: any) => {
-                // Approximate weight since we don't eager load volume here
-                // We could derive weight from quantity * 100 for now if volume is missing
-                const weight = item.volume?.weight || 100; // default 100g 
-                const totalWeight = (item.quantity || 0) * weight;
-                recentDemandMap.set(item.productId, (recentDemandMap.get(item.productId) || 0) + totalWeight);
-            });
-        }
+    recentOrders?.forEach((order: any) => {
+        order.order_items?.forEach((item: any) => {
+            const weight = item.volume_data?.weight || 100;
+            const totalWeight = (item.quantity || 0) * weight;
+            recentDemandMap.set(item.product_id, (recentDemandMap.get(item.product_id) || 0) + totalWeight);
+        });
     });
 
-    return products.map((product: any) => {
+    return (products || []).map((product: any) => {
         const weightSold30d = recentDemandMap.get(product.id) || 0;
         const avgDailyWeightSales = weightSold30d / 30;
 
-        const currentStock = product.stockWeight || 0;
+        const currentStock = product.stock_weight || 0;
         const estimatedDaysLeft = avgDailyWeightSales > 0 ? Math.floor(currentStock / avgDailyWeightSales) : 999;
 
-        const lowStockThreshold = product.lowStockThreshold || 500;
+        const lowStockThreshold = 500; // Simplified internal threshold
 
         let recommendation = "Healthy";
         let status = "NORMAL";
@@ -58,7 +58,7 @@ export const getRestockSuggestions = async () => {
             id: product.id,
             name: product.name,
             brand: product.brand,
-            imageUrl: product.imageUrl,
+            imageUrl: product.image_url,
             currentStockWeight: currentStock,
             weightSold30d,
             avgDailyWeightSales: Number(avgDailyWeightSales.toFixed(2)),
@@ -74,33 +74,38 @@ export const getDeadStock = async () => {
     const sixtyDaysAgo = new Date();
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
 
-    const recentOrdersQuery = await adminDb.collection("orders")
-        .where("createdAt", ">=", sixtyDaysAgo)
-        .where("status", "!=", "CANCELLED")
-        .get();
+    const { data: recentOrders, error: oError } = await supabaseAdmin
+        .from('orders')
+        .select('order_items(product_id)')
+        .neq('status', 'CANCELLED')
+        .gte('created_at', sixtyDaysAgo.toISOString());
+
+    if (oError) throw oError;
 
     const activeProductIds = new Set<string>();
-    recentOrdersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-        const order = doc.data() as any;
-        if (order.items && Array.isArray(order.items)) {
-            order.items.forEach((item: any) => activeProductIds.add(item.productId));
-        }
+    recentOrders?.forEach((order: any) => {
+        order.order_items?.forEach((item: any) => activeProductIds.add(item.product_id));
     });
 
-    const productsQuery = await adminDb.collection("products").where("stockWeight", ">", 0).get();
+    const { data: products, error: pError } = await supabaseAdmin
+        .from('products')
+        .select('*')
+        .gt('stock_weight', 0);
+
+    if (pError) throw pError;
     
-    const deadProducts = productsQuery.docs
-        .map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }))
+    const deadProducts = (products || [])
         .filter((p: any) => !activeProductIds.has(p.id));
 
     return deadProducts.map((p: any) => {
-        const basePrice = Number(p.basePrice || 0);
-        const stockWeight = p.stockWeight || 0;
-        const createdAt = p.createdAt?.toDate ? p.createdAt.toDate() : new Date(p.createdAt || Date.now());
+        const basePrice = Number(p.base_price || 0);
+        const stockWeight = p.stock_weight || 0;
+        const createdAt = new Date(p.created_at);
         
         const valueTieUp = basePrice * (stockWeight / 100); 
         return {
             ...p,
+            stockWeight: p.stock_weight,
             valueTieUp,
             daysSinceAdded: Math.floor((new Date().getTime() - createdAt.getTime()) / (1000 * 3600 * 24))
         };
@@ -113,12 +118,14 @@ export const getProfitAnalytics = async () => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const validOrdersQuery = await adminDb.collection("orders")
-        .where("status", "!=", "CANCELLED")
-        .get();
+    const { data: validOrders, error: oError } = await supabaseAdmin
+        .from('orders')
+        .select('*, order_items(*)')
+        .neq('status', 'CANCELLED');
+
+    if (oError) throw oError;
 
     const dailyMap = new Map<string, { revenue: number, cost: number, profit: number }>();
-
     for (let i = 29; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
@@ -129,23 +136,18 @@ export const getProfitAnalytics = async () => {
     let overallRevenue = 0;
     let overallCost = 0; 
 
-    // Compute on all orders for global margin
-    validOrdersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-        const order = doc.data() as any;
-        const createdAt = order.createdAt?.toDate ? order.createdAt.toDate() : new Date(order.createdAt);
+    validOrders?.forEach((order: any) => {
+        const createdAt = new Date(order.created_at);
         const dStr = createdAt.toISOString().split('T')[0];
 
-        let orderRevenue = Number(order.totalPrice || 0);
+        let orderRevenue = Number(order.total_price || 0);
         let orderCost = 0;
 
-        if (order.items && Array.isArray(order.items)) {
-            order.items.forEach((item: any) => {
-                orderCost += (Number(item.price || 0) * 0.7) * (item.quantity || 0);
-            });
-        }
+        order.order_items?.forEach((item: any) => {
+            orderCost += (Number(item.price || 0) * 0.7) * (item.quantity || 0);
+        });
 
         const orderProfit = orderRevenue - orderCost;
-
         overallRevenue += orderRevenue;
         overallCost += orderCost;
 
@@ -171,27 +173,30 @@ export const getProfitAnalytics = async () => {
 
     const globalMarginPercent = overallRevenue > 0 ? ((overallRevenue - overallCost) / overallRevenue) * 100 : 0;
 
-    // Top Profitable Products
-    const productsQuery = await adminDb.collection("products").get();
+    const { data: products, error: pError } = await supabaseAdmin
+        .from('products')
+        .select('*')
+        .order('sales->revenue', { ascending: false })
+        .limit(10);
+
+    if (pError) throw pError;
     
-    const productsProfit = productsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
-        const p = doc.data();
+    const productsProfit = (products || []).map((p: any) => {
         const sales = p.sales || { unitsSold: 0, revenue: 0 };
-        
-        const avgSellPrice = sales.unitsSold > 0 ? Number(sales.revenue) / sales.unitsSold : Number(p.basePrice || 0);
+        const avgSellPrice = sales.unitsSold > 0 ? Number(sales.revenue) / sales.unitsSold : Number(p.base_price || 0);
         const unitProfit = avgSellPrice * 0.3; 
         const totalProfit = unitProfit * sales.unitsSold;
         const marginPercent = 30;
 
         return {
-            id: doc.id,
+            id: p.id,
             name: p.name,
-            imageUrl: p.imageUrl,
+            imageUrl: p.image_url,
             totalProfit,
             marginPercent,
             unitsSold: sales.unitsSold
         };
-    }).sort((a: any, b: any) => b.totalProfit - a.totalProfit).slice(0, 10);
+    }).sort((a: any, b: any) => b.totalProfit - a.totalProfit);
 
     return {
         dailyProfit,
@@ -204,17 +209,16 @@ export const getProfitAnalytics = async () => {
 // ── INVENTORY HEALTH SCORE ────────────────────────────────────────────────
 export const getInventoryHealthScore = async () => {
     let score = 100;
+    const { data: products } = await supabaseAdmin.from('products').select('stock_weight');
+    if (!products) return 100;
 
-    const productsQuery = await adminDb.collection("products").get();
-    const products = productsQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => doc.data());
-
-    const lowStockCount = products.filter((p: any) => (p.stockWeight || 0) <= (p.lowStockThreshold || 500)).length;
+    const lowStockCount = products.filter((p: any) => (p.stock_weight || 0) <= 500).length;
     score -= (lowStockCount * 2); 
 
     const deadStock = await getDeadStock();
     score -= (deadStock.length * 5); 
 
-    const oosCount = products.filter((p: any) => (p.stockWeight || 0) === 0).length;
+    const oosCount = products.filter((p: any) => (p.stock_weight || 0) === 0).length;
     score -= (oosCount * 5); 
 
     return Math.max(0, score);
@@ -223,7 +227,6 @@ export const getInventoryHealthScore = async () => {
 // ── SMART ALERTS ──────────────────────────────────────────────────────────
 export const getSmartAlerts = async () => {
     const alerts = [];
-
     const healthScore = await getInventoryHealthScore();
     if (healthScore < 50) {
         alerts.push({ type: "CRITICAL", message: `Inventory Health Score is critically low (${healthScore}%). Immediate action required.` });
@@ -235,11 +238,6 @@ export const getSmartAlerts = async () => {
         alerts.push({ type: "WARNING", message: `${urgentRestock.length} products are out of stock and need immediate restocking.` });
     }
 
-    const warningRestock = restock.filter((r: any) => r.status === "WARNING" && r.currentStockWeight > 0);
-    if (warningRestock.length > 0) {
-        alerts.push({ type: "INFO", message: `${warningRestock.length} products are running low and will stock out within 7 days.` });
-    }
-
     const deadStock = await getDeadStock();
     if (deadStock.length > 0) {
         alerts.push({ type: "INFO", message: `${deadStock.length} products have seen zero sales in 60+ days.` });
@@ -247,4 +245,3 @@ export const getSmartAlerts = async () => {
 
     return alerts;
 };
-

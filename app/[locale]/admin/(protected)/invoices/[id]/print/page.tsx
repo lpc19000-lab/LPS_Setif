@@ -1,4 +1,4 @@
-import { adminDb } from "@/lib/firebase-admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { ArrowLeft, Printer } from "lucide-react";
 import Link from "next/link";
 
@@ -6,16 +6,22 @@ export const dynamic = "force-dynamic";
 
 export default async function InvoicePrintPage({ params }: { params: Promise<{ id: string, locale: string }> }) {
     const { id } = await params;
-    // Invoice is embedded in the order document
-    const orderDoc = await adminDb.collection("orders").doc(id).get();
-    if (!orderDoc.exists || !orderDoc.data()?.invoice) return <div className="p-8">Invoice not found.</div>;
-
-    const orderData = orderDoc.data()!;
-    let customer = { shopName: "Unknown", name: "", address: "", wilaya: "", phone: "" };
-    if (orderData.customerId) {
-        const custDoc = await adminDb.collection("customers").doc(orderData.customerId).get();
-        if (custDoc.exists) customer = custDoc.data() as any;
+    
+    // Fetch order with embedded invoice and customer details
+    const { data: orderData, error } = await supabaseAdmin
+        .from("orders")
+        .select(`
+            *,
+            customers (*)
+        `)
+        .eq("id", id)
+        .single();
+    
+    if (error || !orderData || !orderData.invoice) {
+        return <div className="p-8">Invoice not found.</div>;
     }
+
+    const customer = orderData.customers || { shop_name: "Unknown", name: "", address: "", wilaya: "", phone: "" };
 
     const items: any[] = (orderData.items || []).map((item: any) => ({
         id: item.productId,
@@ -26,10 +32,19 @@ export default async function InvoicePrintPage({ params }: { params: Promise<{ i
 
     const invoice = {
         invoiceNumber: orderData.invoice.invoiceNumber,
-        issueDate: orderData.invoice.issueDate?.toDate ? orderData.invoice.issueDate.toDate() : new Date(orderData.invoice.issueDate),
-        totalAmount: orderData.invoice.totalAmount || orderData.totalPrice,
+        issueDate: new Date(orderData.invoice.issueDate || orderData.created_at),
+        totalAmount: orderData.invoice.totalAmount || orderData.total_price,
         orderId: id,
-        order: { customer, items },
+        order: { 
+            customer: {
+                shopName: customer.shop_name,
+                name: customer.name,
+                address: customer.address,
+                wilaya: customer.wilaya,
+                phone: customer.phone
+            }, 
+            items 
+        },
     };
 
     const formatCurrency = (amount: number) => {
@@ -106,8 +121,8 @@ export default async function InvoicePrintPage({ params }: { params: Promise<{ i
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                        {invoice.order.items.map((item) => (
-                            <tr key={item.id}>
+                        {invoice.order.items.map((item: any, idx: number) => (
+                            <tr key={idx}>
                                 <td className="py-8">
                                     <div className="font-bold text-lg text-gray-900">{item.product.name}</div>
                                     <div className="text-xs text-gray-400 uppercase tracking-widest">{item.product.brand}</div>

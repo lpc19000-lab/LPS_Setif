@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -17,57 +16,72 @@ export async function GET(request: Request) {
         let filename = "report.csv";
 
         if (type === "inventory") {
-            const productsQuery = await adminDb.collection("products").orderBy("name", "asc").get();
+            const { data: products, error } = await supabaseAdmin
+                .from("products")
+                .select("*")
+                .order("name", { ascending: true });
+
+            if (error) throw error;
+
             csvData = "ID,Name,Brand,Category,BasePrice,StockWeight,LowStockThreshold\n";
-            productsQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-                const p = doc.data() as any;
-                csvData += `${doc.id},"${p.name}","${p.brand}","${p.categoryName || ''}",${p.basePrice},${p.stockWeight},${p.lowStockThreshold || 500}\n`;
+            products?.forEach((p) => {
+                csvData += `${p.id},"${p.name}","${p.brand}","${p.category_id || ''}",${p.base_price},${p.stock_weight},${p.low_stock_threshold || 500}\n`;
             });
             filename = `inventory_report_${new Date().toISOString().split('T')[0]}.csv`;
         }
 
         else if (type === "sales") {
-            const ordersQuery = await adminDb.collection("orders")
-                .where("status", "!=", "CANCELLED")
-                .orderBy("createdAt", "desc")
-                .get();
+            const { data: orders, error } = await supabaseAdmin
+                .from("orders")
+                .select("*, customers(shop_name)")
+                .neq("status", "CANCELLED")
+                .order("created_at", { ascending: false });
+
+            if (error) throw error;
 
             csvData = "OrderID,Date,Customer,TotalItems,TotalRevenue,Status\n";
-            for (const doc of (ordersQuery.docs as QueryDocumentSnapshot<DocumentData>[])) {
-                const o = doc.data() as any;
-                const createdAt = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+            orders?.forEach((o: any) => {
+                const createdAt = new Date(o.created_at);
                 const totalItems = (o.items || []).reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
+                const shopName = o.customers?.shop_name || "";
                 
-                let shopName = "";
-                if (o.customerId) {
-                    const custDoc = await adminDb.collection("customers").doc(o.customerId).get();
-                    shopName = custDoc.data()?.shopName || "";
-                }
-                
-                csvData += `${doc.id},${createdAt.toISOString().split('T')[0]},"${shopName}",${totalItems},${o.totalPrice},${o.status}\n`;
-            }
+                csvData += `${o.id},${createdAt.toISOString().split('T')[0]},"${shopName}",${totalItems},${o.total_price},${o.status}\n`;
+            });
             filename = `sales_report_${new Date().toISOString().split('T')[0]}.csv`;
         }
         else if (type === "customers") {
-            const customersQuery = await adminDb.collection("customers").orderBy("name", "asc").get();
-            const ordersQuery = await adminDb.collection("orders").where("status", "!=", "CANCELLED").get();
+            // Complex aggregation: customer total spend
+            // In a real app, we might use a view or a group by query
+            // For now, we'll mimic the manual aggregation if simple queries are preferred
+            
+            const { data: customers, error: cError } = await supabaseAdmin
+                .from("customers")
+                .select("*")
+                .order("name", { ascending: true });
+
+            if (cError) throw cError;
+
+            const { data: orders, error: oError } = await supabaseAdmin
+                .from("orders")
+                .select("customer_id, total_price")
+                .neq("status", "CANCELLED");
+
+            if (oError) throw oError;
 
             const customerOrdersMap = new Map<string, { count: number; totalSpent: number }>();
-            ordersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-                const o = doc.data();
-                if (o.customerId) {
-                    const curr = customerOrdersMap.get(o.customerId) || { count: 0, totalSpent: 0 };
+            orders?.forEach((o) => {
+                if (o.customer_id) {
+                    const curr = customerOrdersMap.get(o.customer_id) || { count: 0, totalSpent: 0 };
                     curr.count++;
-                    curr.totalSpent += Number(o.totalPrice || 0);
-                    customerOrdersMap.set(o.customerId, curr);
+                    curr.totalSpent += Number(o.total_price || 0);
+                    customerOrdersMap.set(o.customer_id, curr);
                 }
             });
 
             csvData = "CustomerID,ShopName,ContactName,Phone,Wilaya,TotalOrders,TotalSpent\n";
-            customersQuery.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-                const c = doc.data();
-                const stats = customerOrdersMap.get(doc.id) || { count: 0, totalSpent: 0 };
-                csvData += `${doc.id},"${c.shopName}","${c.name}","${c.phone}","${c.wilaya}",${stats.count},${stats.totalSpent}\n`;
+            customers?.forEach((c) => {
+                const stats = customerOrdersMap.get(c.id) || { count: 0, totalSpent: 0 };
+                csvData += `${c.id},"${c.shop_name}","${c.name}","${c.phone}","${c.wilaya}",${stats.count},${stats.totalSpent}\n`;
             });
             filename = `customers_report_${new Date().toISOString().split('T')[0]}.csv`;
         } else {

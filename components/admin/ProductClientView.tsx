@@ -17,11 +17,13 @@ const STATUS_COLORS: Record<string, string> = {
 export default function ProductClientView({
     products,
     categories,
+    brands = [],
     collections = [],
     tags = [],
 }: {
     products: ProductWithCategory[];
     categories: any[];
+    brands?: any[];
     collections?: any[];
     tags?: any[];
 }) {
@@ -171,10 +173,10 @@ export default function ProductClientView({
                                                     className="object-cover"
                                                 />
                                             </div>
-                                            <div>
-                                                <div className="font-medium text-gray-900">{product.name}</div>
-                                                <div className="text-xs text-gray-500">{product.brand}</div>
-                                            </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-bold text-gray-900 leading-tight">{product.name}</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] mt-0.5">{product.brandName}</span>
+                                                </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-gray-500">
@@ -252,7 +254,12 @@ export default function ProductClientView({
                                 {/* Brand */}
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.brand_label")}</label>
-                                    <input name="brand" defaultValue={editingProduct?.brand} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder={t("modal.brand_placeholder")} />
+                                    <select name="brandId" defaultValue={editingProduct?.brandId} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none">
+                                        <option value="">{t("modal.brand_label")}</option>
+                                        {brands.map((b) => (
+                                            <option key={b.id} value={b.id}>{b.name}</option>
+                                        ))}
+                                    </select>
                                 </div>
 
                                 {/* Category */}
@@ -290,6 +297,10 @@ export default function ProductClientView({
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.price_label")}</label>
                                     <input type="number" step="0.01" name="basePrice" defaultValue={editingProduct?.basePrice} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.purchase_price_label")}</label>
+                                    <input type="number" step="0.01" name="purchasePrice" defaultValue={editingProduct?.purchase_price || 0} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.stock_label")}</label>

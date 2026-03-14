@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase-admin";
-import bcrypt from "bcryptjs";
+import { validateAdminCredentials } from "@/services/admin-service";
 import { signJwtToken } from "@/lib/auth";
 
 export async function POST(request: Request) {
@@ -15,21 +14,11 @@ export async function POST(request: Request) {
             );
         }
 
-        const adminQuery = await adminDb.collection("admins").where("email", "==", email).limit(1).get();
-        const admin = adminQuery.empty ? null : { id: adminQuery.docs[0].id, ...adminQuery.docs[0].data() as any };
+        const admin = await validateAdminCredentials(email, password);
 
         console.log(`[AdminLoginAPI] Admin found: ${!!admin}, Email: ${email}`);
 
         if (!admin) {
-            return NextResponse.json(
-                { success: false, error: "Invalid credentials" },
-                { status: 401 }
-            );
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, admin.passwordHash);
-
-        if (!isPasswordValid) {
             return NextResponse.json(
                 { success: false, error: "Invalid credentials" },
                 { status: 401 }
@@ -62,7 +51,7 @@ export async function POST(request: Request) {
             value: token,
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "lax", // Better for simple SPA
+            sameSite: "lax", 
             path: "/",
             maxAge: 60 * 60 * 24, // 24 hours
         });

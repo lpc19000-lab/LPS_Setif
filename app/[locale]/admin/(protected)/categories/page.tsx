@@ -1,7 +1,6 @@
 import CategoryClientView from "@/components/admin/CategoryClientView";
 import { getTranslations } from "next-intl/server";
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -9,10 +8,23 @@ export default async function AdminCategoriesPage({ params }: { params: Promise<
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.categories" });
 
-    const categoriesSnap = await adminDb.collection("categories").orderBy("name", "asc").get();
-    const categories = await Promise.all(categoriesSnap.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
-        const productsCount = await adminDb.collection("products").where("categoryId", "==", doc.id).count().get();
-        return { id: doc.id, ...doc.data() as any, _count: { products: productsCount.data().count } };
+    // Fetch categories and join with products to get counts
+    // Note: To get counts efficiently in Supabase, we can use a nested select or a separate query
+    const { data: categoriesData, error } = await supabaseAdmin
+        .from("categories")
+        .select(`
+            *,
+            products (id)
+        `)
+        .order("name", { ascending: true });
+
+    if (error) {
+        console.error("Categories fetch error:", error);
+    }
+
+    const categories = (categoriesData || []).map(cat => ({
+        ...cat,
+        _count: { products: cat.products?.length || 0 }
     }));
 
     return (

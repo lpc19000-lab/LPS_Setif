@@ -15,14 +15,34 @@ interface WilayaSelectorProps {
 export default function WilayaSelector({ value, onChange, error, label }: WilayaSelectorProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [wilayas, setWilayas] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
     const t = useTranslations("common.labels");
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const selectedWilaya = WILAYAS.find((w: WilayaData) => String(w.id) === String(value) || w.name === value);
+    useEffect(() => {
+        const fetchWilayas = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch("/api/wilayas");
+                const data = await response.json();
+                if (data.success) {
+                    setWilayas(data.data);
+                }
+            } catch (err) {
+                console.error("Fetch wilayas error:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchWilayas();
+    }, []);
 
-    const filteredWilayas = WILAYAS.filter((w: WilayaData) =>
+    const selectedWilaya = wilayas.find((w: any) => String(w.number) === String(value) || w.name === value);
+
+    const filteredWilayas = wilayas.filter((w: any) =>
         w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        String(w.id).includes(searchTerm)
+        String(w.number).includes(searchTerm)
     );
 
     useEffect(() => {
@@ -45,7 +65,7 @@ export default function WilayaSelector({ value, onChange, error, label }: Wilaya
                     }`}
             >
                 <span className={selectedWilaya ? "text-gray-900" : "text-gray-400"}>
-                    {selectedWilaya ? `${selectedWilaya.id} - ${selectedWilaya.name}` : t("select_wilaya")}
+                    {loading ? "..." : selectedWilaya ? `${selectedWilaya.number} - ${selectedWilaya.name}` : t("select_wilaya")}
                 </span>
                 <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </button>
@@ -65,20 +85,20 @@ export default function WilayaSelector({ value, onChange, error, label }: Wilaya
                     </div>
                     <div className="overflow-y-auto flex-1">
                         {filteredWilayas.length > 0 ? (
-                            filteredWilayas.map((wilaya: WilayaData) => (
+                            filteredWilayas.map((wilaya: any) => (
                                 <button
-                                    key={wilaya.id}
+                                    key={wilaya.number}
                                     type="button"
                                     onClick={() => {
-                                        onChange(wilaya);
+                                        onChange({ id: String(wilaya.number), name: wilaya.name });
                                         setIsOpen(false);
                                         setSearchTerm("");
                                     }}
-                                    className={`w-full flex items-center justify-between px-4 py-2 text-sm hover:bg-primary/5 transition-colors ${selectedWilaya?.id === wilaya.id ? "bg-primary/10 text-primary font-medium" : "text-gray-700"
+                                    className={`w-full flex items-center justify-between px-4 py-2 text-sm hover:bg-primary/5 transition-colors ${selectedWilaya?.number === wilaya.number ? "bg-primary/10 text-primary font-medium" : "text-gray-700"
                                         }`}
                                 >
-                                    <span>{wilaya.id} - {wilaya.name}</span>
-                                    {selectedWilaya?.id === wilaya.id && <Check className="w-4 h-4" />}
+                                    <span>{wilaya.number} - {wilaya.name}</span>
+                                    {selectedWilaya?.number === wilaya.number && <Check className="w-4 h-4" />}
                                 </button>
                             ))
                         ) : (

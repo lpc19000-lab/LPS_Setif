@@ -137,63 +137,14 @@ export default function LoginPage() {
                         </div>
                     </div>
 
-                    {/* Google Login Button */}
+                    {/* Google Login Button - Disabled until Supabase Auth is configured */}
                     <button
-                        onClick={async () => {
-                            const { auth, db } = await import("@/lib/firebase");
-                            const { GoogleAuthProvider, signInWithPopup } = await import("firebase/auth");
-                            const { doc, getDoc, setDoc, serverTimestamp } = await import("firebase/firestore");
-                            
-                            setLoading(true);
-                            setError("");
-                            try {
-                                const provider = new GoogleAuthProvider();
-                                const result = await signInWithPopup(auth, provider);
-                                const user = result.user;
-                                
-                                // Check if user exists in customers collection
-                                const customerRef = doc(db, "customers", user.uid);
-                                const customerSnap = await getDoc(customerRef);
-                                
-                                if (!customerSnap.exists()) {
-                                    // Create new customer document
-                                    await setDoc(customerRef, {
-                                        name: user.displayName,
-                                        email: user.email,
-                                        photoURL: user.photoURL,
-                                        role: "TRADER",
-                                        createdAt: serverTimestamp(),
-                                        authProvider: "google"
-                                    });
-                                }
-                                
-                                // Call login API to set cookies
-                                const response = await fetch("/api/customers/login", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({ googleToken: await user.getIdToken() }),
-                                });
-                                
-                                const data = await response.json();
-                                if (data.success) {
-                                    router.push(`/${locale}/account`);
-                                    router.refresh();
-                                } else {
-                                    setError(data.error || "Google login failed");
-                                }
-                            } catch (err: any) {
-                                console.error("Google Auth Error:", err);
-                                if (err.code !== "auth/popup-closed-by-user") {
-                                    setError("Google login failed");
-                                }
-                            } finally {
-                                setLoading(false);
-                            }
+                        onClick={() => {
+                            setError("Google login is currently being migrated. Please use phone/password.");
                         }}
-                        disabled={loading}
-                        className="w-full bg-white border border-gray-100 text-gray-600 py-4 rounded-2xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                        className="w-full bg-white border border-gray-100 text-gray-400 py-4 rounded-2xl font-bold cursor-not-allowed flex items-center justify-center gap-3"
                     >
-                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 opacity-50" viewBox="0 0 24 24">
                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.16H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.84l3.66-2.75z" fill="#FBBC05" />

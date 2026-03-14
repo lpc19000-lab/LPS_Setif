@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyJwtToken } from "@/lib/auth";
-import { adminDb } from "@/lib/firebase-admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
@@ -43,15 +43,24 @@ export async function POST(request: Request) {
         }
 
         // ── Verify Customer Exists ──────────────────────────────────────
-        const customerDoc = await adminDb.collection("customers").doc(customerId).get();
+        const { data: customer, error: fetchError } = await supabaseAdmin
+            .from("customers")
+            .select("id")
+            .eq("id", customerId)
+            .single();
 
-        if (!customerDoc.exists) {
+        if (fetchError || !customer) {
             return NextResponse.json({ success: false, error: "Customer not found" }, { status: 404 });
         }
 
         // ── Hash & Update ───────────────────────────────────────────────
         const passwordHash = await bcrypt.hash(newPassword, 10);
-        await adminDb.collection("customers").doc(customerId).update({ passwordHash });
+        const { error: updateError } = await supabaseAdmin
+            .from("customers")
+            .update({ password_hash: passwordHash })
+            .eq("id", customerId);
+
+        if (updateError) throw updateError;
 
         return NextResponse.json(
             { success: true, message: "Password reset successfully" },

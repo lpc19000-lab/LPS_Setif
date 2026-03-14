@@ -30,6 +30,9 @@ export const metadata: Metadata = {
     title: "LPS Perfume | B2B Wholesale Luxury Perfumes",
     description:
         "Premium B2B wholesale platform for perfume distributors in Algeria. Luxury fragrances at wholesale prices.",
+    manifest: "/manifest.json",
+    themeColor: "#D4AF37",
+    viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
 };
 
 export default async function RootLayout(props: {

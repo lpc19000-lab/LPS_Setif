@@ -11,11 +11,15 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "firebasestorage.googleapis.com",
+        hostname: "images.unsplash.com",
       },
       {
         protocol: "https",
-        hostname: "lps19-121b2.firebasestorage.app",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
       },
     ],
   },

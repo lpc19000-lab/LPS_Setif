@@ -1,4 +1,4 @@
-import { adminDb } from "@/lib/firebase-admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // ── Event Types ────────────────────────────────────────────────────────────
 
@@ -25,12 +25,16 @@ export async function logEvent(
   description: string
 ) {
   try {
-    await adminDb.collection("system_logs").add({
-      eventType,
-      entityId: entityId || null,
-      description,
-      createdAt: new Date(),
-    });
+    const { error } = await supabaseAdmin
+      .from("system_logs")
+      .insert({
+        event_type: eventType,
+        entity_id: entityId || null,
+        description,
+        created_at: new Date().toISOString(),
+      });
+
+    if (error) throw error;
   } catch (err) {
     // Non-blocking: never let logging break the main flow
     console.error("[Logger] Failed to write system log:", err);

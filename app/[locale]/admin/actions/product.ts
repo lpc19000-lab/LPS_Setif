@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb } from "@/lib/firebase-admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { logEvent } from "@/lib/logger";
 
@@ -14,53 +14,51 @@ export async function createProduct(formData: FormData) {
     const data: any = {
         name: formData.get("name") as string,
         slug,
-        brand: formData.get("brand") as string,
+        brand_id: formData.get("brandId") as string,
         description: formData.get("description") as string,
-        categoryId: formData.get("categoryId") as string,
-        imageUrl: formData.get("imageUrl") as string,
-        basePrice: Number(formData.get("basePrice")),
-        stockWeight: Number(formData.get("stockWeight")),
-        lowStockThreshold: Number(formData.get("lowStockThreshold") || 500),
+        category_id: formData.get("categoryId") as string,
+        image_url: formData.get("imageUrl") as string,
+        base_price: Number(formData.get("basePrice")),
+        purchase_price: Number(formData.get("purchasePrice") || 0),
+        stock_weight: Number(formData.get("stockWeight")),
+        low_stock_threshold: Number(formData.get("lowStockThreshold") || 500),
         status: (formData.get("status") as string) || "ACTIVE",
-        createdAt: new Date(),
-        updatedAt: new Date(),
     };
 
     const collectionIds = (formData.getAll("collectionIds") as string[]).filter(Boolean);
     const tagIds = (formData.getAll("tagIds") as string[]).filter(Boolean);
 
-    if (!data.name || !data.brand || !data.categoryId || !data.basePrice || isNaN(data.basePrice) || data.basePrice <= 0) {
-        return { success: false, error: "Missing or invalid required fields (name, brand, categoryId, basePrice)" };
+    if (!data.name || !data.brand_id || !data.category_id || !data.base_price || isNaN(data.base_price) || data.base_price <= 0) {
+        return { success: false, error: "Missing or invalid required fields (name, brandId, categoryId, base_price)" };
     }
-    if (data.stockWeight < 0 || isNaN(data.stockWeight)) {
+    if (data.stock_weight < 0 || isNaN(data.stock_weight)) {
         return { success: false, error: "Stock (g) cannot be negative" };
     }
 
-    // Resolve category name
-    if (data.categoryId) {
-        const catDoc = await adminDb.collection("categories").doc(data.categoryId).get();
-        if (catDoc.exists) data.categoryName = catDoc.data()?.name || "";
-    }
-
-    data.collectionIds = collectionIds;
-    data.tagIds = tagIds;
+    data.collection_ids = collectionIds;
+    data.tag_ids = tagIds;
 
     try {
-        const docRef = await adminDb.collection("products").add(data);
+        const { data: product, error } = await supabaseAdmin
+            .from("products")
+            .insert(data)
+            .select()
+            .single();
+
+        if (error) throw error;
 
         // Initial stock log
-        if (data.stockWeight > 0) {
-            await adminDb.collection("inventory_logs").add({
-                productId: docRef.id,
-                changeType: "INITIAL_STOCK",
-                quantity: data.stockWeight,
+        if (data.stock_weight > 0) {
+            await supabaseAdmin.from("inventory_logs").insert({
+                product_id: product.id,
+                change_type: "INITIAL_STOCK",
+                quantity: data.stock_weight,
                 source: "ADMIN",
                 reason: "Initial stock on product creation",
-                createdAt: new Date(),
             });
         }
 
-        await logEvent("PRODUCT_CREATED", docRef.id, `Product "${data.name}" created with ${data.stockWeight}g`);
+        await logEvent("PRODUCT_CREATED", product.id, `Product "${data.name}" created with ${data.stock_weight}g`);
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         revalidatePath("/");
@@ -75,50 +73,54 @@ export async function createProduct(formData: FormData) {
 export async function updateProduct(id: string, formData: FormData) {
     const data: any = {
         name: formData.get("name") as string,
-        brand: formData.get("brand") as string,
+        brand_id: formData.get("brandId") as string,
         description: formData.get("description") as string,
-        categoryId: formData.get("categoryId") as string,
-        imageUrl: formData.get("imageUrl") as string,
-        basePrice: Number(formData.get("basePrice")),
-        stockWeight: Number(formData.get("stockWeight")),
-        lowStockThreshold: Number(formData.get("lowStockThreshold") || 500),
+        category_id: formData.get("categoryId") as string,
+        image_url: formData.get("imageUrl") as string,
+        base_price: Number(formData.get("basePrice")),
+        purchase_price: Number(formData.get("purchasePrice") || 0),
+        stock_weight: Number(formData.get("stockWeight")),
+        low_stock_threshold: Number(formData.get("lowStockThreshold") || 500),
         status: (formData.get("status") as string) || "ACTIVE",
-        updatedAt: new Date(),
+        updated_at: new Date().toISOString(),
     };
 
     const collectionIds = (formData.getAll("collectionIds") as string[]).filter(Boolean);
     const tagIds = (formData.getAll("tagIds") as string[]).filter(Boolean);
 
-    // Resolve category name
-    if (data.categoryId) {
-        const catDoc = await adminDb.collection("categories").doc(data.categoryId).get();
-        if (catDoc.exists) data.categoryName = catDoc.data()?.name || "";
-    }
-
-    data.collectionIds = collectionIds;
-    data.tagIds = tagIds;
+    data.collection_ids = collectionIds;
+    data.tag_ids = tagIds;
 
     try {
-        const productRef = adminDb.collection("products").doc(id);
-        const oldDoc = await productRef.get();
-        const oldData = oldDoc.data();
-        const oldStock = oldData?.stockWeight || 0;
+        // Fetch old stock for logging
+        const { data: oldData, error: fetchError } = await supabaseAdmin
+            .from("products")
+            .select("stock_weight, name")
+            .eq("id", id)
+            .single();
 
-        await productRef.update(data);
+        if (fetchError) throw fetchError;
+        const oldStock = oldData?.stock_weight || 0;
+
+        const { error: updateError } = await supabaseAdmin
+            .from("products")
+            .update(data)
+            .eq("id", id);
+
+        if (updateError) throw updateError;
 
         // Log stock adjustment if changed
-        if (data.stockWeight !== undefined && data.stockWeight !== oldStock) {
-            await adminDb.collection("inventory_logs").add({
-                productId: id,
-                changeType: "ADJUSTMENT",
-                quantity: data.stockWeight - oldStock,
+        if (data.stock_weight !== undefined && data.stock_weight !== oldStock) {
+            await supabaseAdmin.from("inventory_logs").insert({
+                product_id: id,
+                change_type: "ADJUSTMENT",
+                quantity: data.stock_weight - oldStock,
                 source: "ADMIN",
-                reason: `Manual adjustment from ${oldStock}g to ${data.stockWeight}g`,
-                createdAt: new Date(),
+                reason: `Manual adjustment from ${oldStock}g to ${data.stock_weight}g`,
             });
         }
 
-        await logEvent("PRODUCT_UPDATED", id, `Product "${data.name}" updated (Stock: ${oldStock}g -> ${data.stockWeight}g)`);
+        await logEvent("PRODUCT_UPDATED", id, `Product "${data.name}" updated (Stock: ${oldStock}g -> ${data.stock_weight}g)`);
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         revalidatePath("/");
@@ -132,30 +134,34 @@ export async function updateProduct(id: string, formData: FormData) {
 
 export async function deleteProduct(id: string) {
     try {
-        // Check for orders referencing this product
-        // Note: Firestore doesn't support complex joins, but we can query orders where this product id exists in the items array
-        // However, a simple count check is safer
-        const orderCheck = await adminDb.collection("orders")
-            .where("items", "array-contains-any", [{ productId: id }]) // This won't work easily for nested fields
-            .limit(1).get();
-            
-        // Fallback: search for any order with this product
-        // In a real app, we'd use a more efficient denormalized reference or a status check
-        // For this audit, we'll try the common pattern
-        const allOrders = await adminDb.collection("orders").limit(20).get(); // Scan small batch for quick check
-        const isReferenced = allOrders.docs.some((doc: any) => doc.data().items?.some((item: any) => item.productId === id));
+        // Check for orders referencing this product using JSONB path filtering
+        // We look for any order where the 'items' JSONB array contains an object with productId matching id
+        const { data: referencedOrders, error: checkError } = await supabaseAdmin
+            .from("orders")
+            .select("id")
+            .contains('items', [{ productId: id }])
+            .limit(1);
 
-        if (isReferenced) {
+        if (checkError) throw checkError;
+
+        if (referencedOrders && referencedOrders.length > 0) {
             return { success: false, error: "Cannot delete product. It is referenced in existing orders." };
         }
 
-        await adminDb.collection("products").doc(id).delete();
+        const { error: deleteError } = await supabaseAdmin
+            .from("products")
+            .delete()
+            .eq("id", id);
+
+        if (deleteError) throw deleteError;
+
         await logEvent("PRODUCT_DELETED", id, `Product ${id} deleted`);
         revalidatePath("/admin/products");
         revalidatePath("/catalog");
         (revalidateTag as any)("products");
         return { success: true };
     } catch (error) {
+        console.error("Delete product error:", error);
         return { success: false, error: "Error during deletion" };
     }
 }

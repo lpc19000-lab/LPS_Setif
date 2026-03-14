@@ -1,53 +1,59 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // ── STOCK ADJUSTMENTS ─────────────────────────────────────────────────────
 export const decrementStock = async (productId: string, quantity: number, weight: number = 100) => {
     const totalWeight = quantity * weight;
     
-    return await adminDb.runTransaction(async (t: any) => {
-        const productRef = adminDb.collection("products").doc(productId);
-        const productDoc = await t.get(productRef);
-        
-        if (!productDoc.exists) throw new Error(`Product ${productId} not found`);
-        
-        const data = productDoc.data();
-        const currentStock = data?.stockWeight || 0;
-        
-        if (currentStock < totalWeight) {
-            throw new Error(`Insufficient stock for "${data?.name}". Available: ${currentStock}g, Requested: ${totalWeight}g`);
-        }
-        
-        t.update(productRef, { stockWeight: currentStock - totalWeight });
-        return { id: productId, ...data, stockWeight: currentStock - totalWeight };
+    // Using a simple RPC or direct update with check
+    // Ideally use an RPC for atomic "check and update"
+    const { data, error } = await supabaseAdmin.rpc('adjust_stock', {
+        p_product_id: productId,
+        p_amount: -totalWeight,
+        p_reason: 'DECREMENT_STOCK',
+        p_source: 'SYSTEM'
     });
+
+    if (error) throw error;
+    return { id: productId, stockWeight: data };
 };
 
 export const incrementStock = async (productId: string, quantity: number, weight: number = 100) => {
     const totalWeight = quantity * weight;
-    return await adminDb.runTransaction(async (t: any) => {
-        const productRef = adminDb.collection("products").doc(productId);
-        const productDoc = await t.get(productRef);
-        
-        if (!productDoc.exists) throw new Error(`Product ${productId} not found`);
-        const currentStock = productDoc.data()?.stockWeight || 0;
-        
-        t.update(productRef, { stockWeight: currentStock + totalWeight });
-        return { id: productId, ...productDoc.data(), stockWeight: currentStock + totalWeight };
+    const { data, error } = await supabaseAdmin.rpc('adjust_stock', {
+        p_product_id: productId,
+        p_amount: totalWeight,
+        p_reason: 'INCREMENT_STOCK',
+        p_source: 'SYSTEM'
     });
+
+    if (error) throw error;
+    return { id: productId, stockWeight: data };
 };
 
 // ── STOCK QUERIES ─────────────────────────────────────────────────────────
 export const getStockLevel = async (productId: string) => {
-    const doc = await adminDb.collection("products").doc(productId).get();
-    if (!doc.exists) return null;
-    const data = doc.data();
-    return { id: doc.id, name: data?.name, stockWeight: data?.stockWeight };
+    const { data, error } = await supabaseAdmin
+        .from('products')
+        .select('id, name, stock_weight')
+        .eq('id', productId)
+        .single();
+    
+    if (error || !data) return null;
+    return { id: data.id, name: data.name, stockWeight: data.stock_weight };
 };
 
 export const getLowStockProducts = async (threshold = 500) => {
-    const query = await adminDb.collection("products").where("stockWeight", "<=", threshold).orderBy("stockWeight", "asc").get();
-    return query.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
+    const { data, error } = await supabaseAdmin
+        .from('products')
+        .select('*')
+        .lte('stock_weight', threshold)
+        .order('stock_weight', { ascending: true });
+
+    if (error) throw error;
+    return (data || []).map(p => ({
+        ...p,
+        stockWeight: p.stock_weight
+    }));
 };
 
 // ── ADMIN ADJUSTMENTS ─────────────────────────────────────────────────────
@@ -56,68 +62,54 @@ export const adjustStock = async (
     weightAmount: number, // can be positive or negative
     reason: string
 ) => {
-    return await adminDb.runTransaction(async (t: any) => {
-        const productRef = adminDb.collection("products").doc(productId);
-        const productDoc = await t.get(productRef);
-        
-        if (!productDoc.exists) throw new Error("Product not found");
-
-        const data = productDoc.data();
-        const currentStock = data?.stockWeight || 0;
-        const newStock = currentStock + weightAmount;
-        
-        if (newStock < 0) {
-            throw new Error("Cannot adjust stock below 0g.");
-        }
-
-        t.update(productRef, { stockWeight: newStock });
-
-        const logRef = adminDb.collection("inventory_logs").doc();
-        t.set(logRef, {
-            productId,
-            changeType: "MANUAL_ADJUSTMENT",
-            quantity: weightAmount,
-            source: "ADMIN",
-            reason,
-            createdAt: new Date()
-        });
-
-        return { id: productId, ...data, stockWeight: newStock };
+    const { data, error } = await supabaseAdmin.rpc('adjust_stock', {
+        p_product_id: productId,
+        p_amount: weightAmount,
+        p_reason: reason,
+        p_source: 'ADMIN'
     });
+
+    if (error) throw error;
+    
+    // Fetch product to return full data as before
+    const { data: product } = await supabaseAdmin
+        .from('products')
+        .select('*')
+        .eq('id', productId)
+        .single();
+
+    return { ...product, stockWeight: product?.stock_weight };
 };
 
 // ── HISTORY ───────────────────────────────────────────────────────────────
-export const getInventoryHistory = async (filters?: { productId?: string; changeType?: "SALE" | "CANCEL" | "RESTOCK" | "MANUAL_ADJUSTMENT" }) => {
-    let queryRef: any = adminDb.collection("inventory_logs");
+export const getInventoryHistory = async (filters?: { productId?: string; changeType?: string }) => {
+    let query = supabaseAdmin
+        .from('inventory_logs')
+        .select('*, products(name, brand, image_url)')
+        .order('created_at', { ascending: false });
     
     if (filters?.productId) {
-        queryRef = queryRef.where("productId", "==", filters.productId);
+        query = query.eq('product_id', filters.productId);
     }
     if (filters?.changeType) {
-        queryRef = queryRef.where("changeType", "==", filters.changeType);
+        query = query.eq('change_type', filters.changeType);
     }
     
-    // We disable sorting by createdAt locally if query requires compound index that doesn't exist yet
-    // For migration, we'll fetch then sort to be safe
-    const snapshot = await queryRef.get();
+    const { data, error } = await query;
+    if (error) throw error;
     
-    const logs = await Promise.all(snapshot.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
-        const data = doc.data();
-        let productInfo = null;
-        if (data.productId) {
-            const pDoc = await adminDb.collection("products").doc(data.productId).get();
-            if (pDoc.exists) {
-                const pData = pDoc.data();
-                productInfo = { name: pData?.name, brand: pData?.brand, imageUrl: pData?.imageUrl };
-            }
-        }
-        return {
-            id: doc.id,
-            ...data,
-            createdAt: data.createdAt?.toDate(),
-            product: productInfo
-        };
+    return (data || []).map(log => ({
+        id: log.id,
+        productId: log.product_id,
+        changeType: log.change_type,
+        quantity: log.quantity,
+        source: log.source,
+        reason: log.reason,
+        createdAt: new Date(log.created_at),
+        product: log.products ? {
+            name: log.products.name,
+            brand: log.products.brand,
+            imageUrl: log.products.image_url
+        } : null
     }));
-    
-    return logs.sort((a: any, b: any) => b.createdAt.getTime() - a.createdAt.getTime());
 };

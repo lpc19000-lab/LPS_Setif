@@ -1,6 +1,6 @@
-import { Search, FileText, Download, ExternalLink } from "lucide-react";
+import { Search, FileText, ExternalLink } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { adminDb } from "@/lib/firebase-admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -8,30 +8,42 @@ export default async function AdminInvoicesPage({ params }: { params: Promise<{ 
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.invoices" });
 
-    // Invoices are embedded in orders
-    const ordersQuery = await adminDb.collection("orders").orderBy("createdAt", "desc").get();
-    const invoices: any[] = [];
-    for (const doc of ordersQuery.docs) {
-        const orderData = doc.data();
-        if (orderData.invoice) {
-            let customer = { shopName: "Unknown" };
-            if (orderData.customerId) {
-                const custDoc = await adminDb.collection("customers").doc(orderData.customerId).get();
-                if (custDoc.exists) customer = custDoc.data() as any;
-            }
-            invoices.push({
-                id: doc.id,
-                invoiceNumber: orderData.invoice.invoiceNumber,
-                issueDate: orderData.invoice.issueDate?.toDate ? orderData.invoice.issueDate.toDate() : new Date(orderData.invoice.issueDate),
-                totalAmount: orderData.invoice.totalAmount || orderData.totalPrice,
-                orderId: doc.id,
-                order: { customer },
-            });
-        }
+    // Invoices are embedded in orders in the Supabase schema as well
+    const { data: ordersWithInvoices, error } = await supabaseAdmin
+        .from("orders")
+        .select(`
+            id,
+            total_price,
+            invoice,
+            created_at,
+            customers (shop_name, name)
+        `)
+        .not("invoice", "is", null)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error("Invoices fetch error:", error);
     }
 
+    const invoices = (ordersWithInvoices || []).map((order: any) => ({
+        id: order.id,
+        invoiceNumber: order.invoice?.invoiceNumber || "N/A",
+        issueDate: new Date(order.invoice?.issueDate || order.created_at),
+        totalAmount: order.invoice?.totalAmount || order.total_price,
+        orderId: order.id,
+        order: { 
+            customer: { 
+                shopName: order.customers?.shop_name || "Unknown",
+                name: order.customers?.name || ""
+            } 
+        },
+    }));
+
     const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat(locale === "ar" ? "ar-DZ" : "fr-FR", { style: "currency", currency: "DZD" }).format(amount);
+        return new Intl.NumberFormat(locale === "ar" ? "ar-DZ" : "fr-FR", { 
+            style: "currency", 
+            currency: "DZD" 
+        }).format(amount);
     };
 
     const formatDate = (date: Date) => {
@@ -44,14 +56,6 @@ export default async function AdminInvoicesPage({ params }: { params: Promise<{ 
                 <div>
                     <h1 className="text-3xl font-serif font-bold text-primary-dark tracking-tight">{t("title")}</h1>
                     <p className="text-gray-500 mt-1 tracking-wide">{t("subtitle")}</p>
-                </div>
-                <div className="relative w-full sm:w-72">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 rtl:left-auto rtl:right-3" />
-                    <input
-                        type="text"
-                        placeholder={t("search_placeholder")}
-                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 rtl:pl-4 rtl:pr-10"
-                    />
                 </div>
             </div>
 

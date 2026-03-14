@@ -2,8 +2,7 @@ import { PackageSearch, History } from "lucide-react";
 import Link from "next/link";
 import InventoryManagerClient from "@/components/admin/InventoryManagerClient";
 import { getTranslations } from "next-intl/server";
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -11,8 +10,24 @@ export default async function AdminInventoryPage({ params }: { params: Promise<{
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "admin.inventory" });
 
-    const productsSnap = await adminDb.collection("products").orderBy("name", "asc").get();
-    const products = productsSnap.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({ id: doc.id, ...doc.data() as any }));
+    const { data: productsData, error } = await supabaseAdmin
+        .from("products")
+        .select("*")
+        .order("name", { ascending: true });
+
+    if (error) {
+        console.error("Inventory products fetch error:", error);
+    }
+
+    const products = (productsData || []).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        brand: p.brand,
+        stockWeight: Number(p.stock_weight || 0),
+        lowStockThreshold: Number(p.low_stock_threshold || 500),
+        status: p.status,
+        imageUrl: p.image_url
+    }));
 
     return (
         <div className="p-8 max-w-7xl mx-auto animate-in fade-in duration-500">

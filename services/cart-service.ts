@@ -1,39 +1,43 @@
-import { adminDb } from "@/lib/firebase-admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // ── READ ──────────────────────────────────────────────────────────────────
 export const getCart = async (customerId: string) => {
-    const doc = await adminDb.collection("carts").doc(customerId).get();
+    const { data: cart, error: cError } = await supabaseAdmin
+        .from('carts')
+        .select('*')
+        .eq('customer_id', customerId)
+        .maybeSingle();
 
-    if (!doc.exists) return { items: [], totalPrice: 0 };
+    if (cError || !cart) return { items: [], totalPrice: 0 };
     
-    const cartData = doc.data();
-    const items = cartData?.items || [];
-
-    // Calculate total using volume-based pricing
+    const items = cart.items || [];
     let totalPrice = 0;
-    
-    // We need to fetch product info for these items
-    const enrichedItems = await Promise.all(items.map(async (item: any) => {
-        const pDoc = await adminDb.collection("products").doc(item.productId).get();
-        if (!pDoc.exists) return null;
-        
-        const product: any = { id: pDoc.id, ...pDoc.data() };
+
+    // Enrich items with product data
+    const productIds = [...new Set(items.map((i: any) => i.productId))];
+    const { data: products } = await supabaseAdmin
+        .from('products')
+        .select('*')
+        .in('id', productIds);
+
+    const productsMap = new Map((products || []).map(p => [p.id, p]));
+
+    const enrichedItems = items.map((item: any) => {
+        const product = productsMap.get(item.productId);
+        if (!product) return null;
         
         let volumeData: any = null;
-        let weight = 0;
         let unitPrice = 0;
 
-        if (item.volumeId && product.volumes && Array.isArray(product.volumes)) {
+        if (item.volumeId && product.volumes) {
             volumeData = product.volumes.find((v: any) => v.id === item.volumeId);
             if (volumeData) {
-                weight = volumeData.weight || 0;
                 unitPrice = Number(volumeData.price);
             }
         }
         
         if (!volumeData) {
-            weight = 0;
-            unitPrice = (Number(product.basePrice) / 100) * weight;
+            unitPrice = 0; // Or standard pricing logic
         }
 
         const lineTotal = unitPrice * item.quantity;
@@ -47,15 +51,19 @@ export const getCart = async (customerId: string) => {
             volumeId: item.volumeId,
             unitPrice,
             lineTotal,
-            weight,
+            weight: volumeData?.weight || 0,
             product,
             volume: volumeData
         };
-    }));
+    }).filter(Boolean);
 
-    const validItems = enrichedItems.filter(Boolean);
-
-    return { id: customerId, customerId, createdAt: cartData?.createdAt?.toDate(), items: validItems, totalPrice };
+    return { 
+        id: customerId, 
+        customerId, 
+        createdAt: new Date(cart.created_at), 
+        items: enrichedItems, 
+        totalPrice 
+    };
 };
 
 // ── ADD TO CART ───────────────────────────────────────────────────────────
@@ -65,38 +73,29 @@ export const addToCart = async (
     quantity: number,
     volumeId: string
 ) => {
-    // Validate product existence
-    const productDoc = await adminDb.collection("products").doc(productId).get();
-    if (!productDoc.exists) throw new Error("Product not found");
+    const { data: product, error: pError } = await supabaseAdmin
+        .from('products')
+        .select('*')
+        .eq('id', productId)
+        .single();
 
-    const product = productDoc.data();
-    
-    // Validate volume
-    let volume = null;
-    if (volumeId && product?.volumes && Array.isArray(product.volumes)) {
-        volume = product.volumes.find((v: any) => v.id === volumeId);
-    }
-    
+    if (pError || !product) throw new Error("Product not found");
+
+    const volume = (product.volumes || []).find((v: any) => v.id === volumeId);
     if (!volume && volumeId) throw new Error("Volume not found");
 
-    // Validate stock availability
     const requiredWeight = quantity * (volume?.weight || 0);
-    if ((product?.stockWeight || 0) < requiredWeight) {
-        throw new Error(`Insufficient stock for "${product?.name}". Available: ${product?.stockWeight}g`);
+    if ((product.stock_weight || 0) < requiredWeight) {
+        throw new Error(`Insufficient stock for "${product.name}".`);
     }
 
-    // Ensure cart exists
-    const cartRef = adminDb.collection("carts").doc(customerId);
-    const cartDoc = await cartRef.get();
-    
-    let items = [];
-    if (!cartDoc.exists) {
-        await cartRef.set({ customerId, items: [], createdAt: new Date() });
-    } else {
-        items = cartDoc.data()?.items || [];
-    }
+    const { data: cart } = await supabaseAdmin
+        .from('carts')
+        .select('*')
+        .eq('customer_id', customerId)
+        .maybeSingle();
 
-    // UNIQUE CONSTRAINT: Identify item by (cart, product, volumeId)
+    let items = cart?.items || [];
     const existingIndex = items.findIndex((i: any) => i.productId === productId && i.volumeId === volumeId);
 
     let updatedItem;
@@ -105,7 +104,7 @@ export const addToCart = async (
         updatedItem = items[existingIndex];
     } else {
         updatedItem = {
-            id: adminDb.collection('carts').doc().id, // Generate a random ID for the item
+            id: crypto.randomUUID(),
             productId,
             quantity,
             volumeId
@@ -113,25 +112,28 @@ export const addToCart = async (
         items.push(updatedItem);
     }
 
-    await cartRef.update({ items });
+    if (!cart) {
+        await supabaseAdmin.from('carts').insert([{ customer_id: customerId, items }]);
+    } else {
+        await supabaseAdmin.from('carts').update({ items }).eq('customer_id', customerId);
+    }
 
-    return { ...updatedItem, product: { id: productId, ...product }, volume };
+    return { ...updatedItem, product, volume };
 };
 
 // ── UPDATE CART ITEM ──────────────────────────────────────────────────────
 export const updateCartItem = async (cartItemId: string, quantity: number) => {
-    // Since items are inside carts by array, we have to find which cart has this cartItemId
-    // This isn't efficient in NoSQL without knowing the cart ID. 
-    // Ideally, the client passes customerId as well, but for compatibility let's search.
-    const cartsQuery = await adminDb.collection("carts").get();
+    // In Supabase, we'll search carts for this item
+    const { data: carts } = await supabaseAdmin.from('carts').select('*');
+    
     let foundCart = null;
     let foundItemIndex = -1;
     
-    for (const doc of cartsQuery.docs) {
-        const items = doc.data().items || [];
+    for (const cart of (carts || [])) {
+        const items = cart.items || [];
         const index = items.findIndex((i: any) => i.id === cartItemId);
         if (index > -1) {
-            foundCart = { id: doc.id, items };
+            foundCart = cart;
             foundItemIndex = index;
             break;
         }
@@ -139,70 +141,49 @@ export const updateCartItem = async (cartItemId: string, quantity: number) => {
 
     if (!foundCart || foundItemIndex === -1) throw new Error("Cart item not found");
 
-    const cartRef = adminDb.collection("carts").doc(foundCart.id);
     const cartItem = foundCart.items[foundItemIndex];
 
     if (quantity <= 0) {
         foundCart.items.splice(foundItemIndex, 1);
-        await cartRef.update({ items: foundCart.items });
+        await supabaseAdmin.from('carts').update({ items: foundCart.items }).eq('id', foundCart.id);
         return { id: cartItemId };
     }
 
-    // Stock validation
-    const pDoc = await adminDb.collection("products").doc(cartItem.productId).get();
-    const productData = pDoc.data();
-    
-    let volumeWeight = 0;
-    let volumeData = null;
-    if (cartItem.volumeId && productData?.volumes) {
-        volumeData = productData.volumes.find((v: any) => v.id === cartItem.volumeId);
-        volumeWeight = volumeData?.weight || 0;
-    }
-    
-    const requiredWeight = quantity * volumeWeight;
-    if ((productData?.stockWeight || 0) < requiredWeight) {
-        throw new Error(`Insufficient stock. Available: ${productData?.stockWeight}g`);
+    const { data: product } = await supabaseAdmin.from('products').select('*').eq('id', cartItem.productId).single();
+    if (!product) throw new Error("Product not found");
+
+    let volumeData = (product.volumes || []).find((v: any) => v.id === cartItem.volumeId);
+    const requiredWeight = quantity * (volumeData?.weight || 0);
+    if ((product.stock_weight || 0) < requiredWeight) {
+        throw new Error(`Insufficient stock.`);
     }
 
     foundCart.items[foundItemIndex].quantity = quantity;
-    await cartRef.update({ items: foundCart.items });
+    await supabaseAdmin.from('carts').update({ items: foundCart.items }).eq('id', foundCart.id);
 
     return {
         ...foundCart.items[foundItemIndex],
-        product: { id: pDoc.id, ...productData },
+        product,
         volume: volumeData
     };
 };
 
 // ── REMOVE CART ITEM ──────────────────────────────────────────────────────
 export const removeCartItem = async (cartItemId: string) => {
-    // Find and remove
-    const cartsQuery = await adminDb.collection("carts").get();
-    let foundCart = null;
-    let foundItemIndex = -1;
-    
-    for (const doc of cartsQuery.docs) {
-        const items = doc.data().items || [];
+    const { data: carts } = await supabaseAdmin.from('carts').select('*');
+    for (const cart of (carts || [])) {
+        const items = cart.items || [];
         const index = items.findIndex((i: any) => i.id === cartItemId);
         if (index > -1) {
-            foundCart = { id: doc.id, items };
-            foundItemIndex = index;
+            items.splice(index, 1);
+            await supabaseAdmin.from('carts').update({ items }).eq('id', cart.id);
             break;
         }
-    }
-
-    if (foundCart && foundItemIndex > -1) {
-        foundCart.items.splice(foundItemIndex, 1);
-        await adminDb.collection("carts").doc(foundCart.id).update({ items: foundCart.items });
     }
     return { id: cartItemId };
 };
 
 // ── CLEAR CART ────────────────────────────────────────────────────────────
 export const clearCart = async (customerId: string) => {
-    const cartRef = adminDb.collection("carts").doc(customerId);
-    const doc = await cartRef.get();
-    if (doc.exists) {
-        await cartRef.update({ items: [] });
-    }
+    await supabaseAdmin.from('carts').update({ items: [] }).eq('customer_id', customerId);
 };

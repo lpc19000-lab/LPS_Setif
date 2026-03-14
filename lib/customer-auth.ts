@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { verifyJwtToken } from "./auth";
-import { adminDb } from "./firebase-admin";
+import { supabaseAdmin } from "./supabase-admin";
 
 export async function getCustomerSession() {
     const cookieStore = await cookies();
@@ -14,17 +14,21 @@ export async function getCustomerSession() {
             return null;
         }
 
-        const customerDoc = await adminDb.collection("customers").doc(payload.sub as string).get();
-        if (!customerDoc.exists) return null;
+        const { data: customer, error } = await supabaseAdmin
+            .from('customers')
+            .select('*')
+            .eq('id', payload.sub as string)
+            .single();
 
-        const data = customerDoc.data()!;
+        if (error || !customer) return null;
+
         return {
-            id: customerDoc.id,
-            name: data.name,
-            phone: data.phone,
-            shopName: data.shopName,
-            wilaya: data.wilaya,
-            address: data.address,
+            id: customer.id,
+            name: customer.name,
+            phone: customer.phone,
+            shopName: customer.shop_name,
+            wilaya: customer.wilaya,
+            address: customer.address,
         };
     } catch (error) {
         return null;

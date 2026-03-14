@@ -1,9 +1,20 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
-import { Customer } from "@/types/firebase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import bcrypt from "bcryptjs";
 
-export type { Customer };
+export interface Customer {
+    id: string;
+    phone: string;
+    passwordHash?: string;
+    name: string;
+    shopName: string;
+    wilaya: string;
+    address: string;
+    role: string;
+    createdAt: Date;
+    ordersCount?: number;
+    orders?: any[];
+    _count?: { orders: number };
+}
 
 // ── REGISTER ──────────────────────────────────────────────────────────────
 export const registerCustomer = async (data: {
@@ -18,57 +29,78 @@ export const registerCustomer = async (data: {
     role?: string;
 }) => {
     // Check if phone is already registered
-    const existing = await adminDb.collection("customers").where("phone", "==", data.phone).limit(1).get();
+    const { data: existing } = await supabaseAdmin
+        .from('customers')
+        .select('id')
+        .eq('phone', data.phone)
+        .maybeSingle();
     
-    if (!existing.empty) {
+    if (existing) {
         throw new Error("A customer with this phone number already exists");
     }
 
     const passwordHash = await bcrypt.hash(data.password, 10);
     const { password, ...rest } = data;
 
-    const docRef = await adminDb.collection("customers").add({
-        ...rest,
-        role: data.role || "TRADER",
-        passwordHash,
-        wilaya: `${data.wilayaNumber} - ${data.wilayaName}`,
-        createdAt: new Date(),
-    });
+    const { data: newCustomer, error } = await supabaseAdmin
+        .from('customers')
+        .insert([{
+            name: data.name,
+            phone: data.phone,
+            password_hash: passwordHash,
+            shop_name: data.shopName,
+            wilaya: `${data.wilayaNumber} - ${data.wilayaName}`,
+            wilaya_id: Number(data.wilayaNumber),
+            commune: data.commune,
+            address: data.address,
+            role: data.role || "TRADER"
+        }])
+        .select()
+        .single();
 
-    return { id: docRef.id, ...rest, role: data.role || "TRADER" };
+    if (error) throw error;
+
+    return { 
+        id: newCustomer.id, 
+        name: newCustomer.name,
+        phone: newCustomer.phone,
+        shopName: newCustomer.shop_name,
+        wilaya: newCustomer.wilaya,
+        address: newCustomer.address,
+        role: newCustomer.role 
+    };
 };
 
 // ── READ ──────────────────────────────────────────────────────────────────
 export const getCustomerById = async (id: string): Promise<Customer | null> => {
     try {
-        const doc = await adminDb.collection("customers").doc(id).get();
-        if (!doc.exists) return null;
+        const { data: customer, error: custError } = await supabaseAdmin
+            .from('customers')
+            .select('*')
+            .eq('id', id)
+            .single();
 
-        const d = doc.data()!;
-        const ordersQuery = await adminDb.collection("orders")
-            .where("customerId", "==", id)
-            .orderBy("createdAt", "desc")
-            .get();
+        if (custError || !customer) return null;
 
-        const orders = ordersQuery.docs.map((o: QueryDocumentSnapshot<DocumentData>) => ({
-            id: o.id,
-            ...o.data() as any,
-            createdAt: (o.data() as any).createdAt?.toDate()
-        }));
+        // Fetch orders count and recent orders
+        const { data: orders, error: ordersError } = await supabaseAdmin
+            .from('orders')
+            .select('*')
+            .eq('customer_id', id)
+            .order('created_at', { ascending: false });
 
         return {
-            id: doc.id,
-            ...d,
-            email: d.email || "",
-            name: d.name || "Unknown",
-            phone: d.phone || "",
-            wilaya: d.wilaya || "",
-            address: d.address || "",
-            shopName: d.shopName || "Customer",
-            createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
-            ordersCount: orders.length,
-            orders
-        } as Customer;
+            id: customer.id,
+            phone: customer.phone,
+            name: customer.name || "Unknown",
+            shopName: customer.shop_name || "Customer",
+            wilaya: customer.wilaya || "",
+            address: customer.address || "",
+            role: customer.role || "TRADER",
+            createdAt: new Date(customer.created_at),
+            ordersCount: orders?.length || 0,
+            orders: orders || []
+        };
     } catch (err) {
         console.error("Customer fetch error (getCustomerById):", err);
         return null;
@@ -77,18 +109,25 @@ export const getCustomerById = async (id: string): Promise<Customer | null> => {
 
 export const getCustomerByPhone = async (phone: string): Promise<Customer | null> => {
     try {
-        const query = await adminDb.collection("customers").where("phone", "==", phone).limit(1).get();
-        if (query.empty) return null;
-        const doc = query.docs[0];
-        const d = doc.data();
+        const { data: customer, error } = await supabaseAdmin
+            .from('customers')
+            .select('*')
+            .eq('phone', phone)
+            .maybeSingle();
+
+        if (error || !customer) return null;
+
         return {
-            id: doc.id,
-            ...d,
-            email: d.email || "",
-            shopName: d.shopName || "Customer",
-            createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
-            ordersCount: 0, // Simplified for byPhone read
-        } as Customer;
+            id: customer.id,
+            phone: customer.phone,
+            name: customer.name || "Unknown",
+            shopName: customer.shop_name || "Customer",
+            wilaya: customer.wilaya || "",
+            address: customer.address || "",
+            role: customer.role || "TRADER",
+            passwordHash: customer.password_hash,
+            createdAt: new Date(customer.created_at),
+        };
     } catch (err) {
         console.error("Customer fetch error (getCustomerByPhone):", err);
         return null;
@@ -97,35 +136,30 @@ export const getCustomerByPhone = async (phone: string): Promise<Customer | null
 
 export const getCustomers = async (limit = 100, startAfterStr?: string): Promise<Customer[]> => {
     try {
-        let queryRef: any = adminDb.collection("customers").orderBy("createdAt", "desc");
+        let query = supabaseAdmin
+            .from('customers')
+            .select('*, orders(id)')
+            .order('created_at', { ascending: false });
         
         if (startAfterStr) {
-            const dateCursor = new Date(startAfterStr);
-            if (!isNaN(dateCursor.getTime())) {
-                queryRef = queryRef.startAfter(dateCursor);
-            }
+            query = query.lt('created_at', startAfterStr);
         }
         
-        queryRef = queryRef.limit(limit);
-        const customersQuery = await queryRef.get();
+        const { data: customers, error } = await query.limit(limit);
+        if (error) throw error;
 
-        return customersQuery.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
-            const d = doc.data();
-            
-            return {
-                id: doc.id,
-                ...d,
-                email: d.email || "",
-                name: d.name || "Unknown",
-                phone: d.phone || "",
-                wilaya: d.wilaya || "",
-                address: d.address || "",
-                shopName: d.shopName || "Customer",
-                createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : new Date(d.createdAt),
-                ordersCount: d.ordersCount || 0,
-                _count: { orders: d.ordersCount || 0 } 
-            } as Customer;
-        });
+        return (customers || []).map(customer => ({
+            id: customer.id,
+            phone: customer.phone,
+            name: customer.name || "Unknown",
+            shopName: customer.shop_name || "Customer",
+            wilaya: customer.wilaya || "",
+            address: customer.address || "",
+            role: customer.role || "TRADER",
+            createdAt: new Date(customer.created_at),
+            ordersCount: (customer as any).orders?.length || 0,
+            _count: { orders: (customer as any).orders?.length || 0 }
+        }));
     } catch (err) {
         console.error("Customers fetch error (getCustomers):", err);
         return [];
@@ -144,6 +178,23 @@ export const updateCustomer = async (
         shopName: string;
     }>
 ) => {
-    await adminDb.collection("customers").doc(id).update(data);
+    const updateObj: any = {};
+    if (data.name) updateObj.name = data.name;
+    if (data.phone) updateObj.phone = data.phone;
+    if (data.address) updateObj.address = data.address;
+    if (data.shopName) updateObj.shop_name = data.shopName;
+    if (data.wilayaNumber && data.wilayaName) {
+        updateObj.wilaya = `${data.wilayaNumber} - ${data.wilayaName}`;
+        updateObj.wilaya_id = Number(data.wilayaNumber);
+    }
+
+    const { data: updated, error } = await supabaseAdmin
+        .from('customers')
+        .update(updateObj)
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (error) throw error;
     return { id, ...data };
 };

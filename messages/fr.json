@@ -295,6 +295,9 @@
             "unpaid_note": "Inclut {count} commandes partiellement payées",
             "daily_revenue": "Chiffre d'Affaire du Jour",
             "monthly_revenue": "Chiffre d'Affaire du Mois",
+            "total_profit": "Bénéfice Total",
+            "avg_margin": "Marge Moyenne",
+            "profit": "Bénéfice",
             "health_score": "Score de Santé",
             "total_orders": "Total des Commandes",
             "pending": "En attente",
@@ -317,6 +320,18 @@
             },
             "inventory_alerts": {
                 "low_stock": "{count} Alerte(s) de stock faible"
+            },
+            "stock_forecast": {
+                "title": "Prévisions de Rupture de Stock",
+                "action": "Action Requise",
+                "days_remaining": "{count} jours restants",
+                "critical": "Critique",
+                "restock": "Réapprovisionner",
+                "table": {
+                    "product": "Produit",
+                    "current": "Stock Actuel",
+                    "forecast": "Prévision Rupture"
+                }
             }
         },
         "products": {
@@ -352,7 +367,8 @@
                 "category_label": "Catégorie",
                 "status_label": "Statut",
                 "image_label": "URL de l'image principale",
-                "price_label": "Prix de base (Par 100g) (DZD)",
+                "price_label": "Prix de Vente (100g) (DZD)",
+                "purchase_price_label": "Prix d'Achat (Coût) (100g) (DZD)",
                 "stock_label": "Stock total (Grammes)",
                 "pricing_note": "Note : Les produits seront automatiquement disponibles en variantes de 200g, 250g, 500g et 1kg basées sur le prix de base.",
                 "collections_label": "Collections",

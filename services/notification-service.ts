@@ -1,5 +1,4 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // ── CREATE NOTIFICATION ───────────────────────────────────────────────────
 export const createNotification = async (
@@ -8,54 +7,71 @@ export const createNotification = async (
     message: string,
     metadata?: Record<string, any>
 ) => {
-    const docRef = await adminDb.collection("notifications").add({
-        type,
-        title,
-        message,
-        metadata: metadata || null,
-        isRead: false,
-        createdAt: new Date(),
-    });
-    return { id: docRef.id, type, title, message, metadata, isRead: false };
+    const { data: notification, error } = await supabaseAdmin
+        .from('notifications')
+        .insert([{
+            type,
+            title,
+            message,
+            metadata: metadata || null,
+            is_read: false
+        }])
+        .select()
+        .single();
+
+    if (error) throw error;
+    return { ...notification, id: notification.id, isRead: notification.is_read };
 };
 
 // ── GET ALL NOTIFICATIONS ────────────────────────────────────────────────
 export const getNotifications = async (limit = 30) => {
-    const query = await adminDb.collection("notifications")
-        .orderBy("createdAt", "desc")
-        .limit(limit)
-        .get();
-    return query.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate()
+    const { data, error } = await supabaseAdmin
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+    if (error) throw error;
+
+    return (data || []).map(n => ({
+        id: n.id,
+        ...n,
+        isRead: n.is_read,
+        createdAt: new Date(n.created_at)
     }));
 };
 
 // ── GET UNREAD COUNT ─────────────────────────────────────────────────────
 export const getUnreadCount = async () => {
-    const result = await adminDb.collection("notifications")
-        .where("isRead", "==", false)
-        .count()
-        .get();
-    return result.data().count;
+    const { count, error } = await supabaseAdmin
+        .from('notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_read', false);
+
+    if (error) throw error;
+    return count || 0;
 };
 
 // ── MARK AS READ ─────────────────────────────────────────────────────────
 export const markAsRead = async (id: string) => {
-    await adminDb.collection("notifications").doc(id).update({ isRead: true });
+    const { error } = await supabaseAdmin
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', id);
+
+    if (error) throw error;
     return { id, isRead: true };
 };
 
 // ── MARK ALL AS READ ─────────────────────────────────────────────────────
 export const markAllAsRead = async () => {
-    const unread = await adminDb.collection("notifications")
-        .where("isRead", "==", false)
-        .get();
-    const batch = adminDb.batch();
-    unread.docs.forEach((doc: any) => batch.update(doc.ref, { isRead: true }));
-    await batch.commit();
-    return { count: unread.size };
+    const { count, error } = await supabaseAdmin
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('is_read', false); // Optional filter to optimize
+
+    if (error) throw error;
+    return { count: count || 0 };
 };
 
 // ── TRIGGER HELPERS ──────────────────────────────────────────────────────
