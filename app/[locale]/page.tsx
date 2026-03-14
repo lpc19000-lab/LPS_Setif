@@ -50,7 +50,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     return (
         <main className={locale === 'ar' ? 'rtl' : 'ltr'}>
             {/* ── Cinematic Hero ──── */}
-            <FragranceScroll logoUrl={settings.logo_url} />
+            <FragranceScroll logoUrl={settings.logo_url ?? undefined} />
 
             {/* ── Product Sections (server-fetched, streamed) ──── */}
             <Suspense
