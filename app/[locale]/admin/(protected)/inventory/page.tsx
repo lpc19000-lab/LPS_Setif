@@ -26,7 +26,8 @@ export default async function AdminInventoryPage({ params }: { params: Promise<{
         stockWeight: Number(p.stock_weight || 0),
         lowStockThreshold: Number(p.low_stock_threshold || 500),
         status: p.status,
-        imageUrl: p.image_url
+        imageUrl: p.image_url,
+        basePrice: Number(p.base_price || 0)
     }));
 
     return (
