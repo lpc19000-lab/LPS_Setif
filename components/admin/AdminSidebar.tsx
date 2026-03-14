@@ -24,7 +24,8 @@ import {
     Menu,
     X,
     Bookmark,
-    Award
+    Award,
+    Shield
 } from "lucide-react";
 
 interface MenuSection {
