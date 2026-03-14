@@ -31,7 +31,7 @@ export async function createCategory(formData: FormData) {
         if (error) throw error;
 
         await logEvent("CATEGORY_CREATED", category.id, `Category "${name}" created`);
-        revalidatePath("/admin/categories");
+        revalidatePath("/", "layout");
         return { success: true };
     } catch (error) {
         console.error("Create category error:", error);
@@ -60,7 +60,7 @@ export async function updateCategory(id: string, formData: FormData) {
 
         if (error) throw error;
 
-        revalidatePath("/admin/categories");
+        revalidatePath("/", "layout");
         return { success: true };
     } catch (error) {
         console.error("Update category error:", error);
@@ -91,7 +91,7 @@ export async function deleteCategory(id: string) {
         if (deleteError) throw deleteError;
 
         await logEvent("CATEGORY_DELETED", id, `Category ${id} deleted`);
-        revalidatePath("/admin/categories");
+        revalidatePath("/", "layout");
         return { success: true };
     } catch (error) {
         console.error("Delete category error:", error);

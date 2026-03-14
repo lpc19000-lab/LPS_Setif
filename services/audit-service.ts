@@ -43,41 +43,57 @@ export const logSystemError = async (data: {
 
 // ── READ LOGS ─────────────────────────────────────────────────────────────
 export const getAdminLogs = async (limit = 100) => {
-    const { data, error } = await supabaseAdmin
-        .from('admin_logs')
-        .select('*, admins(name, email)')
-        .order('created_at', { ascending: false })
-        .limit(limit);
+    try {
+        const { data, error } = await supabaseAdmin
+            .from('admin_logs')
+            .select('*, admins(name, email)')
+            .order('created_at', { ascending: false })
+            .limit(limit);
 
-    if (error) throw error;
+        if (error) {
+            console.error("Failed to fetch admin logs:", error);
+            return [];
+        }
 
-    return (data || []).map(log => ({
-        id: log.id,
-        adminId: log.admin_id,
-        action: log.action,
-        targetType: log.target_type,
-        targetId: log.target_id,
-        metadata: log.metadata,
-        createdAt: new Date(log.created_at),
-        admin: log.admins ? { name: log.admins.name, email: log.admins.email } : null
-    }));
+        return (data || []).map(log => ({
+            id: log.id,
+            adminId: log.admin_id,
+            action: log.action,
+            targetType: log.target_type,
+            targetId: log.target_id,
+            metadata: log.metadata,
+            createdAt: new Date(log.created_at),
+            admin: log.admins ? { name: log.admins.name, email: log.admins.email } : { name: 'System', email: '' }
+        }));
+    } catch (e) {
+        console.error("getAdminLogs failed:", e);
+        return [];
+    }
 };
 
 export const getSystemErrors = async (limit = 100) => {
-    const { data, error } = await supabaseAdmin
-        .from('system_errors')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(limit);
+    try {
+        const { data, error } = await supabaseAdmin
+            .from('system_errors')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(limit);
 
-    if (error) throw error;
+        if (error) {
+            console.error("Failed to fetch system errors:", error);
+            return [];
+        }
 
-    return (data || []).map(err => ({
-        id: err.id,
-        ...err,
-        createdAt: new Date(err.created_at),
-        stackTrace: err.stack_trace
-    }));
+        return (data || []).map(err => ({
+            id: err.id,
+            ...err,
+            createdAt: new Date(err.created_at),
+            stackTrace: err.stack_trace
+        }));
+    } catch (e) {
+        console.error("getSystemErrors failed:", e);
+        return [];
+    }
 };
 
 // ── SYSTEM HEALTH DASHBOARD ───────────────────────────────────────────────
@@ -104,16 +120,13 @@ export const getSystemHealth = async () => {
 
         const { data: inventoryHealth } = await supabaseAdmin
             .from('products')
-            .select('stock_weight, sales')
+            .select('stock_weight')
             .gt('stock_weight', 0);
 
         let lowStockProducts = 0;
-        let deadProducts = 0;
         
         inventoryHealth?.forEach((p: any) => {
             if (p.stock_weight <= 500) lowStockProducts++;
-            const sales = p.sales || { unitsSold: 0 };
-            if (sales.unitsSold === 0) deadProducts++;
         });
 
         const errorCount = recentErrors.count || 0;
@@ -127,7 +140,7 @@ export const getSystemHealth = async () => {
             },
             inventory: {
                 lowStockProducts,
-                deadProducts,
+                deadProducts: 0,
             },
             stability: {
                 recentErrors24h: errorCount,

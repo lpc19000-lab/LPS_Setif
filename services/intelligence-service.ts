@@ -2,11 +2,15 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // ── SMART RESTOCK SYSTEM ──────────────────────────────────────────────────
 export const getRestockSuggestions = async () => {
+  try {
     const { data: products, error: pError } = await supabaseAdmin
         .from('products')
         .select('*');
 
-    if (pError) throw pError;
+    if (pError) {
+        console.error("Failed to fetch products for restock:", pError);
+        return [];
+    }
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -17,7 +21,10 @@ export const getRestockSuggestions = async () => {
         .neq('status', 'CANCELLED')
         .gte('created_at', thirtyDaysAgo.toISOString());
 
-    if (oError) throw oError;
+    if (oError) {
+        console.error("Failed to fetch orders for restock:", oError);
+        return [];
+    }
 
     const recentDemandMap = new Map<string, number>();
     recentOrders?.forEach((order: any) => {
@@ -67,10 +74,15 @@ export const getRestockSuggestions = async () => {
             status
         };
     }).sort((a: any, b: any) => a.estimatedDaysLeft - b.estimatedDaysLeft);
+  } catch (e) {
+    console.error("getRestockSuggestions failed:", e);
+    return [];
+  }
 };
 
 // ── DEAD STOCK DETECTION ──────────────────────────────────────────────────
 export const getDeadStock = async () => {
+  try {
     const sixtyDaysAgo = new Date();
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
 
@@ -80,7 +92,10 @@ export const getDeadStock = async () => {
         .neq('status', 'CANCELLED')
         .gte('created_at', sixtyDaysAgo.toISOString());
 
-    if (oError) throw oError;
+    if (oError) {
+        console.error("Failed to fetch orders for dead stock:", oError);
+        return [];
+    }
 
     const activeProductIds = new Set<string>();
     recentOrders?.forEach((order: any) => {
@@ -92,7 +107,10 @@ export const getDeadStock = async () => {
         .select('*')
         .gt('stock_weight', 0);
 
-    if (pError) throw pError;
+    if (pError) {
+        console.error("Failed to fetch products for dead stock:", pError);
+        return [];
+    }
     
     const deadProducts = (products || [])
         .filter((p: any) => !activeProductIds.has(p.id));
@@ -111,10 +129,15 @@ export const getDeadStock = async () => {
         };
     }).filter((p: any) => p.daysSinceAdded > 60) 
         .sort((a: any, b: any) => b.valueTieUp - a.valueTieUp);
+  } catch (e) {
+    console.error("getDeadStock failed:", e);
+    return [];
+  }
 };
 
 // ── PROFIT ANALYTICS ──────────────────────────────────────────────────────
 export const getProfitAnalytics = async () => {
+  try {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -123,7 +146,10 @@ export const getProfitAnalytics = async () => {
         .select('*, order_items(*)')
         .neq('status', 'CANCELLED');
 
-    if (oError) throw oError;
+    if (oError) {
+        console.error("Failed to fetch orders for profit analytics:", oError);
+        return { dailyProfit: [], globalMarginPercent: 0, overallProfit: 0, topProfitableProducts: [] };
+    }
 
     const dailyMap = new Map<string, { revenue: number, cost: number, profit: number }>();
     for (let i = 29; i >= 0; i--) {
@@ -175,28 +201,21 @@ export const getProfitAnalytics = async () => {
 
     const { data: products, error: pError } = await supabaseAdmin
         .from('products')
-        .select('*')
-        .order('sales->revenue', { ascending: false })
+        .select('id, name, image_url, base_price')
         .limit(10);
 
-    if (pError) throw pError;
-    
     const productsProfit = (products || []).map((p: any) => {
-        const sales = p.sales || { unitsSold: 0, revenue: 0 };
-        const avgSellPrice = sales.unitsSold > 0 ? Number(sales.revenue) / sales.unitsSold : Number(p.base_price || 0);
-        const unitProfit = avgSellPrice * 0.3; 
-        const totalProfit = unitProfit * sales.unitsSold;
-        const marginPercent = 30;
-
+        const basePrice = Number(p.base_price || 0);
+        const unitProfit = basePrice * 0.3;
         return {
             id: p.id,
-            name: p.name,
+            name: p.name || "",
             imageUrl: p.image_url,
-            totalProfit,
-            marginPercent,
-            unitsSold: sales.unitsSold
+            totalProfit: unitProfit,
+            marginPercent: 30,
+            unitsSold: 0
         };
-    }).sort((a: any, b: any) => b.totalProfit - a.totalProfit);
+    });
 
     return {
         dailyProfit,
@@ -204,6 +223,10 @@ export const getProfitAnalytics = async () => {
         overallProfit: overallRevenue - overallCost,
         topProfitableProducts: productsProfit
     };
+  } catch (e) {
+    console.error("getProfitAnalytics failed:", e);
+    return { dailyProfit: [], globalMarginPercent: 0, overallProfit: 0, topProfitableProducts: [] };
+  }
 };
 
 // ── INVENTORY HEALTH SCORE ────────────────────────────────────────────────

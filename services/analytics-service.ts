@@ -2,12 +2,15 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // ── PRODUCT PERFORMANCE & DEMAND FORECAST ─────────────────────────────────
 export const getProductAnalytics = async () => {
+  try {
     const { data: products, error: pError } = await supabaseAdmin
         .from('products')
-        .select('id, name, brand, image_url, sales')
-        .order('sales->revenue', { ascending: false });
+        .select('id, name, brand, image_url, base_price, stock_weight');
 
-    if (pError) throw pError;
+    if (pError) {
+        console.error("Failed to fetch product analytics:", pError);
+        return [];
+    }
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -19,10 +22,12 @@ export const getProductAnalytics = async () => {
         .neq('status', 'CANCELLED')
         .gte('created_at', thirtyDaysAgo.toISOString());
 
-    if (oError) throw oError;
+    if (oError) {
+        console.error("Failed to fetch recent orders:", oError);
+    }
 
     const recentDemandMap = new Map<string, number>();
-    recentOrders?.forEach((order: any) => {
+    (recentOrders || []).forEach((order: any) => {
         order.order_items?.forEach((item: any) => {
             const currentQty = recentDemandMap.get(item.product_id) || 0;
             recentDemandMap.set(item.product_id, currentQty + (item.quantity || 0));
@@ -37,22 +42,26 @@ export const getProductAnalytics = async () => {
 
     return (products || []).map((p: any) => {
         const recentQty = recentDemandMap.get(p.id) || 0;
-        const sales = p.sales || { unitsSold: 0, revenue: 0 };
         return {
             id: p.id,
-            name: p.name,
-            brand: p.brand,
+            name: p.name || "",
+            brand: p.brand || "",
             imageUrl: p.image_url,
-            totalUnitsSold: sales.unitsSold || 0,
-            totalRevenue: Number(sales.revenue || 0),
+            totalUnitsSold: recentQty,
+            totalRevenue: 0,
             recentUnits30d: recentQty,
             demandForecast: getDemandLabel(recentQty),
         };
     });
+  } catch (e) {
+    console.error("getProductAnalytics failed:", e);
+    return [];
+  }
 };
 
 // ── REVENUE ANALYTICS ─────────────────────────────────────────────────────
 export const getRevenueMetrics = async () => {
+  try {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -62,7 +71,10 @@ export const getRevenueMetrics = async () => {
         .neq('status', 'CANCELLED')
         .order('created_at', { ascending: true });
 
-    if (error) throw error;
+    if (error) {
+        console.error("Failed to fetch revenue metrics:", error);
+        return { dailyRevenue: [], monthlyRevenue: [] };
+    }
 
     const dailyMap = new Map<string, { revenue: number, orders: number }>();
     for (let i = 29; i >= 0; i--) {
@@ -104,22 +116,33 @@ export const getRevenueMetrics = async () => {
     .slice(-12);
 
     return { dailyRevenue, monthlyRevenue };
+  } catch (e) {
+    console.error("getRevenueMetrics failed:", e);
+    return { dailyRevenue: [], monthlyRevenue: [] };
+  }
 };
 
 // ── TOP CUSTOMERS ─────────────────────────────────────────────────────────
 export const getTopCustomers = async (limit = 10) => {
+  try {
     const { data: customers, error: cError } = await supabaseAdmin
         .from('customers')
         .select('id, name, shop_name, phone');
 
-    if (cError) throw cError;
+    if (cError) {
+        console.error("Failed to fetch customers:", cError);
+        return [];
+    }
 
     const { data: validOrders, error: oError } = await supabaseAdmin
         .from('orders')
         .select('customer_id, total_price')
         .neq('status', 'CANCELLED');
 
-    if (oError) throw oError;
+    if (oError) {
+        console.error("Failed to fetch orders for top customers:", oError);
+        return [];
+    }
         
     const customerSpentMap = new Map<string, { totalSpent: number, count: number }>();
     validOrders?.forEach((order: any) => {
@@ -146,6 +169,10 @@ export const getTopCustomers = async (limit = 10) => {
     .filter((c: any) => c.totalSpent > 0)
     .sort((a: any, b: any) => b.totalSpent - a.totalSpent)
     .slice(0, limit);
+  } catch (e) {
+    console.error("getTopCustomers failed:", e);
+    return [];
+  }
 };
 
 // ── EXPORTS ───────────────────────────────────────────────────────────────
