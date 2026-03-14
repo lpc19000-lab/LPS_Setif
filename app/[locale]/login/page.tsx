@@ -44,7 +44,7 @@ export default function LoginPage() {
                 router.refresh();
             } else {
                 console.warn(`[LoginForm] Login Failed:`, data.error);
-                setError(data.error || t("error_login_failed"));
+                setError(data.message || data.error || t("error_login_failed"));
             }
         } catch (err) {
             console.error("[LoginForm] Unexpected Login Error:", err);

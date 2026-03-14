@@ -58,7 +58,7 @@ export async function POST(request: Request) {
 
         return response;
     } catch (error: unknown) {
-        const { body, status } = errorResponse(error);
-        return NextResponse.json(body, { status });
+        console.error("[RegisterAPI] Registration error:", error);
+        return errorResponse(error);
     }
 }

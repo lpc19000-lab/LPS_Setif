@@ -65,7 +65,7 @@ export default function RegisterPage() {
                 router.push(`/${locale}/account`);
                 router.refresh();
             } else {
-                setError(data.error || t("error_registration_failed"));
+                setError(data.message || data.error || t("error_registration_failed"));
             }
         } catch (err) {
             setError(t("error_generic"));
