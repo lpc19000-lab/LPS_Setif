@@ -21,7 +21,7 @@ export default async function AdminCollectionsPage({ params }: { params: Promise
     }
 
     // Get product counts for each collection
-    const collections = await Promise.all((collectionsData || []).map(async (col) => {
+    const collections = await Promise.all((collectionsData || []).map(async (col: any) => {
         const { count, error: countError } = await supabaseAdmin
             .from("products")
             .select("id", { count: 'exact', head: true })

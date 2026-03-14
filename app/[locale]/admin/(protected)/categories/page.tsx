@@ -22,7 +22,7 @@ export default async function AdminCategoriesPage({ params }: { params: Promise<
         console.error("Categories fetch error:", error);
     }
 
-    const categories = (categoriesData || []).map(cat => ({
+    const categories = (categoriesData || []).map((cat: any) => ({
         ...cat,
         _count: { products: cat.products?.length || 0 }
     }));

@@ -32,17 +32,17 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
     ]);
 
     // Serialize Decimal values for Client Components
-    const orders = rawOrders.map(order => ({
+    const orders = rawOrders.map((order: any) => ({
         ...order,
         totalPrice: Number(order.totalPrice),
-        items: order.items.map(item => ({
+        items: (order.items || []).map((item: any) => ({
             ...item,
             price: Number(item.price),
             weight: (item as any).volume?.weight || 0
         }))
     }));
 
-    const enrichedCartItems = cart.items.map(item => ({
+    const enrichedCartItems = (cart?.items || []).map((item: any) => ({
         ...item,
         unitPrice: Number(item.unitPrice),
         lineTotal: Number(item.lineTotal),
