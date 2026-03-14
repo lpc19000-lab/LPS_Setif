@@ -1,6 +1,6 @@
 "use client";
 
-import { useRealtimeRefresh } from "@/hooks/useRealtime";
+import { useRealtimeRefresh } from "@/hooks/use-realtime";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
