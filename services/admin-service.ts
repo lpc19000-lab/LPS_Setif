@@ -81,17 +81,31 @@ export const getAdminStats = async () => {
 };
 
 export const validateAdminCredentials = async (email: string, password: string) => {
+    console.log(`[validateAdminCredentials] Checking email: ${email}`);
     const { data: admin, error } = await supabaseAdmin
         .from('admins')
         .select('*')
         .eq('email', email)
         .maybeSingle();
     
-    if (error || !admin) return null;
+    if (error) {
+        console.error(`[validateAdminCredentials] DB Error:`, error);
+        return null;
+    }
     
+    if (!admin) {
+        console.log(`[validateAdminCredentials] Admin not found for email: ${email}`);
+        return null;
+    }
+    
+    console.log(`[validateAdminCredentials] Admin found, verifying password hash...`);
     const isValid = await bcrypt.compare(password, admin.password_hash);
-    if (!isValid) return null;
+    if (!isValid) {
+        console.log(`[validateAdminCredentials] Invalid password for: ${email}`);
+        return null;
+    }
 
+    console.log(`[validateAdminCredentials] Password valid for: ${email}`);
     return { 
         id: admin.id, 
         email: admin.email,

@@ -52,7 +52,7 @@ export default function CommuneSelector({ wilayaId, value, onChange, error, labe
     const selectedCommune = communes.find((c: CommuneItem) => c.name === value || c.id === value);
 
     const filteredCommunes = communes.filter((c: CommuneItem) =>
-        c.name.toLowerCase().includes(searchTerm.toLowerCase())
+        (c.name || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     useEffect(() => {

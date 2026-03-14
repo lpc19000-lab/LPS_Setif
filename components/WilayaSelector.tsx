@@ -38,10 +38,12 @@ export default function WilayaSelector({ value, onChange, error, label }: Wilaya
         fetchWilayas();
     }, []);
 
-    const selectedWilaya = wilayas.find((w: any) => String(w.number) === String(value) || w.name === value);
+    const getWilayaName = (w: any) => w.name || w.name_en || w.name_ar || "";
+
+    const selectedWilaya = wilayas.find((w: any) => String(w.number) === String(value) || getWilayaName(w) === value);
 
     const filteredWilayas = wilayas.filter((w: any) =>
-        w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        getWilayaName(w).toLowerCase().includes(searchTerm.toLowerCase()) ||
         String(w.number).includes(searchTerm)
     );
 
@@ -65,7 +67,7 @@ export default function WilayaSelector({ value, onChange, error, label }: Wilaya
                     }`}
             >
                 <span className={selectedWilaya ? "text-gray-900" : "text-gray-400"}>
-                    {loading ? "..." : selectedWilaya ? `${selectedWilaya.number} - ${selectedWilaya.name}` : t("select_wilaya")}
+                    {loading ? "..." : selectedWilaya ? `${selectedWilaya.number} - ${getWilayaName(selectedWilaya)}` : t("select_wilaya")}
                 </span>
                 <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </button>
@@ -90,14 +92,14 @@ export default function WilayaSelector({ value, onChange, error, label }: Wilaya
                                     key={wilaya.number}
                                     type="button"
                                     onClick={() => {
-                                        onChange({ id: String(wilaya.number), name: wilaya.name });
+                                        onChange({ id: String(wilaya.number), name: getWilayaName(wilaya) });
                                         setIsOpen(false);
                                         setSearchTerm("");
                                     }}
                                     className={`w-full flex items-center justify-between px-4 py-2 text-sm hover:bg-primary/5 transition-colors ${selectedWilaya?.number === wilaya.number ? "bg-primary/10 text-primary font-medium" : "text-gray-700"
                                         }`}
                                 >
-                                    <span>{wilaya.number} - {wilaya.name}</span>
+                                    <span>{wilaya.number} - {getWilayaName(wilaya)}</span>
                                     {selectedWilaya?.number === wilaya.number && <Check className="w-4 h-4" />}
                                 </button>
                             ))

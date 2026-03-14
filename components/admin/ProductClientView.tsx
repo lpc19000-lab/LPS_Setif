@@ -36,9 +36,11 @@ export default function ProductClientView({
     const locale = useLocale();
 
     const filteredProducts = products.filter((p) => {
+        const pName = p.name || "";
+        const pBrand = p.brand || p.brandName || "";
         const matchesSearch =
-            p.name.toLowerCase().includes(search.toLowerCase()) ||
-            p.brand.toLowerCase().includes(search.toLowerCase());
+            pName.toLowerCase().includes(search.toLowerCase()) ||
+            pBrand.toLowerCase().includes(search.toLowerCase());
         const matchesStatus = !statusFilter || p.status === statusFilter;
         return matchesSearch && matchesStatus;
     });

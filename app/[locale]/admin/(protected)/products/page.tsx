@@ -26,8 +26,8 @@ export default async function AdminProductsPage({ params }: { params: Promise<{ 
 
     const serializedProducts = (productsData || []).map((p: any) => ({
         id: p.id,
-        name: p.name,
-        brand: p.brand,
+        name: p.name || "",
+        brand: p.brand || "",
         brandId: p.brand_id,
         slug: p.slug,
         description: p.description,
