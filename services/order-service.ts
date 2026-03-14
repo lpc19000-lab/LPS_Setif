@@ -68,13 +68,23 @@ function mapOrder(data: any): Order {
                 imageUrl: item.products.image_url
             } : undefined
         })),
-        customer: data.customers || null,
+        customer: data.customers ? {
+            id: data.customers.id,
+            name: data.customers.name,
+            shopName: data.customers.shop_name,
+            phone: data.customers.phone,
+            address: data.customers.address,
+            wilaya: data.customers.wilaya,
+            commune: data.customers.commune
+        } : null,
         shipping: data.shipping || null,
         invoice: data.invoice || null,
         wilayaName: data.wilaya_name || null,
         wilayaNumber: data.wilaya_number || null,
         logs: (data.logs || []).sort((a: any, b: any) => {
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA;
         }),
     };
 }

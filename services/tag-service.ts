@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { revalidateTag } from "next/cache";
 
 function generateSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -32,6 +33,7 @@ export const createTag = async (data: { name: string }) => {
         .single();
 
     if (error) throw error;
+    (revalidateTag as any)('tags');
     return { id: newTag.id, name: newTag.name, slug: newTag.slug };
 };
 
@@ -46,6 +48,7 @@ export const updateTag = async (id: string, data: { name: string }) => {
         .single();
 
     if (error) throw error;
+    (revalidateTag as any)('tags');
     return { id: updatedTag.id, name: updatedTag.name, slug: updatedTag.slug };
 };
 
@@ -57,5 +60,6 @@ export const deleteTag = async (id: string) => {
         .eq('id', id);
 
     if (error) throw error;
+    (revalidateTag as any)('tags');
     return { id };
 };

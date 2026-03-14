@@ -105,9 +105,9 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                                 <ShippingInfoForm
                                     orderId={order.id}
                                     initialData={{
-                                        shippingCompany: order.shippingCompany || "",
-                                        trackingNumber: order.trackingNumber || "",
-                                        shippingDate: order.shippingDate ? order.shippingDate.toISOString().split('T')[0] : ""
+                                        shippingCompany: order.shipping?.company || "",
+                                        trackingNumber: order.shipping?.trackingNumber || "",
+                                        shippingDate: order.shipping?.date ? new Date(order.shipping.date).toISOString().split('T')[0] : ""
                                     }}
                                 />
                             </div>

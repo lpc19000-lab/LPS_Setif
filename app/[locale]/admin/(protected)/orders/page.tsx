@@ -15,7 +15,11 @@ export default async function AdminOrdersPage({ params }: { params: Promise<{ lo
         .from("orders")
         .select(`
             *,
-            customers (shop_name)
+            customers (shop_name),
+            items:order_items(
+                *,
+                product:products(*)
+            )
         `)
         .order("created_at", { ascending: false });
 
@@ -33,14 +37,25 @@ export default async function AdminOrdersPage({ params }: { params: Promise<{ lo
         paymentStatus: o.payment_status,
         createdAt: new Date(o.created_at),
         updatedAt: new Date(o.updated_at),
-        items: (o.items || []).map((i: any) => ({
-            ...i,
-            price: Number(i.price || 0),
-            product: i.product ? {
-                ...i.product,
-                basePrice: Number(i.product.basePrice || i.product.price || 0),
-            } : null
-        })),
+        items: (o.items || []).map((i: any) => {
+            const product = i.product ? {
+                id: i.product.id,
+                name: i.product.name,
+                brand: i.product.brand,
+                imageUrl: i.product.image_url,
+                basePrice: Number(i.product.base_price || 0)
+            } : null;
+
+            return {
+                id: i.id,
+                productId: i.product_id,
+                quantity: Number(i.quantity),
+                price: Number(i.price),
+                volumeId: i.volume_id,
+                weight: Number(i.weight || 0),
+                product
+            };
+        }),
         shippingAddress: o.shipping_address,
         notes: o.notes
     }));

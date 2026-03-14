@@ -134,17 +134,16 @@ export async function updateProduct(id: string, formData: FormData) {
 
 export async function deleteProduct(id: string) {
     try {
-        // Check for orders referencing this product using JSONB path filtering
-        // We look for any order where the 'items' JSONB array contains an object with productId matching id
-        const { data: referencedOrders, error: checkError } = await supabaseAdmin
-            .from("orders")
-            .select("id")
-            .contains('items', [{ productId: id }])
+        // Check for orders referencing this product via order_items table
+        const { data: referencedItems, error: checkError } = await supabaseAdmin
+            .from("order_items")
+            .select("order_id")
+            .eq('product_id', id)
             .limit(1);
 
         if (checkError) throw checkError;
 
-        if (referencedOrders && referencedOrders.length > 0) {
+        if (referencedItems && referencedItems.length > 0) {
             return { success: false, error: "Cannot delete product. It is referenced in existing orders." };
         }
 
