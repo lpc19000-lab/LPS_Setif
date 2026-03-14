@@ -19,7 +19,8 @@ import {
     History,
     Activity,
     Bell,
-    Shield
+    Shield,
+    Settings
 } from "lucide-react";
 
 const menuItems = [
@@ -38,6 +39,7 @@ const menuItems = [
     { label: "logs", icon: History, href: "/admin/logs" },
     { label: "system", icon: Activity, href: "/admin/system" },
     { label: "notifications", icon: Bell, href: "/admin/notifications" },
+    { label: "settings", icon: Settings, href: "/admin/settings" },
 ];
 
 export default function AdminSidebar() {

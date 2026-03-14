@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import Link from "next/link";
-import { Package, User, RefreshCcw, LogOut, ChevronRight } from "lucide-react";
+import { Package, User, RefreshCcw, LogOut, ChevronRight, Settings } from "lucide-react";
 import LogoutButton from "@/components/shop/LogoutButton";
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
@@ -8,6 +8,7 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
         { href: "/account", label: "Dashboard", icon: <User className="w-5 h-5" /> },
         { href: "/account/orders", label: "My Orders", icon: <Package className="w-5 h-5" /> },
         { href: "/catalog", label: "Reorder Products", icon: <RefreshCcw className="w-5 h-5" /> },
+        { href: "/account/settings", label: "Settings", icon: <Settings className="w-5 h-5" /> },
     ];
 
     return (
