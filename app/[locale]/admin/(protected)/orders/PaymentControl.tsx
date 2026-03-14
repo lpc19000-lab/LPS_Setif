@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { DollarSign, Save, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { updateOrderPayment } from "@/app/[locale]/admin/actions/order-actions";
+import { updateOrderPayment } from "@/app/[locale]/admin/actions/order";
 
 interface PaymentControlProps {
     orderId: string;
