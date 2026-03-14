@@ -126,8 +126,8 @@ export const createOrder = async (input: CreateOrderInput) => {
         throw new Error(error.message);
     }
 
-    revalidateTag(`orders:${input.customerId}`);
-    revalidateTag("orders");
+    (revalidateTag as any)(`orders:${input.customerId}`);
+    (revalidateTag as any)("orders");
 
     // Fetch the created order for mapping
     const order = await getOrderById(orderId);
@@ -250,7 +250,7 @@ export const updateOrderStatus = async (orderId: string, status: string, changed
 
     if (updateError) throw updateError;
 
-    revalidateTag("orders");
+    (revalidateTag as any)("orders");
     return mapOrder(updatedOrder);
 };
 
@@ -271,7 +271,7 @@ export const updateOrderShipping = async (orderId: string, data: {
         .eq('id', orderId);
 
     if (error) throw error;
-    revalidateTag("orders");
+    (revalidateTag as any)("orders");
     return { success: true };
 };
 

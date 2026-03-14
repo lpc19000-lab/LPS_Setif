@@ -130,7 +130,7 @@ export const createCategory = async (data: {
         .single();
 
     if (error) throw error;
-    revalidateTag('categories');
+    (revalidateTag as any)('categories');
     return { ...newCategory, id: newCategory.id };
 };
 
@@ -152,7 +152,7 @@ export const updateCategory = async (
         .single();
 
     if (error) throw error;
-    revalidateTag('categories');
+    (revalidateTag as any)('categories');
     return { ...updatedCategory, id: updatedCategory.id };
 };
 
@@ -164,6 +164,6 @@ export const deleteCategory = async (id: string) => {
         .eq('id', id);
 
     if (error) throw error;
-    revalidateTag('categories');
+    (revalidateTag as any)('categories');
     return { id };
 };
