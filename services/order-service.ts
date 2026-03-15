@@ -29,6 +29,9 @@ export interface Order {
     invoice?: any;
     wilayaName?: string | null;
     wilayaNumber?: string | null;
+    amountPaid?: number;
+    paymentStatus?: string;
+    updatedAt: Date;
     logs: any[];
 }
 
@@ -81,6 +84,9 @@ function mapOrder(data: any): Order {
         invoice: data.invoice || null,
         wilayaName: data.wilaya_name || null,
         wilayaNumber: data.wilaya_number || null,
+        amountPaid: Number(data.amount_paid || 0),
+        paymentStatus: data.payment_status || 'UNPAID',
+        updatedAt: data.updated_at ? new Date(data.updated_at) : new Date(data.created_at),
         logs: (data.logs || []).sort((a: any, b: any) => {
             const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
             const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;

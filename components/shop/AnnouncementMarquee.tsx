@@ -48,32 +48,29 @@ export default function AnnouncementMarquee() {
     if (!isVisible || announcements.length === 0) return null;
 
     return (
-        <div className="bg-primary text-white py-2 relative overflow-hidden group">
-            <div className="max-w-7xl mx-auto px-10 relative flex items-center">
-                <div className="flex-shrink-0 mr-4 z-10 bg-primary pr-2">
-                    <Megaphone className="w-4 h-4 text-[#D4AF37]" />
+        <div className="bg-gradient-to-r from-primary-dark via-primary to-primary-dark text-white py-2.5 relative border-b border-[#D4AF37]/20 shadow-sm overflow-hidden group">
+            <div className="max-w-7xl mx-auto px-6 relative flex items-center justify-center">
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/20 z-10">
+                    <Megaphone className="w-3.5 h-3.5 text-[#D4AF37] animate-pulse" />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
+                        {isRtl ? 'إعلان' : 'Notice'}
+                    </span>
                 </div>
                 
-                <div className="overflow-hidden flex-1 relative h-6">
-                    <div className="whitespace-nowrap flex animate-marquee hover:pause-marquee">
+                <div className="overflow-hidden flex-1 relative h-6 flex items-center">
+                    <div className="whitespace-nowrap flex animate-marquee hover:pause-marquee py-1">
                         {announcements.map((ann, i) => (
-                            <span key={`${ann.id}-${i}`} className="mx-8 text-sm font-medium">
-                                <span className="text-[#D4AF37] font-bold mr-2">[{ann.title}]</span>
-                                {ann.message}
+                            <span key={`${ann.id}-${i}`} className="mx-12 group/ann flex items-center gap-3">
+                                <span className="text-white/40 text-[10px] sm:text-xs">✦</span>
+                                <span className="text-xs sm:text-sm font-medium tracking-wide">
+                                    <span className="text-[#D4AF37] font-bold mr-2 uppercase tracking-tighter">[{ann.title}]</span>
+                                    {ann.message}
+                                </span>
                                 {ann.link && (
-                                    <a href={ann.link} className="ml-2 underline text-[10px] hover:text-[#D4AF37]">
-                                        {isRtl ? 'عرض المزيد' : 'View More'}
-                                    </a>
-                                )}
-                            </span>
-                        ))}
-                        {/* Duplicate for seamless loop */}
-                        {announcements.map((ann, i) => (
-                            <span key={`${ann.id}-dup-${i}`} className="mx-8 text-sm font-medium">
-                                <span className="text-[#D4AF37] font-bold mr-2">[{ann.title}]</span>
-                                {ann.message}
-                                {ann.link && (
-                                    <a href={ann.link} className="ml-2 underline text-[10px] hover:text-[#D4AF37]">
+                                    <a 
+                                        href={ann.link} 
+                                        className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-white/10 hover:bg-[#D4AF37] hover:text-primary-dark rounded-md text-[9px] font-bold uppercase tracking-wider transition-all duration-300"
+                                    >
                                         {isRtl ? 'عرض المزيد' : 'View More'}
                                     </a>
                                 )}
@@ -84,19 +81,22 @@ export default function AnnouncementMarquee() {
 
                 <button 
                     onClick={() => setIsVisible(false)}
-                    className="flex-shrink-0 ml-4 z-10 bg-primary pl-2 hover:text-[#D4AF37] transition-colors"
+                    className="flex-shrink-0 ml-4 p-1.5 text-white/40 hover:text-[#D4AF37] hover:bg-white/5 rounded-full transition-all duration-300 z-10"
                 >
                     <X className="w-4 h-4" />
                 </button>
             </div>
 
+            <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-primary-dark to-transparent z-[5]"></div>
+            <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-primary-dark to-transparent z-[5]"></div>
+
             <style jsx>{`
                 @keyframes marquee {
                     0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
+                    100% { transform: translateX(calc(-50%)); }
                 }
                 .animate-marquee {
-                    animation: marquee 30s linear infinite;
+                    animation: marquee 40s linear infinite;
                 }
                 .pause-marquee:hover {
                     animation-play-state: paused;
