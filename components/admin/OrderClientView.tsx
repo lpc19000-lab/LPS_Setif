@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Search, ChevronDown, CheckCircle2, Clock, Truck, PackageCheck, XCircle, FileText, X, DollarSign, AlertCircle } from "lucide-react";
-import { adminUpdateOrderStatus, updateOrderPayment } from "@/app/admin/actions/order";
+import { adminUpdateOrderStatus, updateOrderPayment, generateInvoiceAction } from "@/app/admin/actions/order";
 import { OrderStatus } from "@/lib/constants";
 import SafeImage from "@/components/SafeImage";
 import { useTranslations, useLocale } from "next-intl";
@@ -47,6 +48,17 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
         setUpdatingId(null);
 
         if (!res.success) alert(res.error);
+    };
+
+    const handleGenerateInvoice = async (orderId: string, amount: number) => {
+        if (!confirm("Voulez-vous générer la facture officielle pour cette commande ?")) return;
+        
+        const res = await generateInvoiceAction(orderId, amount);
+        if (res.success) {
+            router.refresh();
+        } else {
+            alert(res.error || "Failed to generate invoice");
+        }
     };
 
     const handlePaymentUpdate = async (orderId: string, currentPaid: number) => {
@@ -161,12 +173,21 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                                         {order.invoice ? (
                                             <div className="flex flex-col items-end gap-1">
                                                 <span className="text-xs font-mono text-gray-500">{order.invoice.invoiceNumber}</span>
-                                                <button className="text-xs text-blue-600 hover:underline flex items-center gap-1 rtl:flex-row-reverse">
+                                                <Link 
+                                                    href={`/${locale}/admin/orders/${order.id}/invoice/print`}
+                                                    target="_blank"
+                                                    className="text-xs text-blue-600 hover:underline flex items-center gap-1 rtl:flex-row-reverse"
+                                                >
                                                     <FileText className="w-3.5 h-3.5" /> {t("view_invoice")}
-                                                </button>
+                                                </Link>
                                             </div>
                                         ) : (
-                                            <span className="text-xs text-gray-400 italic">{t("no_invoice")}</span>
+                                            <button 
+                                                onClick={() => handleGenerateInvoice(order.id, order.totalPrice)}
+                                                className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary-dark transition-colors"
+                                            >
+                                                {t("generate_invoice_btn") || "Submit Invoice"}
+                                            </button>
                                         )}
                                     </td>
                                 </tr>

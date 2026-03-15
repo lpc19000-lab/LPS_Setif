@@ -3,6 +3,7 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { updateOrderStatus } from "@/services/order-service";
+import { createInvoice } from "@/services/invoice-service";
 import { OrderStatus } from "@/lib/constants";
 import { requireCustomerSession } from "@/lib/customer-auth";
 
@@ -97,5 +98,17 @@ export async function updateOrderPayment(orderId: string, amountPaid: number) {
     } catch (error) {
         console.error("Update payment error:", error);
         return { success: false, error: "Failed to update payment" };
+    }
+}
+
+export async function generateInvoiceAction(orderId: string, amount: number) {
+    try {
+        await createInvoice(orderId, amount);
+        revalidatePath("/admin/orders");
+        revalidatePath(`/account/orders/${orderId}`);
+        return { success: true };
+    } catch (error) {
+        console.error("Generate invoice error:", error);
+        return { success: false, error: "Failed to generate invoice" };
     }
 }

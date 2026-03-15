@@ -64,13 +64,16 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                     </div>
                 </div>
                 <div className={`flex items-center gap-3 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
-                    <Link
-                        href={`/${locale}/account/orders/${order.id}/invoice`}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all ${locale === 'ar' ? 'flex-row-reverse' : ''}`}
-                    >
-                        <FileText className="w-4 h-4" />
-                        {t("download_invoice")}
-                    </Link>
+                    {order.invoice && (
+                        <Link
+                            href={`/${locale}/account/orders/${order.id}/invoice/print`}
+                            target="_blank"
+                            className={`flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all ${locale === 'ar' ? 'flex-row-reverse' : ''}`}
+                        >
+                            <FileText className="w-4 h-4" />
+                            {t("download_invoice")}
+                        </Link>
+                    )}
                     {canCancel && <CancelOrderButton orderId={order.id} />}
                     <ReorderButton orderId={order.id} />
                 </div>
