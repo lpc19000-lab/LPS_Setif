@@ -58,7 +58,8 @@
             "CANCELLED": "Annulée",
             "PAID": "Payée",
             "PARTIALLY_PAID": "Partiellement payée",
-            "UNPAID": "Impayée"
+            "UNPAID": "Impayée",
+            "SHIPPED_UNPAID": "Expédiée (Non payée)"
         }
     },
     "registration": {
@@ -592,7 +593,13 @@
                 "reason_placeholder": "Réapprovisionnement, correction d'erreur, etc.",
                 "cancel": "Annuler",
                 "update": "Mettre à jour l'inventaire",
-                "updating": "Mise à jour..."
+                "updating": "Mise à jour...",
+                "view_history": "Voir l'historique",
+                "resulting_stock": "Stock Résultant :",
+                "add": "Ajouter",
+                "remove": "Retirer",
+                "no_change": "Pas de changement",
+                "reason_label_detailed": "Raison de l'ajustement"
             }
         },
         "invoices": {
@@ -693,7 +700,7 @@
             "overview": "Tableau de Bord",
             "products": "Produits",
             "categories": "Catégories",
-            "brands": "Marques",
+            "brands": "Marques de Luxe",
             "collections": "Collections",
             "tags": "Étiquettes",
             "orders": "Commandes",
@@ -706,7 +713,15 @@
             "activity_log": "Journal d'Activité",
             "notifications": "Notifications",
             "announcements": "Annonces Publiques",
-            "preferences": "Préférences"
+            "preferences": "Préférences",
+            "sections": {
+                "main": "Menu Principal",
+                "catalog": "Catalogue & Produits",
+                "sales_crm": "Ventes & CRM",
+                "operations": "Opérations & Logistique",
+                "data_bi": "Analyses & Données",
+                "configuration": "Configuration"
+            }
         },
         "notifications": {
             "title": "Centre de Notifications",

@@ -280,9 +280,28 @@ export const updateOrderStatus = async (orderId: string, status: string, changed
         createdAt: new Date().toISOString(),
     });
 
+    const updateData: any = { status, logs };
+
+    // AUTOMATION: If status is SHIPPED, update payment if not yet paid, and generate invoice
+    if (status === OrderStatus.SHIPPED) {
+        if (!order.payment_status || order.payment_status === "UNPAID") {
+            updateData.payment_status = "SHIPPED_UNPAID";
+        }
+        
+        // Trigger invoice generation asynchronously
+        import("@/services/invoice-service").then(m => m.createInvoice(orderId)).catch(err => {
+            console.error("Auto-invoice generation failed:", err);
+            import("@/services/audit-service").then(m => m.logSystemError({
+                message: `Auto-invoice failed for order ${orderId}: ${err.message}`,
+                path: "order-service.updateOrderStatus",
+                method: "AUTO"
+            }));
+        });
+    }
+
     const { data: updatedOrder, error: updateError } = await supabaseAdmin
         .from('orders')
-        .update({ status, logs })
+        .update(updateData)
         .eq('id', orderId)
         .select('*, order_items(*, products(*))')
         .single();

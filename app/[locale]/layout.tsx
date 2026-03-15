@@ -38,6 +38,7 @@ export const metadata: Metadata = {
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { getSiteSettings } from "@/services/settings-service";
+import AnnouncementMarquee from "@/components/shop/AnnouncementMarquee";
 
 export default async function RootLayout(props: {
     children: React.ReactNode;
@@ -63,6 +64,7 @@ export default async function RootLayout(props: {
             >
                 <NextIntlClientProvider messages={messages}>
                     <CartProvider>
+                        <AnnouncementMarquee />
                         <Navbar customerName={customer?.name} settings={settings} />
                         <main className="min-h-screen">
                             {children}

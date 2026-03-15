@@ -46,7 +46,7 @@ export const getAdminLogs = async (limit = 100) => {
     try {
         const { data, error } = await supabaseAdmin
             .from('admin_logs')
-            .select('*, admins(name, email)')
+            .select('*, admin:customers(name, email)')
             .order('created_at', { ascending: false })
             .limit(limit);
 
@@ -63,7 +63,7 @@ export const getAdminLogs = async (limit = 100) => {
             targetId: log.target_id,
             metadata: log.metadata,
             createdAt: new Date(log.created_at),
-            admin: log.admins ? { name: log.admins.name, email: log.admins.email } : { name: 'System', email: '' }
+            admin: log.admin ? { name: log.admin.name, email: log.admin.email } : { name: 'System', email: '' }
         }));
     } catch (e) {
         console.error("getAdminLogs failed:", e);

@@ -162,7 +162,7 @@ export default function InventoryManagerClient({
                                                 className="p-2 text-gray-400 hover:text-primary bg-gray-50 hover:bg-primary/5 rounded-lg transition-colors tooltip-trigger relative group"
                                             >
                                                 <History className="w-4 h-4" />
-                                                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">View History</span>
+                                                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">{t("modal.view_history")}</span>
                                             </Link>
                                             <button
                                                 onClick={() => setIsAdjusting(isAdjusting === product.id ? null : product.id)}
@@ -214,17 +214,17 @@ export default function InventoryManagerClient({
                                                 className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-gray-900 font-bold focus:ring-2 focus:ring-primary/20"
                                             />
                                             <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">
-                                                {adjustQuantity > 0 ? `+${adjustQuantity} (Add)` : adjustQuantity < 0 ? `${adjustQuantity} (Remove)` : "(No Change)"}
+                                                {adjustQuantity > 0 ? `+${adjustQuantity} (${t("modal.add")})` : adjustQuantity < 0 ? `${adjustQuantity} (${t("modal.remove")})` : `(${t("modal.no_change")})`}
                                             </div>
                                         </div>
-                                        <p className="text-[10px] text-primary font-bold uppercase">Resulting Stock: {p.stockWeight + adjustQuantity}g</p>
+                                        <p className="text-[10px] text-primary font-bold uppercase">{t("modal.resulting_stock")} {p.stockWeight + adjustQuantity}g</p>
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Reason for Adjustment</label>
+                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">{t("modal.reason_label_detailed")}</label>
                                         <input
                                             type="text"
-                                            placeholder="e.g. Warehouse correction, Damaged item..."
+                                            placeholder={t("modal.reason_placeholder")}
                                             value={adjustReason}
                                             onChange={(e) => setAdjustReason(e.target.value)}
                                             className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
