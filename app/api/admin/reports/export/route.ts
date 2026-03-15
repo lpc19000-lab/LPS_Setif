@@ -33,7 +33,7 @@ export async function GET(request: Request) {
         else if (type === "sales") {
             const { data: orders, error } = await supabaseAdmin
                 .from("orders")
-                .select("*, customers(shop_name)")
+                .select("*, customers(shop_name), order_items(quantity)")
                 .neq("status", "CANCELLED")
                 .order("created_at", { ascending: false });
 
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
             csvData = "OrderID,Date,Customer,TotalItems,TotalRevenue,Status\n";
             orders?.forEach((o: any) => {
                 const createdAt = new Date(o.created_at);
-                const totalItems = (o.items || []).reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
+                const totalItems = (o.order_items || []).reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
                 const shopName = o.customers?.shop_name || "";
                 
                 csvData += `${o.id},${createdAt.toISOString().split('T')[0]},"${shopName}",${totalItems},${o.total_price},${o.status}\n`;
