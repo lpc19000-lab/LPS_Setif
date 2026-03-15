@@ -2,6 +2,7 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { notifyNewOrder, notifyLowStock } from "./notification-service";
 import { Errors } from "@/lib/errors";
 import { unstable_cache, revalidateTag } from "next/cache";
+import { OrderStatus } from "@/lib/constants";
 
 export interface OrderItem {
     id: string;
@@ -289,7 +290,7 @@ export const updateOrderStatus = async (orderId: string, status: string, changed
         }
         
         // Trigger invoice generation asynchronously
-        import("@/services/invoice-service").then(m => m.createInvoice(orderId)).catch(err => {
+        import("@/services/invoice-service").then(m => m.createInvoice(orderId, Number(order.total_price))).catch(err => {
             console.error("Auto-invoice generation failed:", err);
             import("@/services/audit-service").then(m => m.logSystemError({
                 message: `Auto-invoice failed for order ${orderId}: ${err.message}`,
