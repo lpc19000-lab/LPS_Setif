@@ -25,6 +25,8 @@ interface InvoiceProps {
                 price: number;
             }>;
         };
+        amountPaid?: number;
+        paymentStatus?: string;
     };
     locale: string;
 }
@@ -69,9 +71,9 @@ export default function InvoiceView({ invoice, locale }: InvoiceProps) {
                         <h1 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Invoice Details</h1>
                         <p className="text-3xl font-serif font-bold text-primary-dark mb-1">{invoice.invoiceNumber}</p>
                         <p className="text-sm font-medium text-gray-500">Issued: {formatDate(invoice.issueDate)}</p>
-                        <div className={`mt-4 inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                            Paid & Validated
+                        <div className={`mt-4 inline-flex items-center gap-2 px-3 py-1 ${(invoice.paymentStatus || 'UNPAID') === 'PAID' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : (invoice.paymentStatus || 'UNPAID') === 'PARTIAL' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-red-50 text-red-700 border-red-100'} rounded-full text-[10px] font-black uppercase tracking-widest border ${isRtl ? 'flex-row-reverse' : ''}`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${(invoice.paymentStatus || 'UNPAID') === 'PAID' ? 'bg-emerald-500' : (invoice.paymentStatus || 'UNPAID') === 'PARTIAL' ? 'bg-amber-500' : 'bg-red-500'} animate-pulse`}></div>
+                            {(invoice.paymentStatus || 'UNPAID') === 'PAID' ? 'Paid & Validated' : (invoice.paymentStatus || 'UNPAID') === 'PARTIAL' ? 'Partially Paid' : 'Awaiting Payment'}
                         </div>
                     </div>
                 </div>
@@ -170,6 +172,21 @@ export default function InvoiceView({ invoice, locale }: InvoiceProps) {
                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-3xl -translate-y-12 translate-x-12"></div>
                         </div>
                     </div>
+                    {/* Payment Info */}
+                    {(invoice.amountPaid !== undefined && invoice.amountPaid !== null) && (
+                        <div className="space-y-3 pt-2">
+                            <div className={`flex justify-between items-center text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                <span>Amount Paid</span>
+                                <span className="text-emerald-600 font-bold">{formatCurrency(invoice.amountPaid)}</span>
+                            </div>
+                            {(invoice.totalAmount - (invoice.amountPaid || 0)) > 0 && (
+                                <div className={`flex justify-between items-center text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                    <span>Balance Due</span>
+                                    <span className="text-red-600 font-bold">{formatCurrency(invoice.totalAmount - (invoice.amountPaid || 0))}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 

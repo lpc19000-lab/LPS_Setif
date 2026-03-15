@@ -41,6 +41,8 @@ export default async function CustomerInvoicePage({ params }: { params: Promise<
         issueDate: new Date(order.invoice.issueDate || order.createdAt),
         totalAmount: order.totalPrice,
         orderId: order.id,
+        amountPaid: Number(order.amountPaid || 0),
+        paymentStatus: order.paymentStatus || "UNPAID",
         order: {
             customer: {
                 shopName: customerSession.shopName,

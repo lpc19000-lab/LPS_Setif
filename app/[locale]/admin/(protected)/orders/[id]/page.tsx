@@ -17,6 +17,7 @@ import Link from "next/link";
 import OrderStatusSelect from "@/components/admin/OrderStatusSelect";
 import ShippingInfoForm from "@/components/admin/ShippingInfoForm";
 import SafeImage from "@/components/SafeImage";
+import PaymentManager from "@/components/admin/PaymentManager";
 
 export const dynamic = "force-dynamic";
 
@@ -219,6 +220,14 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                             </Link>
                         )}
                     </div>
+
+                    {/* Payment Tracking */}
+                    <PaymentManager
+                        orderId={order.id}
+                        totalPrice={Number(order.totalPrice)}
+                        currentAmountPaid={Number(order.amountPaid || 0)}
+                        currentPaymentStatus={order.paymentStatus || "UNPAID"}
+                    />
 
                     {/* Invoice Summary */}
                     <div className="bg-primary-dark rounded-2xl p-6 text-white space-y-4">

@@ -11,6 +11,7 @@ export default function CheckoutPage() {
     const router = useRouter();
     const t = useTranslations("checkout");
     const tCommon = useTranslations("common.labels");
+    const tCart = useTranslations("cart");
     const locale = useLocale();
     const { items, totalPrice, clearCart } = useCart();
     const [mounted, setMounted] = useState(false);
@@ -127,7 +128,7 @@ export default function CheckoutPage() {
                             onClick={() => router.push(`/${locale}/catalog`)}
                             className="text-gray-400 text-sm hover:text-primary transition-colors"
                         >
-                            {useTranslations("cart")("continue_shopping")}
+                            {tCart("continue_shopping")}
                         </button>
                     </div>
                 </motion.div>

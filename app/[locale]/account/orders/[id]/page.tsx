@@ -138,7 +138,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                         <div className="divide-y divide-gray-50">
                             {order.items.map((item) => (
                                 <div key={item.id} className={`p-6 flex items-center gap-6 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
-                                    <div className="w-20 h-20 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center overflow-hidden p-2 shrink-0">
+                                    <div className="w-20 h-20 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center overflow-hidden p-2 shrink-0 relative">
                                         <SafeImage
                                             src={item.product?.imageUrl || ""}
                                             alt={item.product?.name || ""}
@@ -200,6 +200,26 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                                     <p className="text-4xl font-serif font-bold">{Number(order.totalPrice).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')}</p>
                                 </div>
                                 <span className="text-xs text-gray-400 mb-1">{com("labels.currency")}</span>
+                            </div>
+
+                            {/* Payment Info */}
+                            <div className="pt-4 border-t border-white/10 space-y-3">
+                                <div className={`flex justify-between text-sm ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
+                                    <span className="text-gray-400">{locale === 'ar' ? 'المبلغ المدفوع' : 'Amount Paid'}</span>
+                                    <span className="font-bold text-emerald-400">{Number(order.amountPaid || 0).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')} {com("labels.currency")}</span>
+                                </div>
+                                {Number(order.totalPrice) - Number(order.amountPaid || 0) > 0 && (
+                                    <div className={`flex justify-between text-sm ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
+                                        <span className="text-gray-400">{locale === 'ar' ? 'المبلغ المتبقي' : 'Balance Due'}</span>
+                                        <span className="font-bold text-red-400">{(Number(order.totalPrice) - Number(order.amountPaid || 0)).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')} {com("labels.currency")}</span>
+                                    </div>
+                                )}
+                                <div className={`flex justify-between text-sm ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
+                                    <span className="text-gray-400">{locale === 'ar' ? 'حالة الدفع' : 'Payment'}</span>
+                                    <span className={`font-bold text-xs px-2 py-0.5 rounded-full ${order.paymentStatus === 'PAID' ? 'bg-emerald-500/20 text-emerald-400' : order.paymentStatus === 'PARTIAL' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'}`}>
+                                        {order.paymentStatus === 'PAID' ? (locale === 'ar' ? 'مدفوع' : 'Paid') : order.paymentStatus === 'PARTIAL' ? (locale === 'ar' ? 'دفع جزئي' : 'Partial') : (locale === 'ar' ? 'غير مدفوع' : 'Unpaid')}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 

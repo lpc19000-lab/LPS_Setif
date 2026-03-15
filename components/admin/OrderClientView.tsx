@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ChevronDown, CheckCircle2, Clock, Truck, PackageCheck, XCircle, FileText, X } from "lucide-react";
+import { Search, ChevronDown, CheckCircle2, Clock, Truck, PackageCheck, XCircle, FileText, X, DollarSign, AlertCircle } from "lucide-react";
 import { adminUpdateOrderStatus } from "@/app/admin/actions/order";
 import { OrderStatus } from "@/lib/constants";
 import SafeImage from "@/components/SafeImage";
@@ -83,6 +83,7 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                                 <th className="px-6 py-4 font-medium">{t("table.order_details")}</th>
                                 <th className="px-6 py-4 font-medium">{t("table.customer_info")}</th>
                                 <th className="px-6 py-4 font-medium">{t("table.total_amount")}</th>
+                                <th className="px-6 py-4 font-medium">Payment</th>
                                 <th className="px-6 py-4 font-medium">{t("table.status_action")}</th>
                                 <th className="px-6 py-4 font-medium text-right rtl:text-left">{t("table.invoice")}</th>
                             </tr>
@@ -104,6 +105,15 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                                     </td>
                                     <td className="px-6 py-4 font-medium text-gray-900">
                                         {formatCurrency(order.totalPrice)}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {order.paymentStatus === "PAID" ? (
+                                            <span className="flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium w-fit"><CheckCircle2 className="w-3 h-3" /> Paid</span>
+                                        ) : order.paymentStatus === "PARTIAL" ? (
+                                            <span className="flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium w-fit"><AlertCircle className="w-3 h-3" /> Partial</span>
+                                        ) : (
+                                            <span className="flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded-lg text-xs font-medium w-fit"><Clock className="w-3 h-3" /> Unpaid</span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col gap-2 items-start">
@@ -139,7 +149,7 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                             ))}
                             {filteredOrders.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-10 text-center text-gray-500">
+                                    <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
                                         {t("no_orders")}
                                     </td>
                                 </tr>
@@ -199,9 +209,25 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                                 ))}
                             </div>
 
-                            <div className="mt-6 border-t border-gray-100 pt-4 flex justify-between items-center bg-primary/5 p-4 rounded-xl border-primary/10">
-                                <span className="font-serif font-bold text-gray-900">{t("modal.total_validated")}</span>
-                                <span className="text-xl font-bold text-primary-dark">{formatCurrency(selectedOrder.totalPrice)}</span>
+                            <div className="mt-6 border-t border-gray-100 pt-4 space-y-3">
+                                <div className="flex justify-between items-center bg-primary/5 p-4 rounded-xl border border-primary/10">
+                                    <span className="font-serif font-bold text-gray-900">{t("modal.total_validated")}</span>
+                                    <span className="text-xl font-bold text-primary-dark">{formatCurrency(selectedOrder.totalPrice)}</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-3">
+                                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Paid</p>
+                                        <p className="text-sm font-bold text-emerald-700">{formatCurrency(selectedOrder.amountPaid || 0)}</p>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Balance</p>
+                                        <p className={`text-sm font-bold ${(selectedOrder.totalPrice - (selectedOrder.amountPaid || 0)) > 0 ? 'text-red-600' : 'text-gray-400'}`}>{formatCurrency(Math.max(0, selectedOrder.totalPrice - (selectedOrder.amountPaid || 0)))}</p>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Status</p>
+                                        <p className="text-sm font-bold text-gray-700">{selectedOrder.paymentStatus || 'UNPAID'}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
