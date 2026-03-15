@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Bell, X, Megaphone } from "lucide-react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { useLocale } from 'next-intl';
 
 export default function NotificationBell({ isHeroPage }: { isHeroPage: boolean }) {
     const [announcements, setAnnouncements] = useState<any[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
-    const supabase = createClientComponentClient();
     const dropdownRef = useRef<HTMLDivElement>(null);
     const locale = useLocale();
     const isRtl = locale === 'ar';
