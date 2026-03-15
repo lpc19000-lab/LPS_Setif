@@ -2,6 +2,7 @@
 import { getInvoiceByOrderId } from "@/services/invoice-service";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import PrintButton from "@/components/admin/PrintButton";
 
 export const dynamic = "force-dynamic";
 
@@ -25,12 +26,7 @@ export default async function PrintInvoicePage({ params }: PageProps) {
       {/* Print Controls (Hidden on Print) */}
       <div className="mb-8 flex justify-between items-center print:hidden bg-gray-50 p-4 rounded-xl border border-gray-100">
         <p className="text-sm font-medium text-gray-500 italic">Preuve d'impression - Format Officiel</p>
-        <button 
-          onClick="window.print()" 
-          className="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-primary-dark transition-all"
-        >
-          Imprimer / Télécharger PDF
-        </button>
+        <PrintButton label="Imprimer / Télécharger PDF" />
       </div>
 
       {/* Invoice Header */}
@@ -60,7 +56,11 @@ export default async function PrintInvoicePage({ params }: PageProps) {
         <div className="text-right">
           <div className="mb-4">
             <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Date d'émission</h3>
-            <p className="text-sm font-bold text-gray-900">{new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' }).format(new Date(invoice.issueDate))}</p>
+            <p className="text-sm font-bold text-gray-900">
+              {invoice.issueDate 
+                ? new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' }).format(new Date(invoice.issueDate))
+                : 'N/A'}
+            </p>
           </div>
           <div>
             <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Commande ID</h3>
