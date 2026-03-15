@@ -41,8 +41,8 @@ export default function CheckoutPage() {
                         name: prev.name || c.shopName || c.name || "",
                         phone: prev.phone || c.phone || "",
                         address: prev.address || c.address || "",
-                        wilayaNumber: prev.wilayaNumber || (c.wilaya ? c.wilaya.split(" - ")[0] : ""),
-                        wilayaName: prev.wilayaName || (c.wilaya ? c.wilaya.split(" - ")[1] : ""),
+                        wilayaNumber: prev.wilayaNumber || (c.wilaya && c.wilaya.includes(" - ") ? c.wilaya.split(" - ")[0] : c.wilayaNumber || ""),
+                        wilayaName: prev.wilayaName || (c.wilaya && c.wilaya.includes(" - ") ? c.wilaya.split(" - ")[1] : c.wilayaName || ""),
                     }));
                 }
             })

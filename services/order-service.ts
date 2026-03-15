@@ -111,15 +111,38 @@ export const createOrder = async (input: CreateOrderInput) => {
         if (!product) throw new Error(`Product not found: ${item.productId}`);
         
         const volume = (product.volumes || []).find((v: any) => v.id === item.volumeId);
-        const unitPrice = volume?.price 
-            ? Number(volume.price) 
-            : (Number(product.base_price || 0) / 100) * (volume?.weight || 0);
+        
+        let unitPrice = 0;
+        if (volume?.price) {
+            unitPrice = Number(volume.price);
+        } else {
+            // Fallback price logic if volume price is missing
+            const weight = volume?.weight || 0;
+            const basePrice = Number(product.base_price || 0);
+            unitPrice = (basePrice / 100) * weight;
+        }
+
+        // Final sanity check for price
+        if (isNaN(unitPrice) || unitPrice <= 0) {
+            console.error(`[OrderService] Invalid price calculated for product ${item.productId}:`, {
+                unitPrice,
+                volume,
+                productBasePrice: product.base_price
+            });
+            unitPrice = Number(product.base_price || 0); // Last resort fallback
+        }
 
         return {
             ...item,
             price: unitPrice,
-            volume: volume || null
+            volume: volume || { id: item.volumeId, price: unitPrice } 
         };
+    });
+
+    console.log("[OrderService] Creating order with payload:", {
+        customerId: input.customerId,
+        itemCount: itemsWithData.length,
+        itemsSummary: itemsWithData.map(i => ({ id: i.productId, price: i.price, qty: i.quantity }))
     });
 
     // Call Supabase RPC for atomic transaction

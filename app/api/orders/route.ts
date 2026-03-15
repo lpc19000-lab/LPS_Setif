@@ -68,8 +68,7 @@ export async function POST(request: Request) {
         if (error instanceof Error) {
             console.error("Stack trace:", error.stack);
         }
-        const { body, status } = errorResponse(error);
-        return NextResponse.json(body, { status });
+        return errorResponse(error);
     }
 }
 
@@ -78,7 +77,6 @@ export async function GET() {
         const orders = await getOrders();
         return NextResponse.json({ success: true, data: orders });
     } catch (error) {
-        const { body, status } = errorResponse(error);
-        return NextResponse.json(body, { status });
+        return errorResponse(error);
     }
 }
