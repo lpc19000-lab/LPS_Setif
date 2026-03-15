@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, ChevronDown, CheckCircle2, Clock, Truck, PackageCheck, XCircle, FileText, X, DollarSign, AlertCircle } from "lucide-react";
-import { adminUpdateOrderStatus } from "@/app/admin/actions/order";
+import { adminUpdateOrderStatus, updateOrderPayment } from "@/app/admin/actions/order";
 import { OrderStatus } from "@/lib/constants";
 import SafeImage from "@/components/SafeImage";
 import { useTranslations, useLocale } from "next-intl";
@@ -12,6 +12,7 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
     const router = useRouter();
     const [search, setSearch] = useState("");
     const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const [updatingPaymentId, setUpdatingPaymentId] = useState<string | null>(null);
     const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
     const t = useTranslations("admin.orders");
     const tStatus = useTranslations("common.status");
@@ -46,6 +47,29 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
         setUpdatingId(null);
 
         if (!res.success) alert(res.error);
+    };
+
+    const handlePaymentUpdate = async (orderId: string, currentPaid: number) => {
+        const amountStr = window.prompt("Enter total amount paid (DZD):", currentPaid.toString());
+        if (amountStr === null) return;
+        
+        const amount = parseFloat(amountStr);
+        if (isNaN(amount) || amount < 0) {
+            alert("Please enter a valid amount");
+            return;
+        }
+
+        setUpdatingPaymentId(orderId);
+        const res = await updateOrderPayment(orderId, amount);
+        setUpdatingPaymentId(null);
+
+        if (res.success) {
+            // Close modal and refresh to see changes
+            setSelectedOrder(null);
+            router.refresh();
+        } else {
+            alert(res.error);
+        }
     };
 
     const StatusBadge = ({ status }: { status: string }) => {
@@ -215,9 +239,16 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                                     <span className="text-xl font-bold text-primary-dark">{formatCurrency(selectedOrder.totalPrice)}</span>
                                 </div>
                                 <div className="grid grid-cols-3 gap-3">
-                                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                    <div className="bg-gray-50 rounded-lg p-3 text-center relative group">
                                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Paid</p>
                                         <p className="text-sm font-bold text-emerald-700">{formatCurrency(selectedOrder.amountPaid || 0)}</p>
+                                        <button 
+                                            onClick={() => handlePaymentUpdate(selectedOrder.id, selectedOrder.amountPaid || 0)}
+                                            disabled={updatingPaymentId === selectedOrder.id}
+                                            className="absolute inset-0 bg-primary/90 text-white text-[10px] font-bold items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex"
+                                        >
+                                            {updatingPaymentId === selectedOrder.id ? "..." : "RECORD PAYMENT"}
+                                        </button>
                                     </div>
                                     <div className="bg-gray-50 rounded-lg p-3 text-center">
                                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Balance</p>

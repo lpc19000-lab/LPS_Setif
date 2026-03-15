@@ -283,8 +283,8 @@ export const updateOrderStatus = async (orderId: string, status: string, changed
 
     const updateData: any = { status, logs };
 
-    // AUTOMATION: If status is SHIPPED, update payment if not yet paid, and generate invoice
-    if (status === OrderStatus.SHIPPED) {
+    // AUTOMATION: If status is SHIPPED or DELIVERED, update payment if not yet paid, and generate invoice
+    if (status === OrderStatus.SHIPPED || status === OrderStatus.DELIVERED) {
         if (!order.payment_status || order.payment_status === "UNPAID") {
             updateData.payment_status = "SHIPPED_UNPAID";
         }

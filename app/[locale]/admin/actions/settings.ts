@@ -15,15 +15,15 @@ export async function updateSiteSettingsAction(formData: FormData) {
     try {
         const { error } = await supabaseAdmin
             .from("site_settings")
-            .update({
+            .upsert({
+                id: id || "00000000-0000-0000-0000-000000000000",
                 whatsapp_number,
                 facebook_page,
                 contact_email,
                 store_address,
                 logo_url,
                 updated_at: new Date().toISOString()
-            })
-            .eq("id", id);
+            });
 
         if (error) throw error;
 

@@ -72,12 +72,12 @@ export async function updateOrderPayment(orderId: string, amountPaid: number) {
         if (error || !order) throw new Error("Order not found");
 
         const totalAmount = Number(order.total_price);
-        let paymentStatus: "PAID" | "PARTIALLY_PAID" | "UNPAID" = "UNPAID";
+        let paymentStatus: "PAID" | "PARTIAL" | "UNPAID" = "UNPAID";
 
         if (amountPaid >= totalAmount) {
             paymentStatus = "PAID";
         } else if (amountPaid > 0) {
-            paymentStatus = "PARTIALLY_PAID";
+            paymentStatus = "PARTIAL";
         }
 
         const { error: updateError } = await supabaseAdmin
