@@ -15,7 +15,7 @@ export default async function AdminOrdersPage({ params }: { params: Promise<{ lo
         .from("orders")
         .select(`
             *,
-            customers (shop_name),
+            customers (id, shop_name, name, phone, wilaya, address),
             items:order_items(
                 *,
                 product:products(*)
@@ -30,13 +30,21 @@ export default async function AdminOrdersPage({ params }: { params: Promise<{ lo
     const serializedOrders = (ordersData || []).map((o: any) => ({
         id: o.id,
         customerId: o.customer_id,
+        customer: {
+            id: o.customer_id,
+            shopName: o.customers?.shop_name || "",
+            name: o.customers?.name || "",
+            phone: o.customers?.phone || "",
+            wilaya: o.wilaya_name ? `${o.wilaya_number || ''} - ${o.wilaya_name}` : (o.customers?.wilaya || ""),
+            address: o.customers?.address || "",
+        },
         shopName: o.customers?.shop_name || "",
         status: o.status,
-        totalPrice: Number(o.total_price),
+        totalPrice: Number(o.total_price || 0),
         amountPaid: Number(o.amount_paid || 0),
-        paymentStatus: o.payment_status,
-        createdAt: new Date(o.created_at),
-        updatedAt: new Date(o.updated_at),
+        paymentStatus: o.payment_status || "UNPAID",
+        createdAt: o.created_at ? new Date(o.created_at).toISOString() : new Date().toISOString(),
+        updatedAt: o.updated_at ? new Date(o.updated_at).toISOString() : (o.created_at ? new Date(o.created_at).toISOString() : new Date().toISOString()),
         items: (o.items || []).map((i: any) => {
             const product = i.product ? {
                 id: i.product.id,
@@ -56,6 +64,7 @@ export default async function AdminOrdersPage({ params }: { params: Promise<{ lo
                 product
             };
         }),
+        invoice: o.invoice || null,
         shippingAddress: o.shipping_address,
         notes: o.notes
     }));
