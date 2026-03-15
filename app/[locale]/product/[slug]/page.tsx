@@ -29,6 +29,7 @@ export default function ProductPage() {
     const t = useTranslations("product");
     const c = useTranslations("catalog");
     const locale = useLocale();
+    const tCommon = useTranslations("common");
     const isRtl = locale === "ar";
 
     const [product, setProduct] = useState<Product | null>(null);
@@ -232,7 +233,7 @@ export default function ProductPage() {
                                         <span className="text-5xl font-bold">
                                             {(selectedVolume?.price || 0).toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')}
                                         </span>
-                                        <span className="text-xl text-gray-500 font-serif">{useTranslations('common')('currency')}</span>
+                                        <span className="text-xl text-gray-500 font-serif">{tCommon('currency')}</span>
                                         <span className={`text-gray-400 text-sm font-light tracking-wide italic ${isRtl ? "mr-4" : "ml-4"}`}>
                                             {t("per_unit")} {selectedVolume ? (selectedVolume.weight >= 1000 ? `${selectedVolume.weight / 1000}kg` : `${selectedVolume.weight}g`) : ""}
                                         </span>
@@ -249,7 +250,7 @@ export default function ProductPage() {
                                         <div className="space-y-1">
                                             <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">{t("order_total")}</p>
                                             <p className="text-lg font-bold text-[#D4AF37]">
-                                                {((selectedVolume?.price || 0) * quantity).toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')} {useTranslations('common')('currency')}
+                                                {((selectedVolume?.price || 0) * quantity).toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')} {tCommon('currency')}
                                             </p>
                                         </div>
                                     </div>

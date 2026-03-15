@@ -198,7 +198,7 @@
             "become_partner": "Devenez Partenaire",
             "beats": [
                 {
-                    "heading": "AURA Luxe.",
+                    "heading": "LPS Luxe.",
                     "sub": "L'Essence de la Présence."
                 },
                 {
@@ -363,7 +363,7 @@
                 "name_label": "Nom du Produit",
                 "name_placeholder": "ex: LPS Royal Gold",
                 "brand_label": "Marque",
-                "brand_placeholder": "ex: AURA Luxe",
+                "brand_placeholder": "ex: LPS Luxe",
                 "category_label": "Catégorie",
                 "status_label": "Statut",
                 "image_label": "URL de l'image principale",
@@ -420,6 +420,33 @@
                 "desc_placeholder": "Ajoutez une description pour cette ligne de parfums...",
                 "cancel": "Annuler",
                 "save": "Enregistrer la Catégorie",
+                "saving": "Enregistrement..."
+            }
+        },
+        "brands": {
+            "title": "Marques",
+            "subtitle": "Gérez votre liste de marques de luxe et surveillez les produits associés.",
+            "search_placeholder": "Rechercher des marques...",
+            "add_brand": "Ajouter une Marque",
+            "table": {
+                "name": "Marque",
+                "description": "Description",
+                "products": "Produits",
+                "actions": "Actions",
+                "products_count": "produits"
+            },
+            "no_brands": "Aucune marque trouvée.",
+            "delete_confirm": "Êtes-vous sûr de vouloir supprimer cette marque ?",
+            "delete_error": "Impossible de supprimer cette marque. Elle contient {count} produits actifs.",
+            "modal": {
+                "create": "Nouvelle Marque",
+                "edit": "Modifier la Marque",
+                "name_label": "Nom de la Marque",
+                "name_placeholder": "ex: LPS Luxe",
+                "desc_label": "Description (Optionnel)",
+                "desc_placeholder": "Ajoutez une description...",
+                "cancel": "Annuler",
+                "save": "Enregistrer la Marque",
                 "saving": "Enregistrement..."
             }
         },
@@ -670,7 +697,8 @@
             "invoices": "Facturation",
             "analytics": "Business Intelligence",
             "reports": "Rapports",
-            "notifications": "Notifications"
+            "notifications": "Notifications",
+            "announcements": "Annonces Publiques"
         },
         "notifications": {
             "title": "Centre de Notifications",

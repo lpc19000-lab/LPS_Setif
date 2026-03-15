@@ -62,7 +62,15 @@ export async function updateCategory(id: string, formData: FormData) {
 
         if (error) throw error;
 
+        revalidatePath("/admin/categories");
+        revalidatePath("/admin/products");
         revalidatePath("/", "layout");
+        try {
+            const { revalidateTag } = await import("next/cache");
+            (revalidateTag as any)("products");
+        } catch (e) {
+            console.error("Revalidate tag failed", e);
+        }
         return { success: true };
     } catch (error) {
         console.error("Update category error:", error);
@@ -93,7 +101,15 @@ export async function deleteCategory(id: string) {
         if (deleteError) throw deleteError;
 
         await logEvent("CATEGORY_DELETED", id, `Category ${id} deleted`);
+        revalidatePath("/admin/categories");
+        revalidatePath("/admin/products");
         revalidatePath("/", "layout");
+        try {
+            const { revalidateTag } = await import("next/cache");
+            (revalidateTag as any)("products");
+        } catch (e) {
+            console.error("Revalidate tag failed", e);
+        }
         return { success: true };
     } catch (error) {
         console.error("Delete category error:", error);

@@ -25,7 +25,8 @@ import {
     X,
     Bookmark,
     Award,
-    Shield
+    Shield,
+    Megaphone
 } from "lucide-react";
 
 interface MenuSection {
@@ -80,6 +81,7 @@ const menuSections: MenuSection[] = [
     {
         title: "System",
         items: [
+            { label: "announcements", icon: Megaphone, href: "/admin/announcements" },
             { label: "notifications", icon: Bell, href: "/admin/notifications" },
             { label: "settings", icon: Settings, href: "/admin/settings" },
             { label: "system", icon: Activity, href: "/admin/system" },

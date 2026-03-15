@@ -51,7 +51,12 @@ function mapProduct(data: any): Product {
         category: data.category_id ? { id: data.category_id, name: data.category_name || "" } : null,
         categoryId: data.category_id,
         images: (data.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)),
-        volumes: data.volumes || [],
+        volumes: (data.volumes && data.volumes.length > 0) ? data.volumes : [
+            { id: 'v200', weight: 200, price: basePrice * 2 },
+            { id: 'v250', weight: 250, price: basePrice * 2.5 },
+            { id: 'v500', weight: 500, price: basePrice * 5 },
+            { id: 'v1000', weight: 1000, price: basePrice * 10 }
+        ],
         tagIds: data.tag_ids || [],
         collectionIds: data.collection_ids || [],
     };
@@ -160,48 +165,36 @@ export const getProducts = (filters?: {
     )();
 };
 
-export const getProductById = (id: string) => {
-    return unstable_cache(
-        async () => {
-            try {
-                const { data, error } = await supabaseAdmin
-                    .from('products')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-                
-                if (error || !data) return null;
-                return mapProduct(data);
-            } catch (err) {
-                console.error("Product fetch error (getProductById):", err);
-                return null;
-            }
-        },
-        ['product-id', id],
-        { tags: ['products', `product-${id}`] }
-    )();
+export const getProductById = async (id: string) => {
+    try {
+        const { data, error } = await supabaseAdmin
+            .from('products')
+            .select('*')
+            .eq('id', id)
+            .single();
+        
+        if (error || !data) return null;
+        return mapProduct(data);
+    } catch (err) {
+        console.error("Product fetch error (getProductById):", err);
+        return null;
+    }
 };
 
-export const getProductBySlug = (slug: string) => {
-    return unstable_cache(
-        async () => {
-            try {
-                const { data, error } = await supabaseAdmin
-                    .from('products')
-                    .select('*')
-                    .eq('slug', slug)
-                    .single();
-                
-                if (error || !data) return null;
-                return mapProduct(data);
-            } catch (err) {
-                console.error("Product fetch error (getProductBySlug):", err);
-                return null;
-            }
-        },
-        ['product-slug', slug],
-        { tags: ['products', `product-slug-${slug}`] }
-    )();
+export const getProductBySlug = async (slug: string) => {
+    try {
+        const { data, error } = await supabaseAdmin
+            .from('products')
+            .select('*')
+            .eq('slug', slug)
+            .single();
+        
+        if (error || !data) return null;
+        return mapProduct(data);
+    } catch (err) {
+        console.error("Product fetch error (getProductBySlug):", err);
+        return null;
+    }
 };
 
 // ── Featured / New Arrivals / Best Sellers ────────────────────────────────

@@ -29,7 +29,7 @@ export default async function ReportsPage({ params }: { params: Promise<{ locale
                         {t("inventory.subtitle")}
                     </p>
                     <a
-                        href={`/${locale}/api/admin/reports/export?type=inventory`}
+                        href={`/api/admin/reports/export?type=inventory`}
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-primary-dark hover:text-white text-gray-700 text-sm font-bold uppercase tracking-widest rounded-xl transition-colors border border-gray-100 group"
                     >
                         <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
@@ -47,7 +47,7 @@ export default async function ReportsPage({ params }: { params: Promise<{ locale
                         {t("sales.subtitle")}
                     </p>
                     <a
-                        href={`/${locale}/api/admin/reports/export?type=sales`}
+                        href={`/api/admin/reports/export?type=sales`}
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-primary-dark hover:text-white text-gray-700 text-sm font-bold uppercase tracking-widest rounded-xl transition-colors border border-gray-100 group"
                     >
                         <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
@@ -65,7 +65,7 @@ export default async function ReportsPage({ params }: { params: Promise<{ locale
                         {t("customers.subtitle")}
                     </p>
                     <a
-                        href={`/${locale}/api/admin/reports/export?type=customers`}
+                        href={`/api/admin/reports/export?type=customers`}
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-primary-dark hover:text-white text-gray-700 text-sm font-bold uppercase tracking-widest rounded-xl transition-colors border border-gray-100 group"
                     >
                         <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />

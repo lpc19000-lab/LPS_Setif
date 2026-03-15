@@ -38,6 +38,14 @@ export async function createProduct(formData: FormData) {
     data.collection_ids = collectionIds;
     data.tag_ids = tagIds;
 
+    // Sync brand name from brand_id
+    if (data.brand_id) {
+        const { data: brandData } = await supabaseAdmin.from("brands").select("name").eq("id", data.brand_id).single();
+        if (brandData) {
+            data.brand = brandData.name;
+        }
+    }
+
     try {
         const { data: product, error } = await supabaseAdmin
             .from("products")
@@ -84,6 +92,14 @@ export async function updateProduct(id: string, formData: FormData) {
         status: (formData.get("status") as string) || "ACTIVE",
         updated_at: new Date().toISOString(),
     };
+
+    // Sync brand name from brand_id
+    if (data.brand_id) {
+        const { data: brandData } = await supabaseAdmin.from("brands").select("name").eq("id", data.brand_id).single();
+        if (brandData) {
+            data.brand = brandData.name;
+        }
+    }
 
     const collectionIds = (formData.getAll("collectionIds") as string[]).filter(Boolean);
     const tagIds = (formData.getAll("tagIds") as string[]).filter(Boolean);

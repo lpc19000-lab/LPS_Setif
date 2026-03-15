@@ -198,7 +198,7 @@
             "become_partner": "كن شريكاً معنا",
             "beats": [
                 {
-                    "heading": "AURA Luxe.",
+                    "heading": "LPS Luxe.",
                     "sub": "جوهر الحضور."
                 },
                 {
@@ -363,7 +363,7 @@
                 "name_label": "اسم المنتج",
                 "name_placeholder": "مثال: LPS Royal Gold",
                 "brand_label": "العلامة التجارية",
-                "brand_placeholder": "مثال: AURA Luxe",
+                "brand_placeholder": "مثال: LPS Luxe",
                 "category_label": "الفئة",
                 "status_label": "الحالة",
                 "image_label": "رابط الصورة الأساسية",
@@ -445,6 +445,33 @@
                 "desc_placeholder": "أضف وصفاً لخط الإنتاج هذا...",
                 "cancel": "إلغاء",
                 "save": "حفظ الفئة",
+                "saving": "جاري الحفظ..."
+            }
+        },
+        "brands": {
+            "title": "العلامات التجارية",
+            "subtitle": "إدارة قائمة العلامات التجارية الفاخرة ومراقبة المنتجات المرتبطة بها.",
+            "search_placeholder": "البحث عن العلامات التجارية...",
+            "add_brand": "إضافة علامة تجارية",
+            "table": {
+                "name": "العلامة التجارية",
+                "description": "الوصف",
+                "products": "المنتجات",
+                "actions": "الإجراءات",
+                "products_count": "منتجات"
+            },
+            "no_brands": "لم يتم العثور على علامات تجارية.",
+            "delete_confirm": "هل أنت متأكد أنك تريد حذف هذه العلامة التجارية؟",
+            "delete_error": "لا يمكن حذف هذه العلامة التجارية. تحتوي على {count} منتجات نشطة.",
+            "modal": {
+                "create": "علامة تجارية جديدة",
+                "edit": "تعديل العلامة التجارية",
+                "name_label": "اسم العلامة التجارية",
+                "name_placeholder": "مثال: LPS Luxe",
+                "desc_label": "الوصف (اختياري)",
+                "desc_placeholder": "أضف وصفاً...",
+                "cancel": "إلغاء",
+                "save": "حفظ العلامة التجارية",
                 "saving": "جاري الحفظ..."
             }
         },
@@ -671,7 +698,8 @@
             "reports": "التقارير",
             "logs": "سجلات التدقيق",
             "system": "صحة النظام",
-            "notifications": "الإشعارات"
+            "notifications": "الإشعارات",
+            "announcements": "إعلانات عامة"
         },
         "notifications": {
             "title": "مركز الإشعارات",
@@ -760,7 +788,5 @@
                 "ADMIN": "مسؤول",
                 "SYSTEM": "نظام"
             }
-        }
     }
 }
-```

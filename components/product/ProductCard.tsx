@@ -9,6 +9,7 @@ import Link from "next/link";
 interface ProductProps {
     product: {
         id: string;
+        slug?: string;
         name: string;
         brand: string;
         description: string;
@@ -57,7 +58,7 @@ export default function ProductCard({ product }: ProductProps) {
                         </div>
                     </div>
 
-                    <Link href={`/${locale}/product/${product.id}`} className="w-full">
+                    <Link href={`/${locale}/product/${product.slug || product.id}`} className="w-full">
                         <Button className="w-full gap-2 py-6">
                             <ShoppingCart size={18} />
                             {t("view_details")}

@@ -12,6 +12,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 const MiniCart = dynamic(() => import("./shop/MiniCart"), {
     ssr: false,
 });
+import NotificationBell from "./shop/NotificationBell";
 
 interface NavbarProps {
     customerName?: string | null;
@@ -144,6 +145,8 @@ export default function Navbar({ customerName, settings }: Readonly<NavbarProps 
                         )}
                     </button>
 
+                    <NotificationBell isHeroPage={isHeroPage} />
+
                     {/* Admin Portal Icon */}
                     <Link
                         href={`/${locale}/admin/login`}
@@ -173,6 +176,7 @@ export default function Navbar({ customerName, settings }: Readonly<NavbarProps 
                             </span>
                         )}
                     </button>
+                    <NotificationBell isHeroPage={isHeroPage} />
                     <Link
                         href={`/${locale}/admin/login`}
                         prefetch={true}
