@@ -66,8 +66,6 @@ export default function NotificationBell({ isHeroPage }: { isHeroPage: boolean }
         setIsOpen(!isOpen);
     };
 
-    if (announcements.length === 0) return null;
-
     return (
         <div className="relative" ref={dropdownRef}>
             <button
@@ -96,22 +94,29 @@ export default function NotificationBell({ isHeroPage }: { isHeroPage: boolean }
                     </div>
 
                     <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-                        {announcements.map((announcement) => (
-                            <div key={announcement.id} className={`p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors ${isRtl ? 'text-right' : 'text-left'}`}>
-                                <h4 className="font-bold text-sm text-primary-dark mb-1">{announcement.title}</h4>
-                                <p className="text-xs text-gray-600 leading-relaxed">{announcement.message}</p>
-                                <div className={`flex items-center justify-between mt-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                                    <span className="text-[10px] text-gray-400">
-                                        {new Intl.DateTimeFormat(isRtl ? 'ar-DZ' : 'fr-FR', { dateStyle: 'medium' }).format(new Date(announcement.created_at))}
-                                    </span>
-                                    {announcement.link && (
-                                        <a href={announcement.link} className="text-[10px] font-bold text-primary hover:underline">
-                                            {isRtl ? 'عرض المزيد' : 'View Details'}
-                                        </a>
-                                    )}
-                                </div>
+                        {announcements.length === 0 ? (
+                            <div className="py-8 text-center">
+                                <Megaphone className="w-8 h-8 text-gray-200 mx-auto mb-3" />
+                                <p className="text-sm text-gray-400 font-medium">{isRtl ? 'لا توجد إعلانات حالياً' : 'No announcements yet'}</p>
                             </div>
-                        ))}
+                        ) : (
+                            announcements.map((announcement) => (
+                                <div key={announcement.id} className={`p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors ${isRtl ? 'text-right' : 'text-left'}`}>
+                                    <h4 className="font-bold text-sm text-primary-dark mb-1">{announcement.title}</h4>
+                                    <p className="text-xs text-gray-600 leading-relaxed">{announcement.message}</p>
+                                    <div className={`flex items-center justify-between mt-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                        <span className="text-[10px] text-gray-400">
+                                            {new Intl.DateTimeFormat(isRtl ? 'ar-DZ' : 'fr-FR', { dateStyle: 'medium' }).format(new Date(announcement.created_at))}
+                                        </span>
+                                        {announcement.link && (
+                                            <a href={announcement.link} className="text-[10px] font-bold text-primary hover:underline">
+                                                {isRtl ? 'عرض المزيد' : 'View Details'}
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             )}

@@ -29,6 +29,24 @@ export default function CheckoutPage() {
 
     useEffect(() => {
         setMounted(true);
+
+        // Auto-fill from customer account if logged in
+        fetch("/api/customers/me")
+            .then(r => r.json())
+            .then(json => {
+                if (json.success && json.data) {
+                    const c = json.data;
+                    setForm(prev => ({
+                        ...prev,
+                        name: prev.name || c.shopName || c.name || "",
+                        phone: prev.phone || c.phone || "",
+                        address: prev.address || c.address || "",
+                        wilayaNumber: prev.wilayaNumber || (c.wilaya ? c.wilaya.split(" - ")[0] : ""),
+                        wilayaName: prev.wilayaName || (c.wilaya ? c.wilaya.split(" - ")[1] : ""),
+                    }));
+                }
+            })
+            .catch(() => {}); // Silently fail — user might not be logged in
     }, []);
 
     const MIN_ORDER_AMOUNT = 5000;

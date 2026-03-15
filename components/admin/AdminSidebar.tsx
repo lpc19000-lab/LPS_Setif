@@ -75,16 +75,15 @@ const menuSections: MenuSection[] = [
         items: [
             { label: "analytics", icon: BarChart3, href: "/admin/analytics" },
             { label: "reports", icon: FileText, href: "/admin/reports" },
-            { label: "logs", icon: History, href: "/admin/logs" },
+            { label: "activity_log", icon: History, href: "/admin/logs" },
         ]
     },
     {
-        title: "System",
+        title: "Configuration",
         items: [
             { label: "announcements", icon: Megaphone, href: "/admin/announcements" },
             { label: "notifications", icon: Bell, href: "/admin/notifications" },
-            { label: "settings", icon: Settings, href: "/admin/settings" },
-            { label: "system", icon: Activity, href: "/admin/system" },
+            { label: "preferences", icon: Settings, href: "/admin/settings" },
         ]
     }
 ];

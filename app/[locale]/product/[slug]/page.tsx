@@ -166,7 +166,7 @@ export default function ProductPage() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8 }}
-                        className="sticky top-32"
+                        className="lg:sticky lg:top-32"
                     >
                         <div className="aspect-square rounded-[3rem] bg-white border border-gray-100 shadow-sm overflow-hidden p-12 flex items-center justify-center group relative">
                             <SafeImage
@@ -233,7 +233,7 @@ export default function ProductPage() {
                                         <span className="text-5xl font-bold">
                                             {(selectedVolume?.price || 0).toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')}
                                         </span>
-                                        <span className="text-xl text-gray-500 font-serif">{tCommon('currency')}</span>
+                                        <span className="text-xl text-gray-500 font-serif">{tCommon('labels.currency')}</span>
                                         <span className={`text-gray-400 text-sm font-light tracking-wide italic ${isRtl ? "mr-4" : "ml-4"}`}>
                                             {t("per_unit")} {selectedVolume ? (selectedVolume.weight >= 1000 ? `${selectedVolume.weight / 1000}kg` : `${selectedVolume.weight}g`) : ""}
                                         </span>
@@ -250,7 +250,7 @@ export default function ProductPage() {
                                         <div className="space-y-1">
                                             <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">{t("order_total")}</p>
                                             <p className="text-lg font-bold text-[#D4AF37]">
-                                                {((selectedVolume?.price || 0) * quantity).toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')} {tCommon('currency')}
+                                                {((selectedVolume?.price || 0) * quantity).toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')} {tCommon('labels.currency')}
                                             </p>
                                         </div>
                                     </div>

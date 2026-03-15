@@ -697,8 +697,10 @@
             "invoices": "Facturation",
             "analytics": "Business Intelligence",
             "reports": "Rapports",
+            "activity_log": "Journal d'Activité",
             "notifications": "Notifications",
-            "announcements": "Annonces Publiques"
+            "announcements": "Annonces Publiques",
+            "preferences": "Préférences"
         },
         "notifications": {
             "title": "Centre de Notifications",

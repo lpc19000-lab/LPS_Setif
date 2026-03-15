@@ -697,9 +697,11 @@
             "analytics": "ذكاء الأعمال",
             "reports": "التقارير",
             "logs": "سجلات التدقيق",
+            "activity_log": "سجل النشاط",
             "system": "صحة النظام",
             "notifications": "الإشعارات",
-            "announcements": "إعلانات عامة"
+            "announcements": "إعلانات عامة",
+            "preferences": "التفضيلات"
         },
         "notifications": {
             "title": "مركز الإشعارات",
