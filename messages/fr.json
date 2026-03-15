@@ -401,6 +401,8 @@
             "orders_count": "{count} commandes",
             "suspend": "Suspendre",
             "suspend_title": "Désactiver ce compte",
+            "restore": "Réactiver",
+            "restore_title": "Rétablir l'accès du client",
             "no_customers": "Aucun client enregistré trouvé."
         },
         "categories": {

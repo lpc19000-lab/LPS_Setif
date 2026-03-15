@@ -426,6 +426,8 @@
             "orders_count": "{count} طلبات",
             "suspend": "تجميد",
             "suspend_title": "تعطيل هذا الحساب",
+            "restore": "استعادة",
+            "restore_title": "استعادة صلاحية الوصول للعميل",
             "no_customers": "لم يتم العثور على عملاء مسجلين."
         },
         "categories": {

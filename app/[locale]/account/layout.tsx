@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import LogoutButton from "@/components/shop/LogoutButton";
 import { getTranslations } from "next-intl/server";
+import { requireCustomerSession } from "@/lib/customer-auth";
 
 interface Props {
     children: ReactNode;
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default async function AccountLayout({ children, params }: Props) {
+    await requireCustomerSession();
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: "account" });
     const isRtl = locale === 'ar';

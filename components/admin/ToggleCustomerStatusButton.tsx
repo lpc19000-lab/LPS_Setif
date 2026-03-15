@@ -35,7 +35,7 @@ export default function ToggleCustomerStatusButton({ customerId, currentStatus }
                     ? "text-gray-500 hover:text-red-700 hover:bg-red-50 disabled:opacity-50"
                     : "text-red-700 bg-red-50 hover:bg-green-50 hover:text-green-700 disabled:opacity-50 border border-red-200"
             }`}
-            title={isActive ? t("suspend_title") : "Restore customer access"}
+            title={isActive ? t("suspend_title") : t("restore_title")}
         >
             {isActive ? (
                 <>
@@ -45,7 +45,7 @@ export default function ToggleCustomerStatusButton({ customerId, currentStatus }
             ) : (
                 <>
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    {isPending ? "..." : "Restore"}
+                    {isPending ? "..." : t("restore")}
                 </>
             )}
         </button>

@@ -22,6 +22,10 @@ export async function getCustomerSession() {
 
         if (error || !customer) return null;
 
+        if (customer.status === "SUSPENDED") {
+            return null;
+        }
+
         return {
             id: customer.id,
             name: customer.name,
