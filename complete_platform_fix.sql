@@ -48,9 +48,16 @@ ALTER TABLE brands ENABLE ROW LEVEL SECURITY;
 ALTER TABLE collections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tags ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public categories access" ON categories;
 CREATE POLICY "Public categories access" ON categories FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public brands access" ON brands;
 CREATE POLICY "Public brands access" ON brands FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public collections access" ON collections;
 CREATE POLICY "Public collections access" ON collections FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public tags access" ON tags;
 CREATE POLICY "Public tags access" ON tags FOR SELECT USING (true);
 
 -- 5. RE-CREATE ORDER RPC (Corrected Version)

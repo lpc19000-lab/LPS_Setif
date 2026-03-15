@@ -15,7 +15,7 @@ import { getTranslations } from "next-intl/server";
 
 interface Props {
     children: ReactNode;
-    params: { locale: string };
+    params: Promise<{ locale: string }>;
 }
 
 export default async function AccountLayout({ children, params }: Props) {

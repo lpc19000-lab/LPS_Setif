@@ -23,6 +23,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AccountPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
+    const isRtl = locale === 'ar';
     const t = await getTranslations({ locale, namespace: "account" });
     const com = await getTranslations({ locale, namespace: "common" });
     const customer = await requireCustomerSession();
