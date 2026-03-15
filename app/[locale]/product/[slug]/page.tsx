@@ -287,7 +287,7 @@ export default function ProductPage() {
                                                 disabled={quantity <= 1}
                                                 className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
                                             >
-                                                {isRtl ? "+" : "−"}
+                                                −
                                             </button>
                                             <div className="px-8 text-center min-w-[120px]">
                                                 <span className="block text-2xl font-bold text-gray-950">{quantity}</span>
@@ -300,7 +300,7 @@ export default function ProductPage() {
                                                 disabled={(quantity + 1) * (selectedVolume?.weight || 0) > product.stockWeight}
                                                 className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold text-xl"
                                             >
-                                                {isRtl ? "−" : "+"}
+                                                +
                                             </button>
                                         </div>
                                     </div>

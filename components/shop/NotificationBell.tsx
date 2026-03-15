@@ -19,9 +19,8 @@ export default function NotificationBell({ isHeroPage }: { isHeroPage: boolean }
                 .from("notifications")
                 .select("*")
                 .eq("type", "ANNOUNCEMENT")
-                .eq("is_read", false) // Active announcements
                 .order("created_at", { ascending: false })
-                .limit(5);
+                .limit(10);
 
             if (data && data.length > 0) {
                 setAnnouncements(data);

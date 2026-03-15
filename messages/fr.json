@@ -230,7 +230,13 @@
     },
     "account": {
         "title": "Mon Compte",
+        "my_account": "Mon Compte",
+        "trader_partner": "Partenaire Grossiste LPS",
         "trader_account": "Compte Commerçant",
+        "dashboard": "Tableau de Bord",
+        "my_orders": "Mes Commandes",
+        "reorder": "Récommander",
+        "settings": "Paramètres",
         "orders": "Mes Commandes",
         "saved_cart": "Panier Sauvegardé",
         "no_orders": "Aucune commande pour le moment",

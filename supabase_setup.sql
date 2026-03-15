@@ -6,12 +6,14 @@ CREATE TABLE IF NOT EXISTS products (
     name TEXT NOT NULL,
     slug TEXT UNIQUE NOT NULL,
     brand TEXT,
+    brand_id UUID,
     description TEXT,
-    category_id UUID, -- Foreign Key if using categories table
+    category_id UUID,
     image_url TEXT,
     images JSONB DEFAULT '[]',
     volumes JSONB DEFAULT '[]',
     base_price NUMERIC DEFAULT 0,
+    purchase_price NUMERIC DEFAULT 0,
     stock_weight NUMERIC DEFAULT 0,
     low_stock_threshold NUMERIC DEFAULT 500,
     status TEXT DEFAULT 'ACTIVE',
@@ -21,6 +23,39 @@ CREATE TABLE IF NOT EXISTS products (
     sales_revenue NUMERIC DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- LOOKUP TABLES
+CREATE TABLE IF NOT EXISTS categories (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    image_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS brands (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    image_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS collections (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    description TEXT,
+    image_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS tags (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- 2. CUSTOMERS TABLE
@@ -44,6 +79,9 @@ CREATE TABLE IF NOT EXISTS orders (
     total_price NUMERIC DEFAULT 0,
     items JSONB DEFAULT '[]', -- Snapshot of items
     invoice JSONB,
+    wilaya_number TEXT,
+    wilaya_name TEXT,
+    notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -93,18 +131,24 @@ $$ LANGUAGE plpgsql;
 -- 7. RPC: Create Order Logic
 CREATE OR REPLACE FUNCTION create_order(
     p_customer_id UUID,
-    p_total_price NUMERIC,
-    p_items JSONB
+    p_items JSONB,
+    p_wilaya_name TEXT DEFAULT NULL,
+    p_wilaya_number TEXT DEFAULT NULL,
+    p_notes TEXT DEFAULT NULL
 ) RETURNS UUID AS $$
 DECLARE
     v_order_id UUID;
+    v_total NUMERIC := 0;
+    v_item JSONB;
 BEGIN
-    INSERT INTO orders (customer_id, total_price, items)
-    VALUES (p_customer_id, p_total_price, p_items)
+    -- Calculate total from items
+    FOR v_item IN SELECT * FROM jsonb_array_elements(p_items) LOOP
+        v_total := v_total + (v_item->>'price')::NUMERIC * (v_item->>'quantity')::NUMERIC;
+    END LOOP;
+
+    INSERT INTO orders (customer_id, total_price, items, wilaya_name, wilaya_number, notes)
+    VALUES (p_customer_id, v_total, p_items, p_wilaya_name, p_wilaya_number, p_notes)
     RETURNING id INTO v_order_id;
-    
-    -- Insert into normalized items table
-    -- (Logic to loop through jsonb if needed, or handle via app layer)
     
     RETURN v_order_id;
 END;
@@ -135,6 +179,9 @@ CREATE POLICY "Order owner access" ON orders FOR SELECT
     USING (customer_id::text = auth.uid()::text OR current_setting('role') = 'service_role');
 CREATE POLICY "Order owner insert" ON orders FOR INSERT 
     WITH CHECK (customer_id::text = auth.uid()::text OR current_setting('role') = 'service_role');
+
+-- Public access for notifications (Announcements)
+CREATE POLICY "Public notifications access" ON notifications FOR SELECT USING (true);
 
 -- 11. AUTOMATION TRIGGERS
 

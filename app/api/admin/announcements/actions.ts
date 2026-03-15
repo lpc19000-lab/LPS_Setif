@@ -17,7 +17,7 @@ export async function createAnnouncement(data: { title: string, message: string,
 
         if (error) throw error;
         
-        revalidatePath('/[locale]/admin/(protected)/announcements', 'page');
+        revalidatePath('/', 'layout');
         return { success: true };
     } catch (error: any) {
         return { success: false, error: error.message };

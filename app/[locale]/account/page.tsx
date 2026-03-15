@@ -54,53 +54,73 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
         .reduce((sum, order) => sum + Number(order.totalPrice), 0);
 
     const stats = [
-        { label: t("total_orders"), value: orders.length, icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
-        { label: t("total_spent"), value: `${totalSpent.toLocaleString()} ${com("labels.currency")}`, icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
+        { label: t("total_orders"), value: orders.length, icon: ShoppingBag, color: "text-[#2563EB]", bg: "bg-[#2563EB]/10" },
+        { label: t("total_spent"), value: `${totalSpent.toLocaleString()} ${com("labels.currency")}`, icon: TrendingUp, color: "text-[#059669]", bg: "bg-[#059669]/10" },
     ];
 
     return (
-        <div className={`max-w-7xl mx-auto px-6 pt-32 pb-20 ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
-            <div className={`flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 ${locale === 'ar' ? 'md:flex-row-reverse' : ''}`}>
-                <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
+        <div className="space-y-8">
+            {/* Header */}
+            <div className={`flex flex-col md:flex-row md:items-center justify-between gap-6 ${isRtl ? 'md:flex-row-reverse' : ''}`}>
+                <div className={isRtl ? 'text-right' : 'text-left'}>
                     <h1 className="text-3xl font-serif font-bold text-primary-dark">{t("trader_account")}</h1>
                     <p className="text-gray-500 mt-1">{t("welcome_back")} {customer.name}</p>
                 </div>
-                <LogoutButton variant="trader" />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Profile Card & Saved Cart */}
-                <div className="lg:col-span-1 space-y-6">
-                    <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
-                        <div className={`flex items-center gap-4 mb-8 ${locale === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl font-serif font-bold">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Stats Section */}
+                <div className="lg:col-span-12">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {stats.map((stat: any) => (
+                            <div key={stat.label} className={`bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between group hover:border-primary/20 transition-all ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                <div className={isRtl ? 'text-right' : 'text-left'}>
+                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">{stat.label}</p>
+                                    <p className="text-3xl font-bold text-gray-900 group-hover:text-primary transition-colors">{stat.value}</p>
+                                </div>
+                                <div className={`w-14 h-14 rounded-2xl ${stat.bg} flex items-center justify-center ${stat.color} group-hover:scale-110 transition-transform`}>
+                                    <stat.icon className="w-7 h-7" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Main Content Split */}
+                <div className="lg:col-span-4 space-y-8">
+                    {/* Profile Card */}
+                    <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[100px] -z-0 transition-all group-hover:scale-110" />
+                        
+                        <div className={`relative z-10 flex items-center gap-4 mb-8 ${isRtl ? 'flex-row-reverse' : 'flex-row'}`}>
+                            <div className="w-16 h-16 rounded-2xl bg-primary-dark text-white flex items-center justify-center text-2xl font-serif font-bold shadow-lg shadow-primary/20">
                                 {(customer.name || "?").charAt(0)}
                             </div>
-                            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
+                            <div className={isRtl ? 'text-right' : 'text-left'}>
                                 <h2 className="text-xl font-bold text-gray-900">{customer.shopName}</h2>
-                                <p className="text-sm text-gray-500">{customer.name}</p>
+                                <p className="text-xs font-medium text-primary uppercase tracking-widest">{customer.wilaya}</p>
                             </div>
                         </div>
 
-                        <div className="space-y-6">
-                            <div className={`flex items-start gap-4 ${locale === 'ar' ? 'flex-row-reverse text-right' : 'text-left'}`}>
+                        <div className="space-y-6 relative z-10">
+                            <div className={`flex items-start gap-4 ${isRtl ? 'flex-row-reverse text-right' : 'text-left'}`}>
                                 <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
                                     <Phone className="w-5 h-5" />
                                 </div>
-                                <div>
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">{t("phone_number")}</p>
-                                    <p className="text-sm font-medium text-gray-900">{customer.phone}</p>
+                                <div className="flex-1">
+                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t("phone_number")}</p>
+                                    <p className="text-sm font-bold text-gray-900">{customer.phone}</p>
                                 </div>
                             </div>
 
-                            <div className={`flex items-start gap-4 ${locale === 'ar' ? 'flex-row-reverse text-right' : 'text-left'}`}>
+                            <div className={`flex items-start gap-4 ${isRtl ? 'flex-row-reverse text-right' : 'text-left'}`}>
                                 <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
                                     <MapPin className="w-5 h-5" />
                                 </div>
-                                <div>
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">{t("business_address")}</p>
-                                    <p className="text-sm font-medium text-gray-900 leading-relaxed">
-                                        {customer.address}, {customer.wilaya}
+                                <div className="flex-1">
+                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t("business_address")}</p>
+                                    <p className="text-sm font-bold text-gray-900 leading-relaxed">
+                                        {customer.address}
                                     </p>
                                 </div>
                             </div>
@@ -109,101 +129,63 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
 
                     {/* Saved Cart Preview */}
                     {enrichedCartItems.length > 0 && (
-                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                            <div className={`flex items-center justify-between mb-6 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
-                                <h3 className={`font-bold text-gray-900 flex items-center gap-2 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
-                                    <ShoppingCart className="w-4 h-4 text-primary" />
+                        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+                            <div className={`flex items-center justify-between mb-8 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                <h3 className={`font-bold text-gray-900 flex items-center gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                    <ShoppingCart className="w-5 h-5 text-primary" />
                                     {t("saved_cart")}
                                 </h3>
-                                <span className="text-[10px] font-black bg-gray-100 px-2 py-0.5 rounded-full uppercase text-gray-400">
+                                <span className="text-[10px] font-black bg-gray-100 px-3 py-1 rounded-full uppercase text-gray-400">
                                     {t("items_count", { count: enrichedCartItems.length })}
                                 </span>
                             </div>
-                            <div className="space-y-4 mb-6">
+                            <div className="space-y-4 mb-8">
                                 {enrichedCartItems.slice(0, 3).map((item: any) => (
-                                    <div key={item.id} className={`flex items-center gap-3 ${locale === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                        <div className="w-10 h-10 bg-gray-50 rounded-lg border border-gray-100 p-1 flex-shrink-0 relative overflow-hidden">
+                                    <div key={item.id} className={`flex items-center gap-4 group ${isRtl ? 'flex-row-reverse' : 'flex-row'}`}>
+                                        <div className="w-14 h-14 bg-gray-50 rounded-2xl border border-gray-100 p-2 flex-shrink-0 relative overflow-hidden group-hover:border-primary/20 transition-all">
                                             <SafeImage src={item.product.imageUrl} alt={item.product.name} fill className="object-contain" />
                                         </div>
-                                        {/* Item Info */}
-                                        <div className={`flex-1 min-w-0 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
-                                            <h4 className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors truncate">
+                                        <div className={`flex-1 min-w-0 ${isRtl ? 'text-right' : 'text-left'}`}>
+                                            <h4 className="text-sm font-bold text-gray-950 truncate group-hover:text-primary transition-colors">
                                                 {item.product.name}
                                             </h4>
-                                            <div className={`flex items-center gap-2 mt-1 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
-                                                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider truncate">
-                                                    {item.product.brand}
-                                                </span>
-                                                <div className="w-1 h-1 rounded-full bg-gray-200" />
-                                                <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
-                                                    {locale === 'ar' ? (
-                                                        <span className="flex flex-row-reverse gap-1">
-                                                            {item.weight}g · {item.quantity} :{com("labels.qty" as any) || "Quantité"}
-                                                        </span>
-                                                    ) : (
-                                                        `${com("labels.qty" as any) || "Quantité"}: ${item.quantity} · ${item.weight}g`
-                                                    )}
-                                                </span>
-                                            </div>
+                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">
+                                                {item.quantity} × {item.weight >= 1000 ? `${item.weight / 1000}kg` : `${item.weight}g`}
+                                            </p>
                                         </div>
                                     </div>
                                 ))}
-                                {enrichedCartItems.length > 3 && (
-                                    <p className="text-[10px] text-center text-gray-400 font-medium">
-                                        {t("more_items", { count: enrichedCartItems.length - 3 })}
-                                    </p>
-                                )}
                             </div>
                             <Link
                                 href={`/${locale}/cart`}
-                                className={`w-full flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all ${locale === 'ar' ? 'flex-row-reverse' : ''}`}
+                                className={`w-full flex items-center justify-center gap-2 py-4 bg-gray-900 text-white rounded-2xl text-xs font-bold hover:bg-black transition-all hover:shadow-lg active:scale-95 ${isRtl ? 'flex-row-reverse' : ''}`}
                             >
-                                <ShoppingCart className="w-3.5 h-3.5" />
+                                <ShoppingCart className="w-4 h-4" />
                                 {t("review_checkout")}
                             </Link>
                         </div>
                     )}
-
-                    <Link
-                        href={`/${locale}/catalog`}
-                        className={`flex items-center justify-between p-6 bg-primary rounded-2xl text-white group hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}
-                    >
-                        <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
-                            <p className="text-sm font-medium opacity-80 mb-1">{t("stock_ready")}</p>
-                            <p className="text-lg font-bold">{t("browse_catalog")}</p>
-                        </div>
-                        <ArrowRight className={`w-6 h-6 group-hover:translate-x-1 transition-transform ${locale === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
-                    </Link>
                 </div>
 
-                {/* Stats & Recent Orders */}
-                <div className="lg:col-span-2 space-y-8">
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {stats.map((stat: any) => (
-                            <div key={stat.label} className={`bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
-                                <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                {/* Orders Section */}
+                <div className="lg:col-span-8">
+                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className={`p-8 border-b border-gray-50 flex items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
+                            <div className={`flex items-center gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                                    <ShoppingBag className="w-5 h-5" />
                                 </div>
-                                <div className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center ${stat.color}`}>
-                                    <stat.icon className="w-6 h-6" />
-                                </div>
+                                <h3 className="font-bold text-gray-900 text-lg">{t("recent_orders")}</h3>
                             </div>
-                        ))}
-                    </div>
-
-                    {/* Recent Orders Preview */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className={`p-6 border-b border-gray-100 flex items-center justify-between ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
-                            <h3 className="font-bold text-gray-900">{t("recent_orders")}</h3>
-                            <Link href={`/${locale}/account/orders`} className="text-sm font-bold text-primary hover:text-primary-dark transition-colors">
+                            <Link href={`/${locale}/account/orders`} className="text-sm font-bold text-primary hover:text-primary-dark transition-colors flex items-center gap-1 group">
                                 {t("view_all")}
+                                <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${isRtl ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
                             </Link>
                         </div>
 
-                        {/* Realtime Orders List */}
-                        <RealtimeOrderList initialOrders={orders} customerId={customer.id} />
+                        <div className="p-2">
+                             <RealtimeOrderList initialOrders={orders} customerId={customer.id} />
+                        </div>
                     </div>
                 </div>
             </div>

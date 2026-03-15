@@ -230,7 +230,13 @@
     },
     "account": {
         "title": "حسابي",
+        "my_account": "حسابي",
+        "trader_partner": "شريك LPS للجملة",
         "trader_account": "حساب التاجر",
+        "dashboard": "لوحة التحكم",
+        "my_orders": "طلباتي",
+        "reorder": "إعادة الطلب",
+        "settings": "الإعدادات",
         "orders": "طلباتي",
         "saved_cart": "السلة المحفوظة",
         "no_orders": "لا توجد طلبات حتى الآن",
