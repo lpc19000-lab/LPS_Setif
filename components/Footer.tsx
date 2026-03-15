@@ -18,11 +18,11 @@ export default function Footer({ settings }: FooterProps) {
     const locale = useLocale();
 
     return (
-        <footer className="relative bg-[#0F0F0F] text-white pt-10 pb-6 overflow-hidden">
+        <footer className="relative bg-[#0F0F0F] text-white pt-6 pb-6 overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent" />
             
             <div className="max-w-7xl mx-auto px-6 relative z-10">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-4">
                     {/* Brand */}
                     <div className="flex flex-col gap-3">
                         <Link href={`/${locale}`} className="flex items-center gap-2">

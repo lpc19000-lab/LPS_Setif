@@ -44,7 +44,7 @@ function ProductCard({ product, i }: Readonly<{ product: Product; i: number }>) 
                         </h3>
                         <p className="text-gray-400 text-sm mb-3">{product.brand}</p>
                         <p className="text-primary-dark font-bold text-xl">
-                            {Number(product.basePrice).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')} DA
+                            {Number(product.basePrice).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')} {useTranslations("common.labels")("currency")}
                         </p>
                     </div>
                 </div>

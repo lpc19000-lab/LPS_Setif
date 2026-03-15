@@ -30,7 +30,7 @@ export const getCollections = () => {
             }
         },
         ['collections-list'],
-        { revalidate: 300, tags: ['collections'] }
+        { revalidate: 60, tags: ['collections'] }
     )();
 };
 

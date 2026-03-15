@@ -157,8 +157,10 @@ export default function CheckoutPage() {
                                 <h2 className={`font-serif text-lg text-gray-800 mb-4 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t("shipping_details")}</h2>
                                 <div className="space-y-4">
                                     <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
-                                        <label className="block text-sm text-gray-500 mb-1">{t("company_name")}</label>
+                                        <label htmlFor="name" className="block text-sm text-gray-500 mb-1">{t("company_name")}</label>
                                         <input
+                                            id="name"
+                                            name="name"
                                             type="text"
                                             required
                                             value={form.name}
@@ -169,8 +171,10 @@ export default function CheckoutPage() {
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
-                                            <label className="block text-sm text-gray-500 mb-1">{t("phone")}</label>
+                                            <label htmlFor="phone" className="block text-sm text-gray-500 mb-1">{t("phone")}</label>
                                             <input
+                                                id="phone"
+                                                name="phone"
                                                 type="text"
                                                 required
                                                 value={form.phone}
@@ -180,16 +184,19 @@ export default function CheckoutPage() {
                                             />
                                         </div>
                                         <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
-                                            <label className="block text-sm text-gray-500 mb-1">{t("wilaya")}</label>
+                                            <label htmlFor="wilaya" className="block text-sm text-gray-500 mb-1">{t("wilaya")}</label>
                                             <WilayaSelector
+                                                id="wilaya"
                                                 value={form.wilayaNumber}
                                                 onChange={(wilaya) => handleWilayaChange(wilaya.id, wilaya.name)}
                                             />
                                         </div>
                                     </div>
                                     <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
-                                        <label className="block text-sm text-gray-500 mb-1">{t("address")}</label>
+                                        <label htmlFor="address" className="block text-sm text-gray-500 mb-1">{t("address")}</label>
                                         <input
+                                            id="address"
+                                            name="address"
                                             type="text"
                                             required
                                             value={form.address}
@@ -199,8 +206,10 @@ export default function CheckoutPage() {
                                         />
                                     </div>
                                     <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
-                                        <label className="block text-sm text-gray-500 mb-1">{t("order_notes")}</label>
+                                        <label htmlFor="notes" className="block text-sm text-gray-500 mb-1">{t("order_notes")}</label>
                                         <textarea
+                                            id="notes"
+                                            name="notes"
                                             value={form.notes}
                                             onChange={(e) => setForm({ ...form, notes: e.target.value })}
                                             className="input-luxury w-full min-h-[100px]"

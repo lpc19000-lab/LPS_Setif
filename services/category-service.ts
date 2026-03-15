@@ -40,7 +40,7 @@ export const getCategories = () => {
             }
         },
         ['categories-list'],
-        { revalidate: 300, tags: ['categories'] }
+        { revalidate: 60, tags: ['categories'] }
     )();
 };
 

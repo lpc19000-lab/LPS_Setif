@@ -10,9 +10,11 @@ interface WilayaSelectorProps {
     onChange: (wilaya: { id: string; name: string }) => void;
     error?: string;
     label?: string;
+    id?: string;
+    name?: string;
 }
 
-export default function WilayaSelector({ value, onChange, error, label }: WilayaSelectorProps) {
+export default function WilayaSelector({ value, onChange, error, label, id, name }: WilayaSelectorProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [wilayas, setWilayas] = useState<any[]>([]);
@@ -61,6 +63,8 @@ export default function WilayaSelector({ value, onChange, error, label }: Wilaya
         <div className="relative" ref={containerRef}>
             {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
             <button
+                id={id}
+                name={name}
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 className={`w-full flex items-center justify-between px-4 py-2.5 bg-white border rounded-lg text-left transition-all ${error ? "border-red-500 ring-1 ring-red-500" : "border-gray-300 focus:border-primary focus:ring-1 focus:ring-primary"

@@ -6,6 +6,7 @@ import { ProductSection, FeaturesSection, CTASection } from "@/components/HomeCl
 import { getTranslations } from "next-intl/server";
 
 import { getSiteSettings } from "@/services/settings-service";
+import AnnouncementMarquee from "@/components/shop/AnnouncementMarquee";
 
 const FragranceScroll = dynamic(() => import("@/components/FragranceScroll"), {
     loading: () => <div className="h-screen bg-[#121212] animate-pulse" />,
@@ -49,6 +50,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
     return (
         <main className={locale === 'ar' ? 'rtl' : 'ltr'}>
+            <AnnouncementMarquee />
             {/* ── Cinematic Hero ──── */}
             <FragranceScroll logoUrl={settings.logo_url ?? undefined} />
 

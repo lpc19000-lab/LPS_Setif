@@ -92,12 +92,14 @@ export default function CartPage() {
                                         transition={{ duration: 0.4, delay: i * 0.05 }}
                                         className={`bg-white rounded-3xl p-6 flex flex-col sm:flex-row items-center gap-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative group ${isRtl ? "sm:flex-row-reverse text-right" : "text-left"}`}
                                     >
-                                        <SafeImage
-                                            src={item.product.imageUrl || ""}
-                                            alt={item.product.name}
-                                            fill
-                                            className="object-contain group-hover:scale-110 transition-transform duration-700"
-                                        />
+                                        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-50 rounded-2xl p-2 border border-gray-100 flex-shrink-0 relative overflow-hidden">
+                                            <SafeImage
+                                                src={item.product.imageUrl || ""}
+                                                alt={item.product.name}
+                                                fill
+                                                className="object-contain group-hover:scale-110 transition-transform duration-700"
+                                            />
+                                        </div>
 
                                         <div className="flex-1 min-w-0 w-full">
                                             <div className={`flex items-start justify-between mb-4 ${isRtl ? "flex-row-reverse" : "flex-row"}`}>
@@ -123,13 +125,13 @@ export default function CartPage() {
                                             </div>
 
                                             <div className={`flex flex-wrap items-end justify-between gap-6 ${isRtl ? "flex-row-reverse" : "flex-row"}`}>
-                                                <div className={`flex items-center bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 p-1 ${isRtl ? "flex-row-reverse" : "flex-row"}`}>
+                                                <div className={`flex items-center bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 p-1 flex-row`}>
                                                     <button
                                                         onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                                                         disabled={item.quantity <= 1}
                                                         className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white rounded-xl disabled:opacity-20 transition-all font-bold text-lg"
                                                     >
-                                                        {isRtl ? "+" : "−"}
+                                                        −
                                                     </button>
                                                     <div className="px-5 text-center min-w-[100px]">
                                                         <span className="block text-base font-black text-gray-900 leading-none">{item.quantity}</span>
@@ -141,14 +143,14 @@ export default function CartPage() {
                                                         onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                                                         className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white rounded-xl transition-all font-bold text-lg"
                                                     >
-                                                        {isRtl ? "−" : "+"}
+                                                        +
                                                     </button>
                                                 </div>
 
                                                 <div className={isRtl ? "text-left" : "text-right"}>
                                                     <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-1">{t("subtotal")}</p>
                                                     <p className="font-bold text-gray-900 text-2xl">
-                                                        {(Number(item.product.basePrice) * item.quantity).toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')} <span className="text-sm text-gray-400 font-normal">{com('currency')}</span>
+                                                        {(Number(item.product.basePrice) * item.quantity).toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')} <span className="text-sm text-gray-400 font-normal">{com('labels.currency')}</span>
                                                     </p>
                                                 </div>
                                             </div>
@@ -171,7 +173,7 @@ export default function CartPage() {
                                 <div className="space-y-5 mb-10">
                                     <div className={`flex justify-between items-center text-sm ${isRtl ? "flex-row-reverse" : "flex-row"}`}>
                                         <span className="text-gray-400">{t("subtotal_products")}</span>
-                                        <span className={`font-bold leading-none ${isRtl ? "flex flex-row-reverse items-center gap-1" : ""}`}>{totalPrice.toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')} <span className="text-[10px] text-gray-600 font-normal">{com('currency')}</span></span>
+                                        <span className={`font-bold leading-none ${isRtl ? "flex flex-row-reverse items-center gap-1" : ""}`}>{totalPrice.toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')} <span className="text-[10px] text-gray-600 font-normal">{com('labels.currency')}</span></span>
                                     </div>
                                     <div className={`flex justify-between items-center text-sm ${isRtl ? "flex-row-reverse" : "flex-row"}`}>
                                         <span className="text-gray-400">{t("shipping_fees")}</span>
@@ -185,7 +187,7 @@ export default function CartPage() {
                                             <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#D4AF37] mb-2">{t("grand_total")}</p>
                                             <p className="text-5xl font-serif font-bold tracking-tight">{totalPrice.toLocaleString(isRtl ? 'ar-DZ' : 'fr-FR')}</p>
                                         </div>
-                                        <span className="text-sm text-gray-500 mb-2 font-bold">{com('currency')}</span>
+                                        <span className="text-sm text-gray-500 mb-2 font-bold">{com('labels.currency')}</span>
                                     </div>
                                 </div>
 

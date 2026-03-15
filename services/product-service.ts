@@ -119,7 +119,7 @@ export const getActiveProducts = (filters?: {
     return unstable_cache(
         fetchFunc,
         ['products', cacheKey],
-        { revalidate: 300, tags: ['products'] }
+        { revalidate: 60, tags: ['products'] }
     )();
 };
 
