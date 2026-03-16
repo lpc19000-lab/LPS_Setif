@@ -66,7 +66,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                 <div className={`flex items-center gap-3 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
                     {order.invoice && (
                         <Link
-                            href={`/${locale}/account/orders/${order.id}/invoice/print`}
+                            href={`/${locale}/account/orders/${order.id}/invoice`}
                             target="_blank"
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all ${locale === 'ar' ? 'flex-row-reverse' : ''}`}
                         >
@@ -194,7 +194,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                             </div>
                             <div className={`flex justify-between text-sm ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
                                 <span className="text-gray-400">{t("shipping")}</span>
-                                <span className="font-bold text-[#D4AF37]">{t("free_b2b")}</span>
+                                <span className="font-bold text-amber-500">+ {locale === 'ar' ? 'رسوم التوصيل' : 'Shipping Costs'}</span>
                             </div>
                             <div className="h-px bg-white/10 my-6"></div>
                             <div className={`flex justify-between items-end ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>

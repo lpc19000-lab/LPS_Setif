@@ -17,6 +17,7 @@ interface Product {
 
 function ProductCard({ product, i }: Readonly<{ product: Product; i: number }>) {
     const locale = useLocale();
+    const tl = useTranslations("common.labels");
     return (
         <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -25,28 +26,44 @@ function ProductCard({ product, i }: Readonly<{ product: Product; i: number }>) 
             transition={{ delay: i * 0.08, duration: 0.5 }}
         >
             <Link href={`/${locale}/product/${product.slug || product.id}`} prefetch={true}>
-                <div className={`product-card group cursor-pointer ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
+                <div className={`product-card group cursor-pointer relative ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
+                    {/* Image */}
                     <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
                         <SafeImage
                             src={product.imageUrl}
                             alt={product.name}
                             fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-700"
+                            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
-                    </div>
-                    <div className="p-5">
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        {/* Quick View Badge */}
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-primary-dark opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 shadow-lg">
+                            {locale === 'ar' ? 'عرض' : 'View'}
+                        </div>
+                        {/* Category Badge */}
                         {product.category && (
-                            <p className="text-xs text-primary uppercase tracking-widest mb-1">{product.category.name}</p>
+                            <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/80 backdrop-blur-sm rounded-full text-[9px] font-black uppercase tracking-[0.15em] text-primary-dark border border-primary/10">
+                                {product.category.name}
+                            </span>
                         )}
-                        <h3 className="font-serif text-lg text-gray-800 mb-1 group-hover:text-primary-dark transition-colors">
+                    </div>
+                    {/* Info */}
+                    <div className="p-5 space-y-1.5">
+                        <p className="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold">{product.brand}</p>
+                        <h3 className="font-serif text-lg text-gray-900 leading-tight group-hover:text-primary-dark transition-colors duration-300 line-clamp-1">
                             {product.name}
                         </h3>
-                        <p className="text-gray-400 text-sm mb-3">{product.brand}</p>
-                        <p className="text-primary-dark font-bold text-xl">
-                            {Number(product.basePrice).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')} {useTranslations("common.labels")("currency")}
-                        </p>
+                        <div className="flex items-baseline gap-1.5 pt-1">
+                            <span className="text-xl font-serif font-bold text-primary-dark">
+                                {Number(product.basePrice).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')}
+                            </span>
+                            <span className="text-xs font-bold text-gray-400">{tl("currency")}</span>
+                        </div>
                     </div>
+                    {/* Bottom Gold Accent */}
+                    <div className="h-0.5 w-0 group-hover:w-full bg-gradient-to-r from-[#D4AF37] via-[#F5F5DC] to-[#B8860B] transition-all duration-700 ease-out" />
                 </div>
             </Link>
         </motion.div>

@@ -18,7 +18,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: "Invalid token" }, { status: 401 });
         }
 
-        const adminPhone = payload.sub as string; // We used phone as sub for admins
+        const adminId = payload.sub as string;
 
         const body = await request.json();
         const { currentPassword, newPassword } = body;
@@ -27,11 +27,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: "Current and new password are required" }, { status: 400 });
         }
 
-        // Fetch admin by phone
+        // Fetch admin by ID (JWT sub stores admin.id, not phone)
         const { data: admin, error: fetchError } = await supabaseAdmin
             .from("admins")
             .select("*")
-            .eq("phone", adminPhone)
+            .eq("id", adminId)
             .single();
 
         if (fetchError || !admin) {
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         const { error: updateError } = await supabaseAdmin
             .from("admins")
             .update({ password_hash: hashedNewPassword })
-            .eq("phone", adminPhone);
+            .eq("id", adminId);
 
         if (updateError) throw updateError;
 

@@ -152,12 +152,12 @@ export default function InvoiceView({ invoice, locale }: InvoiceProps) {
             <div className={`flex justify-end mb-20 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <div className="w-full sm:w-[380px] space-y-4">
                     <div className={`flex justify-between items-center text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black ${isRtl ? 'flex-row-reverse' : ''}`}>
-                        <span>Subtotal</span>
+                        <span>{isRtl ? 'المجموع الفرعي' : 'Subtotal'}</span>
                         <span className="text-gray-900 font-bold">{formatCurrency(invoice.totalAmount)}</span>
                     </div>
                     <div className={`flex justify-between items-center text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black ${isRtl ? 'flex-row-reverse' : ''}`}>
-                        <span>Shipping Fee</span>
-                        <span className="text-emerald-600 font-bold">COMPLIMENTARY</span>
+                        <span>{isRtl ? 'تكاليف الشحن' : 'Shipping'}</span>
+                        <span className="text-amber-600 font-bold">+ {isRtl ? 'رسوم التوصيل' : 'SHIPPING COSTS'}</span>
                     </div>
                     <div className="pt-4">
                         <div className={`flex justify-between items-center bg-primary-dark p-8 rounded-[2rem] text-white shadow-2xl shadow-primary/20 relative overflow-hidden group ${isRtl ? 'flex-row-reverse' : ''}`}>

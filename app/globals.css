@@ -150,3 +150,35 @@ h6 {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(212, 175, 55, 0.6);
 }
+
+/* ── Print Optimization ──────────────────────────────────────── */
+@media print {
+  /* Hide all non-invoice elements */
+  header,
+  nav,
+  footer,
+  aside,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  /* Reset page */
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Remove shadows for clean print */
+  * {
+    box-shadow: none !important;
+  }
+
+  /* Force page break behavior */
+  @page {
+    margin: 1cm;
+    size: A4;
+  }
+}

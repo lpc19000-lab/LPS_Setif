@@ -83,7 +83,7 @@ export default function AdminHeader() {
     };
 
     return (
-        <header className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-8">
+        <header className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-2 mb-4">
             <div className="flex items-center gap-4 flex-1">
                 {highestAlert ? (
                     <Link href={`/${locale}/admin/restock`} className={`flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-colors group ${getAlertStyle(highestAlert.type)} hover:opacity-90`}>

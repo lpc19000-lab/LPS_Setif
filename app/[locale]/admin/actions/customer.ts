@@ -47,6 +47,12 @@ export async function toggleCustomerStatus(customerId: string, newStatus: "ACTIV
 
 export async function deleteCustomer(customerId: string) {
     try {
+        // First, nullify customer_id on any associated orders to avoid FK constraint errors
+        await supabaseAdmin
+            .from("orders")
+            .update({ customer_id: null })
+            .eq("customer_id", customerId);
+
         const { error } = await supabaseAdmin
             .from("customers")
             .delete()

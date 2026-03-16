@@ -4,6 +4,7 @@ import { getInventoryHealthScore } from "@/services/intelligence-service";
 import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 import RealtimeReloader from "@/components/admin/RealtimeReloader";
+import ResetProfitButton from "@/components/admin/ResetProfitButton";
 import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
@@ -226,7 +227,10 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider relative z-10">{t("total_profit")}</h3>
                     </div>
                     <p className="text-2xl font-bold text-emerald-600 relative z-10">{formatCurrency(totalProfit)}</p>
-                    <p className="text-xs text-gray-400 mt-2 font-medium">{t("avg_margin")}: {profitMargin.toFixed(1)}%</p>
+                    <div className="flex items-center justify-between mt-2">
+                        <p className="text-xs text-gray-400 font-medium">{t("avg_margin")}: {profitMargin.toFixed(1)}%</p>
+                        <ResetProfitButton />
+                    </div>
                 </div>
             </div>
 

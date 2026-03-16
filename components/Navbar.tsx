@@ -51,7 +51,7 @@ export default function Navbar({ customerName, settings }: Readonly<NavbarProps 
                 : "bg-white/90 backdrop-blur-lg border-b border-primary/10 shadow-sm"
                 }`}
         >
-            <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+            <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-2.5">
                 {/* Logo */}
                 <Link href={`/${locale}`} className="flex items-center gap-2" prefetch={true}>
                     {settings?.logo_url ? (
