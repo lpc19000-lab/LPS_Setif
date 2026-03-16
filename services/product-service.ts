@@ -94,11 +94,10 @@ export const getActiveProducts = (filters?: {
             // Client-side filtering for search (or move to Postgres text search)
             if (filters?.search) {
                 const s = filters.search.toLowerCase();
-                products = products.filter((p: Product) =>
-                    p.name?.toLowerCase().includes(s) || 
-                    p.brand?.toLowerCase().includes(s) ||
-                    p.description?.toLowerCase().includes(s)
-                );
+                products = products.filter((p: Product) => {
+                    const searchable = `${p.name} ${p.brand} ${p.description} ${p.category?.name || ""}`.toLowerCase();
+                    return filters.search!.toLowerCase().trim().split(/\s+/).every(term => searchable.includes(term));
+                });
             }
 
             // Collection/Tag filtering logic would go here
@@ -139,18 +138,17 @@ export const getProducts = (filters?: {
             if (filters?.brand) query = query.eq('brand', filters.brand);
             if (filters?.status) query = query.eq('status', filters.status);
 
-            const { data, error } = await query.limit(filters?.limit || 100);
+            const { data, error } = await query;
             if (error) throw error;
 
             let products = (data || []).map(mapProduct);
 
             if (filters?.search) {
                 const s = filters.search.toLowerCase();
-                products = products.filter((p: Product) =>
-                    p.name?.toLowerCase().includes(s) || 
-                    p.brand?.toLowerCase().includes(s) ||
-                    p.description?.toLowerCase().includes(s)
-                );
+                products = products.filter((p: Product) => {
+                    const searchable = `${p.name} ${p.brand} ${p.description} ${p.category?.name || ""}`.toLowerCase();
+                    return filters.search!.toLowerCase().trim().split(/\s+/).every(term => searchable.includes(term));
+                });
             }
 
             return products;

@@ -141,7 +141,7 @@ export const getCustomerByPhone = async (phone: string): Promise<Customer | null
     }
 };
 
-export const getCustomers = async (limit = 100, startAfterStr?: string): Promise<Customer[]> => {
+export const getCustomers = async (limit = 1000, startAfterStr?: string): Promise<Customer[]> => {
     try {
         let query = supabaseAdmin
             .from('customers')

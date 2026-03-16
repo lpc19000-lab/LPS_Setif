@@ -17,7 +17,7 @@ export default async function AdminProductsPage({ params }: { params: Promise<{ 
         { data: collections },
         { data: tags }
     ] = await Promise.all([
-        supabaseAdmin.from("products").select("*, category:categories(name), brand_rel:brands(name)").order("created_at", { ascending: false }).limit(100),
+        supabaseAdmin.from("products").select("*, category:categories(name), brand_rel:brands(name)").order("created_at", { ascending: false }),
         supabaseAdmin.from("categories").select("*").order("name", { ascending: true }),
         supabaseAdmin.from("brands").select("*").order("name", { ascending: true }),
         supabaseAdmin.from("collections").select("*").order("name", { ascending: true }),

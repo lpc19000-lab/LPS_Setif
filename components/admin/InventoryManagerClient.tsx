@@ -48,13 +48,14 @@ export default function InventoryManagerClient({
         const pCategory = (p as any).categoryName || "";
         const pDescription = (p as any).description || "";
 
-        const matchesSearch = 
-            pName.toLowerCase().includes(searchLower) || 
-            pBrand.toLowerCase().includes(searchLower) ||
-            pCategory.toLowerCase().includes(searchLower) ||
-            pDescription.toLowerCase().includes(searchLower);
+        const searchLower = searchTerm.toLowerCase().trim();
+        if (!searchLower) return statusFilter === "ALL" || status === statusFilter;
+
+        const searchTerms = searchLower.split(/\s+/);
+        const searchableText = `${pName} ${pBrand} ${pCategory} ${pDescription}`.toLowerCase();
+
+        const matchesSearch = searchTerms.every(term => searchableText.includes(term));
             
-        const status = getStatus(p.stockWeight, p.lowStockThreshold);
         const matchesStatus = statusFilter === "ALL" || status === statusFilter;
         return matchesSearch && matchesStatus;
     });

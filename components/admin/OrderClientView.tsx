@@ -29,8 +29,14 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
     }, [router]);
 
     const filteredOrders = orders.filter(o => {
-        const matchesSearch = o.id.toLowerCase().includes(search.toLowerCase()) || o.customer.shopName.toLowerCase().includes(search.toLowerCase());
+        const searchLower = search.toLowerCase().trim();
         const matchesStatus = filterStatus === "ALL" || o.status === filterStatus;
+        if (!searchLower) return matchesStatus;
+
+        const searchTerms = searchLower.split(/\s+/);
+        const searchableText = `${o.id} ${o.customer.shopName} ${o.customer.name} ${o.customer.phone} ${o.customer.wilaya}`.toLowerCase();
+        
+        const matchesSearch = searchTerms.every(term => searchableText.includes(term));
         return matchesSearch && matchesStatus;
     });
 
