@@ -21,7 +21,10 @@ export const getInvoices = async () => {
             id: order.id,
             ...order,
             customer: order.customers,
-            items: order.order_items || []
+            items: (order.order_items || []).map((item: any) => ({
+                ...item,
+                product: Array.isArray(item.products) ? item.products[0] : item.products
+            }))
         }
     }));
 };
@@ -46,7 +49,10 @@ export const getInvoiceById = async (id: string) => {
             id: data.id,
             ...data,
             customer: data.customers,
-            items: data.order_items || []
+            items: (data.order_items || []).map((item: any) => ({
+                ...item,
+                product: Array.isArray(item.products) ? item.products[0] : item.products
+            }))
         }
     };
 };
@@ -70,7 +76,10 @@ export const getInvoiceByOrderId = async (orderId: string) => {
             id: data.id,
             ...data,
             customer: data.customers,
-            items: data.order_items || []
+            items: (data.order_items || []).map((item: any) => ({
+                ...item,
+                product: Array.isArray(item.products) ? item.products[0] : item.products
+            }))
         }
     };
 };

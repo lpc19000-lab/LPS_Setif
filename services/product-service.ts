@@ -95,7 +95,9 @@ export const getActiveProducts = (filters?: {
             if (filters?.search) {
                 const s = filters.search.toLowerCase();
                 products = products.filter((p: Product) =>
-                    p.name?.toLowerCase().includes(s) || p.brand?.toLowerCase().includes(s)
+                    p.name?.toLowerCase().includes(s) || 
+                    p.brand?.toLowerCase().includes(s) ||
+                    p.description?.toLowerCase().includes(s)
                 );
             }
 
@@ -145,7 +147,9 @@ export const getProducts = (filters?: {
             if (filters?.search) {
                 const s = filters.search.toLowerCase();
                 products = products.filter((p: Product) =>
-                    p.name?.toLowerCase().includes(s) || p.brand?.toLowerCase().includes(s)
+                    p.name?.toLowerCase().includes(s) || 
+                    p.brand?.toLowerCase().includes(s) ||
+                    p.description?.toLowerCase().includes(s)
                 );
             }
 

@@ -12,7 +12,7 @@ export default async function AdminInventoryPage({ params }: { params: Promise<{
 
     const { data: productsData, error } = await supabaseAdmin
         .from("products")
-        .select("*")
+        .select("*, categories(name)")
         .order("name", { ascending: true });
 
     if (error) {
@@ -23,11 +23,13 @@ export default async function AdminInventoryPage({ params }: { params: Promise<{
         id: p.id,
         name: p.name,
         brand: p.brand,
+        categoryName: p.categories?.name || "",
         stockWeight: Number(p.stock_weight || 0),
         lowStockThreshold: Number(p.low_stock_threshold || 500),
         status: p.status,
         imageUrl: p.image_url,
-        basePrice: Number(p.base_price || 0)
+        basePrice: Number(p.base_price || 0),
+        description: p.description || ""
     }));
 
     return (

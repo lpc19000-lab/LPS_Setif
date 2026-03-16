@@ -51,7 +51,13 @@ export default function InventoryManagerClient({
     };
 
     const filteredProducts = initialProducts.filter(p => {
-        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.brand.toLowerCase().includes(searchTerm.toLowerCase());
+        const searchLower = searchTerm.toLowerCase();
+        const matchesSearch = 
+            p.name.toLowerCase().includes(searchLower) || 
+            p.brand.toLowerCase().includes(searchLower) ||
+            (p as any).categoryName?.toLowerCase().includes(searchLower) ||
+            (p as any).description?.toLowerCase().includes(searchLower);
+            
         const status = getStatus(p.stockWeight, p.lowStockThreshold);
         const matchesStatus = statusFilter === "ALL" || status === statusFilter;
         return matchesSearch && matchesStatus;
