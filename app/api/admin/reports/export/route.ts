@@ -88,8 +88,9 @@ export async function GET(request: Request) {
             return new NextResponse("Invalid report type", { status: 400 });
         }
 
-        // Return CSV file
-        return new NextResponse(csvData, {
+        // Return CSV file with UTF-8 BOM for Excel compatibility
+        const bom = "\ufeff";
+        return new NextResponse(bom + csvData, {
             status: 200,
             headers: {
                 "Content-Type": "text/csv; charset=utf-8",
