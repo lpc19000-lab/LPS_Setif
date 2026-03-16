@@ -42,7 +42,6 @@ export default function InventoryManagerClient({
     };
 
     const filteredProducts = initialProducts.filter(p => {
-        const searchLower = searchTerm.toLowerCase();
         const pName = p.name || "";
         const pBrand = p.brand || "";
         const pCategory = (p as any).categoryName || "";
