@@ -6,6 +6,20 @@ import { updateOrderStatus } from "@/services/order-service";
 import { createInvoice } from "@/services/invoice-service";
 import { OrderStatus } from "@/lib/constants";
 import { requireCustomerSession } from "@/lib/customer-auth";
+import { logAdminAction } from "@/services/audit-service";
+import { cookies } from "next/headers";
+import { verifyJwtToken } from "@/lib/auth";
+
+async function getAdminId() {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("admin_token")?.value;
+        const payload = token ? await verifyJwtToken(token) : null;
+        return payload?.sub as string | undefined;
+    } catch {
+        return undefined;
+    }
+}
 
 export async function cancelOrderAction(orderId: string) {
     try {
@@ -50,6 +64,17 @@ export async function adminUpdateOrderStatus(orderId: string, status: string) {
     try {
         await updateOrderStatus(orderId, status, "ADMIN", `Status updated manually by admin to ${status}.`);
         
+        const adminId = await getAdminId();
+        if (adminId) {
+            await logAdminAction({
+                adminId,
+                action: "UPDATE_ORDER_STATUS",
+                targetType: "ORDER",
+                targetId: orderId,
+                metadata: { status }
+            });
+        }
+
         revalidatePath("/admin/orders");
         revalidatePath(`/account/orders/${orderId}`);
         revalidatePath("/account/orders");
@@ -92,6 +117,17 @@ export async function updateOrderPayment(orderId: string, amountPaid: number) {
 
         if (updateError) throw updateError;
 
+        const adminId = await getAdminId();
+        if (adminId) {
+            await logAdminAction({
+                adminId,
+                action: "UPDATE_PAYMENT",
+                targetType: "ORDER",
+                targetId: orderId,
+                metadata: { amountPaid, paymentStatus }
+            });
+        }
+
         revalidatePath("/admin/dashboard");
         revalidatePath("/admin/orders");
         return { success: true };
@@ -110,5 +146,32 @@ export async function generateInvoiceAction(orderId: string, amount: number) {
     } catch (error) {
         console.error("Generate invoice error:", error);
         return { success: false, error: "Failed to generate invoice" };
+    }
+}
+
+export async function deleteOrderAction(orderId: string) {
+    try {
+        // First delete order_items to avoid foreign key constraint errors
+        await supabaseAdmin.from("order_items").delete().eq("order_id", orderId);
+        
+        const { error } = await supabaseAdmin.from("orders").delete().eq("id", orderId);
+        if (error) throw error;
+        
+        const adminId = await getAdminId();
+        if (adminId) {
+            await logAdminAction({
+                adminId,
+                action: "DELETE_ORDER",
+                targetType: "ORDER",
+                targetId: orderId,
+                metadata: {}
+            });
+        }
+
+        revalidatePath("/admin/orders");
+        return { success: true };
+    } catch (error) {
+        console.error("Delete order error:", error);
+        return { success: false, error: "Failed to delete order" };
     }
 }

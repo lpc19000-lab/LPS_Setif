@@ -17,3 +17,8 @@ export async function updateOrderPayment(...args: Parameters<typeof _updateOrder
 export async function generateInvoiceAction(...args: Parameters<typeof _generateInvoiceAction>) {
     return _generateInvoiceAction(...args);
 }
+
+export async function deleteOrderAction(...args: Parameters<typeof import("@/app/[locale]/admin/actions/order").deleteOrderAction>) {
+    const { deleteOrderAction: _deleteOrderAction } = await import("@/app/[locale]/admin/actions/order");
+    return _deleteOrderAction(...args);
+}

@@ -283,6 +283,31 @@ export const updateOrderStatus = async (orderId: string, status: string, changed
 
     const updateData: any = { status, logs };
 
+    // STOCK RETURN ON CANCELLATION
+    if (status === "CANCELLED" && order.status !== "CANCELLED") {
+        try {
+            const { data: items } = await supabaseAdmin.from('order_items').select('*').eq('order_id', orderId);
+            if (items && items.length > 0) {
+                for (const item of items) {
+                    try {
+                        const weight = item.volume_data?.weight || parseInt((item.volume_id || "").replace(/\D/g, "")) || 0;
+                        const totalReturn = weight * (item.quantity || 1);
+                        if (totalReturn > 0) {
+                            const { data: p } = await supabaseAdmin.from('products').select('stock_weight').eq('id', item.product_id).single();
+                            if (p) {
+                                await supabaseAdmin.from('products').update({ stock_weight: (p.stock_weight || 0) + totalReturn }).eq('id', item.product_id);
+                            }
+                        }
+                    } catch (itemErr) {
+                        console.error(`Failed to return stock for item ${item.id}`, itemErr);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Failed to process stock return on cancel", err);
+        }
+    }
+
     // AUTOMATION: If status is SHIPPED or DELIVERED, update payment if not yet paid, and generate invoice
     if (status === OrderStatus.SHIPPED || status === OrderStatus.DELIVERED) {
         if (!order.payment_status || order.payment_status === "UNPAID") {

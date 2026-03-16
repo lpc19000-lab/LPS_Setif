@@ -77,16 +77,32 @@ export const getInvoiceByOrderId = async (orderId: string) => {
 
 // ── CREATE ────────────────────────────────────────────────────────────────
 export const createInvoice = async (orderId: string, amount: number) => {
-    const { data, error } = await supabaseAdmin.functions.invoke('generate-invoice', {
-        body: { orderId }
-    });
+    // Generate invoice data locally instead of relying on the failing edge function
+    const date = new Date();
+    const year = date.getFullYear().toString().slice(-2);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const random = Math.floor(1000 + Math.random() * 9000);
+    const invoiceNumber = `INV-${year}${month}-${random}`;
+    
+    const invoiceData = {
+        invoiceNumber,
+        issueDate: date.toISOString(),
+        totalAmount: amount
+    };
+
+    const { data: updatedOrder, error } = await supabaseAdmin
+        .from('orders')
+        .update({ invoice: invoiceData })
+        .eq('id', orderId)
+        .select()
+        .single();
 
     if (error) throw error;
-    if (!data.success) throw new Error(data.error || "Failed to generate invoice");
+    if (!updatedOrder) throw new Error("Failed to update order with invoice");
 
     return { 
-        id: data.invoice.invoiceNumber, 
+        id: invoiceNumber, 
         orderId, 
-        ...data.invoice 
+        ...invoiceData 
     };
 };

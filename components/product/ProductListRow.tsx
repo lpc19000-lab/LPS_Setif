@@ -48,7 +48,7 @@ export default function ProductListRow({ product }: ProductListRowProps) {
 
                 {/* Weight Options Placeholder - Compact */}
                 <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                    {["200g", "250g", "500g", "1kg"].map((unit) => (
+                    {["100g", "500g", "1kg"].map((unit) => (
                         <span key={unit} className="px-2 py-0.5 bg-gray-100 text-[9px] font-medium text-gray-500 rounded border border-gray-200">
                             {unit}
                         </span>

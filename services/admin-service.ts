@@ -59,7 +59,8 @@ export const getAdminStats = async () => {
         const { data: revenueData, error: revError } = await supabaseAdmin
             .from('orders')
             .select('total_price')
-            .not('total_price', 'is', null);
+            .not('total_price', 'is', null)
+            .neq('status', 'CANCELLED');
         
         let totalRevenue = (revenueData || []).reduce((acc, curr) => acc + Number(curr.total_price), 0);
 

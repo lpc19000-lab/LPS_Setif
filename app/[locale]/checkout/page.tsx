@@ -156,6 +156,18 @@ export default function CheckoutPage() {
                         <div className="space-y-6">
                             <div className="bg-white rounded-xl p-6 border border-gray-100">
                                 <h2 className={`font-serif text-lg text-gray-800 mb-4 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t("shipping_details")}</h2>
+                                
+                                {/* YALIDINE BANNER */}
+                                <div className={`mb-6 p-4 rounded-xl bg-blue-50 border border-blue-100 flex items-start gap-3 ${locale === 'ar' ? 'flex-row-reverse text-right' : 'flex-row text-left'}`}>
+                                    <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+                                        <svg className="w-5 h-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-blue-900 text-sm">التوصيل عبر شركة ياليدين / Livraison via Yalidine</p>
+                                        <p className="text-blue-700 text-xs mt-1">يتم التوصيل حصرياً وبشكل مضمون عبر شركة ياليدين لجميع الولايات.</p>
+                                    </div>
+                                </div>
+
                                 <div className="space-y-4">
                                     <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
                                         <label htmlFor="name" className="block text-sm text-gray-500 mb-1">{t("company_name")}</label>

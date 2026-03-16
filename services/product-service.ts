@@ -52,8 +52,7 @@ function mapProduct(data: any): Product {
         categoryId: data.category_id,
         images: (data.images || []).sort((a: any, b: any) => (a.position || 0) - (b.position || 0)),
         volumes: (data.volumes && data.volumes.length > 0) ? data.volumes : [
-            { id: 'v200', weight: 200, price: basePrice * 2 },
-            { id: 'v250', weight: 250, price: basePrice * 2.5 },
+            { id: 'v100', weight: 100, price: basePrice * 1 },
             { id: 'v500', weight: 500, price: basePrice * 5 },
             { id: 'v1000', weight: 1000, price: basePrice * 10 }
         ],

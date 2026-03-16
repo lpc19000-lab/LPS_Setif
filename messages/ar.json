@@ -715,6 +715,9 @@
             "logs": "سجلات التدقيق",
             "activity_log": "سجل النشاط",
             "system": "صحة النظام",
+            "notifications": "الإشعارات",
+            "announcements": "الإعلانات العامة",
+            "preferences": "التفضيلات",
             "sections": {
                 "main": "القائمة الرئيسية",
                 "catalog": "الكتالوج والمنتجات",
@@ -736,6 +739,11 @@
             "unread_count": "لديك {count} تنبيه(ات) غير مقروءة",
             "no_unread": "كل شيء على ما يرام!",
             "no_notifications_desc": "لا توجد إشعارات في الوقت الحالي."
+        },
+        "header": {
+            "smart_alert": "تنبيه ذكي نشط",
+            "no_alerts": "لا توجد تنبيهات نشطة. النظام طبيعي.",
+            "inventory_health": "صحة المخزون"
         },
         "system": {
             "title": "صحة وحالة النظام",

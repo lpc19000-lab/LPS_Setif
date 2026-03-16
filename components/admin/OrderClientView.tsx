@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Search, ChevronDown, CheckCircle2, Clock, Truck, PackageCheck, XCircle, FileText, X, DollarSign, AlertCircle } from "lucide-react";
-import { adminUpdateOrderStatus, updateOrderPayment, generateInvoiceAction } from "@/app/admin/actions/order";
+import { Search, ChevronDown, CheckCircle2, Clock, Truck, PackageCheck, XCircle, FileText, X, DollarSign, AlertCircle, Trash2 } from "lucide-react";
+import { adminUpdateOrderStatus, updateOrderPayment, generateInvoiceAction, deleteOrderAction } from "@/app/admin/actions/order";
 import { OrderStatus } from "@/lib/constants";
 import SafeImage from "@/components/SafeImage";
 import { useTranslations, useLocale } from "next-intl";
@@ -58,6 +58,20 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
             router.refresh();
         } else {
             alert(res.error || "Failed to generate invoice");
+        }
+    };
+
+    const handleDeleteOrder = async (orderId: string) => {
+        if (!confirm("Voulez-vous vraiment supprimer cette commande ? Cette action est irréversible.")) return;
+        
+        setUpdatingId(orderId);
+        const res = await deleteOrderAction(orderId);
+        setUpdatingId(null);
+
+        if (res.success) {
+            router.refresh();
+        } else {
+            alert(res.error || "Échec de la suppression de la commande");
         }
     };
 
@@ -170,25 +184,35 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right rtl:text-left">
-                                        {order.invoice ? (
-                                            <div className="flex flex-col items-end gap-1">
-                                                <span className="text-xs font-mono text-gray-500">{order.invoice.invoiceNumber}</span>
-                                                <Link 
-                                                    href={`/${locale}/admin/orders/${order.id}/invoice/print`}
-                                                    target="_blank"
-                                                    className="text-xs text-blue-600 hover:underline flex items-center gap-1 rtl:flex-row-reverse"
+                                        <div className="flex items-center justify-end rtl:justify-start gap-4">
+                                            {order.invoice ? (
+                                                <div className="flex flex-col items-end gap-1">
+                                                    <span className="text-xs font-mono text-gray-500">{order.invoice.invoiceNumber}</span>
+                                                    <Link 
+                                                        href={`/${locale}/admin/orders/${order.id}/invoice/print`}
+                                                        target="_blank"
+                                                        className="text-xs text-blue-600 hover:underline flex items-center gap-1 rtl:flex-row-reverse"
+                                                    >
+                                                        <FileText className="w-3.5 h-3.5" /> {t("view_invoice")}
+                                                    </Link>
+                                                </div>
+                                            ) : (
+                                                <button 
+                                                    onClick={() => handleGenerateInvoice(order.id, order.totalPrice)}
+                                                    className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary-dark transition-colors"
                                                 >
-                                                    <FileText className="w-3.5 h-3.5" /> {t("view_invoice")}
-                                                </Link>
-                                            </div>
-                                        ) : (
-                                            <button 
-                                                onClick={() => handleGenerateInvoice(order.id, order.totalPrice)}
-                                                className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary-dark transition-colors"
+                                                    {t("generate_invoice_btn") || "Submit Invoice"}
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => handleDeleteOrder(order.id)}
+                                                disabled={updatingId === order.id}
+                                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+                                                title="Delete Order"
                                             >
-                                                {t("generate_invoice_btn") || "Submit Invoice"}
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
-                                        )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

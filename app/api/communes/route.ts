@@ -1,5 +1,7 @@
-import { supabaseAdmin } from "@/lib/supabase-admin";
 import { NextRequest, NextResponse } from "next/server";
+import wilayasDataRaw from "@/lib/algeria_69_wilayas.json";
+
+const wilayasData = wilayasDataRaw as any[];
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -10,15 +12,20 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-        const { data, error } = await supabaseAdmin
-            .from("communes")
-            .select("*")
-            .eq("wilaya_id", wilayaId)
-            .order("name", { ascending: true });
+        const wilaya = wilayasData.find((w: any) => String(w.code) === String(wilayaId) || w.name === wilayaId);
+        
+        if (!wilaya) {
+             return NextResponse.json({ success: true, data: [] });
+        }
 
-        if (error) throw error;
+        const communes = (wilaya.communes || []).map((c: any) => ({
+            id: c.name,
+            name: c.name,
+            name_en: c.name,
+            name_ar: c.name,
+        }));
 
-        return NextResponse.json({ success: true, data });
+        return NextResponse.json({ success: true, data: communes });
     } catch (error) {
         console.error("Communes API Error:", error);
         return NextResponse.json({ success: false, error: "Failed to fetch communes" }, { status: 500 });

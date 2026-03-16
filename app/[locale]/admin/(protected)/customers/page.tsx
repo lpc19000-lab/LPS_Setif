@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { getCustomers, Customer } from "@/services/customer-service";
 import ResetPasswordButton from "@/components/admin/ResetPasswordButton";
 import ToggleCustomerStatusButton from "@/components/admin/ToggleCustomerStatusButton";
+import DeleteCustomerButton from "@/components/admin/DeleteCustomerButton";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +79,7 @@ export default async function AdminCustomersPage({ params }: { params: Promise<{
                                         <div className="flex items-center justify-end rtl:justify-start gap-2">
                                             <ResetPasswordButton customerId={customer.id} customerName={customer.shopName || customer.name} />
                                             <ToggleCustomerStatusButton customerId={customer.id} currentStatus={customer.status || "ACTIVE"} />
+                                            <DeleteCustomerButton customerId={customer.id} customerName={customer.shopName || customer.name} />
                                         </div>
                                     </td>
                                 </tr>
