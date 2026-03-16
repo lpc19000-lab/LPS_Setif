@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import wilayasDataRaw from "@/lib/algeria_69_wilayas.json";
 
-const wilayasData = wilayasDataRaw as any[];
-
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const wilayaId = searchParams.get("wilayaId");
@@ -12,6 +10,7 @@ export async function GET(req: NextRequest) {
     }
 
     try {
+        const wilayasData = wilayasDataRaw as any[];
         const wilaya = wilayasData.find((w: any) => String(w.code) === String(wilayaId) || w.name === wilayaId);
         
         if (!wilaya) {
