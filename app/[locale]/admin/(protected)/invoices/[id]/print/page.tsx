@@ -28,16 +28,19 @@ export default async function InvoicePrintPage({ params }: { params: Promise<{ i
 
     const customer = orderData.customers || { shop_name: "Unknown", name: "", address: "", wilaya: "", phone: "" };
 
-    const items: any[] = (orderData.items || []).map((item: any) => ({
-        id: item.product_id,
-        quantity: item.quantity,
-        price: item.price,
-        product: { 
-            name: item.product?.name || "Product", 
-            brand: item.product?.brand || "",
-            imageUrl: item.product?.image_url
-        }
-    }));
+    const items: any[] = (orderData.items || []).map((item: any) => {
+        const prod = Array.isArray(item.product) ? item.product[0] : item.product;
+        return {
+            id: item.product_id,
+            quantity: item.quantity,
+            price: item.price,
+            product: { 
+                name: prod?.name || "Product", 
+                brand: prod?.brand || "",
+                imageUrl: prod?.image_url
+            }
+        };
+    });
 
     const invoice = {
         invoiceNumber: orderData.invoice.invoiceNumber,

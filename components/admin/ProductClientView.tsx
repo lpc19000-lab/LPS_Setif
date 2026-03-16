@@ -43,10 +43,10 @@ export default function ProductClientView({
         const searchLower = search.toLowerCase();
         
         const matchesSearch =
-            pName.toLowerCase().includes(searchLower) ||
-            pBrand.toLowerCase().includes(searchLower) ||
-            pCategory.toLowerCase().includes(searchLower) ||
-            pDescription.toLowerCase().includes(searchLower);
+            (pName || "").toLowerCase().includes(searchLower) ||
+            (pBrand || "").toLowerCase().includes(searchLower) ||
+            (pCategory || "").toLowerCase().includes(searchLower) ||
+            (pDescription || "").toLowerCase().includes(searchLower);
             
         const matchesStatus = !statusFilter || p.status === statusFilter;
         return matchesSearch && matchesStatus;

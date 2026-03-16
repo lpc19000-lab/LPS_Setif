@@ -29,15 +29,18 @@ export default async function PrintInvoicePage({ params }: { params: Promise<{ l
                 wilaya: order.customer?.wilaya || "",
                 phone: order.customer?.phone || "",
             },
-            items: (order.items || []).map((item: any) => ({
-                product: {
-                    name: item.product_name || "Product",
-                    brand: "", // Not available in order_items slice
-                    imageUrl: null
-                },
-                quantity: item.quantity,
-                price: item.price
-            }))
+            items: (order.items || []).map((item: any) => {
+                const prod = Array.isArray(item.product) ? item.product[0] : item.product;
+                return {
+                    product: {
+                        name: (prod?.name || item.product_name) || "Product",
+                        brand: prod?.brand || "",
+                        imageUrl: prod?.image_url || null
+                    },
+                    quantity: item.quantity,
+                    price: item.price
+                };
+            })
         }
     };
 

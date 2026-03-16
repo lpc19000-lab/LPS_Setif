@@ -41,27 +41,35 @@ export default function InventoryManagerClient({
         return "NORMAL";
     };
 
-    const getStatusDisplay = (status: string) => {
-        switch (status) {
-            case "NORMAL": return <span className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><Package className="w-3 h-3" /> {t("modal.type.SET").split(" ")[0]}</span>;
-            case "LOW_STOCK": return <span className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><AlertTriangle className="w-3 h-3" /> {t("modal.reason_placeholder").split(",")[1].trim()}</span>;
-            case "OUT_OF_STOCK": return <span className="flex items-center gap-1 text-red-600 bg-red-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><XCircle className="w-3 h-3" /> {t("modal.reason_placeholder").split(",")[0].trim()}</span>;
-            default: return null;
-        }
-    };
-
     const filteredProducts = initialProducts.filter(p => {
         const searchLower = searchTerm.toLowerCase();
+        const pName = p.name || "";
+        const pBrand = p.brand || "";
+        const pCategory = (p as any).categoryName || "";
+        const pDescription = (p as any).description || "";
+
         const matchesSearch = 
-            p.name.toLowerCase().includes(searchLower) || 
-            p.brand.toLowerCase().includes(searchLower) ||
-            (p as any).categoryName?.toLowerCase().includes(searchLower) ||
-            (p as any).description?.toLowerCase().includes(searchLower);
+            pName.toLowerCase().includes(searchLower) || 
+            pBrand.toLowerCase().includes(searchLower) ||
+            pCategory.toLowerCase().includes(searchLower) ||
+            pDescription.toLowerCase().includes(searchLower);
             
         const status = getStatus(p.stockWeight, p.lowStockThreshold);
         const matchesStatus = statusFilter === "ALL" || status === statusFilter;
         return matchesSearch && matchesStatus;
     });
+
+    const getStatusDisplay = (status: string) => {
+        const placeholder = t("modal.reason_placeholder") || "";
+        const parts = placeholder.includes("،") ? placeholder.split("،") : placeholder.split(",");
+        
+        switch (status) {
+            case "NORMAL": return <span className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><Package className="w-3 h-3" /> {t("modal.type.SET")?.split(" ")[0] || "Stock"}</span>;
+            case "LOW_STOCK": return <span className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><AlertTriangle className="w-3 h-3" /> {parts[1]?.trim() || t("modal.reason_placeholder")}</span>;
+            case "OUT_OF_STOCK": return <span className="flex items-center gap-1 text-red-600 bg-red-50 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"><XCircle className="w-3 h-3" /> {parts[0]?.trim() || t("modal.reason_placeholder")}</span>;
+            default: return null;
+        }
+    };
 
     const handleAdjust = async (productId: string) => {
         if (adjustQuantity === 0 || !adjustReason) {
