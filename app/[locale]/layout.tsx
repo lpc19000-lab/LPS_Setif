@@ -60,15 +60,15 @@ export default async function RootLayout(props: {
     return (
         <html lang={locale} dir={direction}>
             <body
-                className={`${playfair.variable} ${inter.variable} ${notoArabic.variable} ${locale === 'ar' ? 'font-arabic' : 'font-sans'} antialiased`}
+                className={`${playfair.variable} ${inter.variable} ${notoArabic.variable} ${locale === 'ar' ? 'font-arabic' : 'font-sans'} antialiased flex flex-col min-h-screen`}
             >
                 <NextIntlClientProvider messages={messages}>
                     <CartProvider>
-                        <header className="sticky top-0 left-0 w-full z-50 flex flex-col">
+                        <header className="fixed top-0 left-0 w-full z-50 flex flex-col">
                             <AnnouncementMarquee />
                             <Navbar customerName={customer?.name} settings={settings} />
                         </header>
-                        <main className="min-h-screen">
+                        <main className="flex-1">
                             {children}
                         </main>
                         <Footer settings={settings} />

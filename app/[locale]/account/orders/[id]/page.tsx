@@ -192,9 +192,9 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                                     <span>{com("labels.currency")}</span>
                                 </span>
                             </div>
-                            <div className={`flex justify-between text-sm ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
-                                <span className="text-gray-400">{t("shipping")}</span>
-                                <span className="font-bold text-amber-500">+ {locale === 'ar' ? 'رسوم التوصيل' : 'Shipping Costs'}</span>
+                            <div className={`flex justify-between flex-wrap gap-2 text-sm ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
+                                <span className="text-gray-400">{locale === 'ar' ? 'التوصيل (Yalidine)' : 'Shipping (Yalidine)'}</span>
+                                <span className="font-bold text-amber-500 text-xs sm:text-sm text-right max-w-[150px]">{locale === 'ar' ? 'تُحسب عند الاستلام' : 'Calculated on Delivery'}</span>
                             </div>
                             <div className="h-px bg-white/10 my-6"></div>
                             <div className={`flex justify-between items-end ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>

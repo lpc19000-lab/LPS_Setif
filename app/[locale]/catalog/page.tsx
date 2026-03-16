@@ -225,7 +225,7 @@ function CatalogContent() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.03, duration: 0.4 }}
                             >
-                                <Link href={`/${locale}/product/${product.slug || product.id}`}>
+                                <Link href={`/${locale}/product/${encodeURIComponent(product.slug || product.id)}`}>
                                     {viewMode === "grid" ? (
                                         <div className={`product-card group cursor-pointer ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                                             <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">

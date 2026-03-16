@@ -32,7 +32,7 @@ function StaticHeroFallback({ logoUrl }: { logoUrl?: string }) {
                 priority
                 className="object-cover opacity-60"
             />
-            <div className="text-center z-10 px-6">
+            <div className="text-center z-10 px-6 pt-24 sm:pt-0">
                 {logoUrl ? (
                     <div className="mb-6 flex justify-center">
                         <div className="relative w-32 h-32 sm:w-48 sm:h-48 overflow-hidden rounded-full border-2 border-[#D4AF37]/30 shadow-2xl bg-black/20 backdrop-blur-sm p-1">
@@ -182,7 +182,7 @@ export default function FragranceScroll({ logoUrl }: { logoUrl?: string }) {
             <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
                 {/* Loading screen */}
                 {!isLoaded && (
-                    <div className="absolute inset-0 z-30 bg-[#121212] flex flex-col items-center justify-center gap-6">
+                    <div className="absolute inset-0 z-30 bg-[#121212] flex flex-col items-center justify-center gap-6 pt-24 sm:pt-0">
                         <div className="relative flex flex-col items-center">
                             {logoUrl ? (
                                  <motion.div
@@ -243,7 +243,7 @@ export default function FragranceScroll({ logoUrl }: { logoUrl?: string }) {
                         <motion.div
                             key={i}
                             style={{ opacity: textOpacities[i] }}
-                            className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
+                            className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none pt-24 sm:pt-0"
                         >
                             <h2 className="text-[#D4AF37] text-4xl sm:text-5xl md:text-8xl font-serif font-bold tracking-tight mb-4 drop-shadow-2xl">
                                 {beat.heading}

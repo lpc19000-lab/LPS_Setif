@@ -155,9 +155,9 @@ export default function InvoiceView({ invoice, locale }: InvoiceProps) {
                         <span>{isRtl ? 'المجموع الفرعي' : 'Subtotal'}</span>
                         <span className="text-gray-900 font-bold">{formatCurrency(invoice.totalAmount)}</span>
                     </div>
-                    <div className={`flex justify-between items-center text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black ${isRtl ? 'flex-row-reverse' : ''}`}>
-                        <span>{isRtl ? 'تكاليف الشحن' : 'Shipping'}</span>
-                        <span className="text-amber-600 font-bold">+ {isRtl ? 'رسوم التوصيل' : 'SHIPPING COSTS'}</span>
+                    <div className={`flex justify-between flex-wrap gap-2 items-center text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black w-full ${isRtl ? 'flex-row-reverse' : ''}`}>
+                        <span>{isRtl ? 'الشحن والتوصيل (Yalidine)' : 'Shipping & Delivery (Yalidine)'}</span>
+                        <span className="text-amber-600 font-bold uppercase text-[9px] sm:text-[10px] text-right">{isRtl ? 'تُحسب وتُدفع عند الاستلام' : 'Calculated & Paid on Delivery'}</span>
                     </div>
                     <div className="pt-4">
                         <div className={`flex justify-between items-center bg-primary-dark p-8 rounded-[2rem] text-white shadow-2xl shadow-primary/20 relative overflow-hidden group ${isRtl ? 'flex-row-reverse' : ''}`}>
