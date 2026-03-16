@@ -5,7 +5,7 @@ export const getInvoices = async () => {
     // Invoices are embedded in the 'orders' table in Supabase (JSONB)
     const { data, error } = await supabaseAdmin
         .from('orders')
-        .select('*, customers(*)')
+        .select('*, customers(*), order_items(*, products(*))')
         .not('invoice', 'is', null)
         .order('created_at', { ascending: false });
 
@@ -30,7 +30,7 @@ export const getInvoiceById = async (id: string) => {
     // Search within orders for the specific invoice number
     const { data, error } = await supabaseAdmin
         .from('orders')
-        .select('*, customers(*)')
+        .select('*, customers(*), order_items(*, products(*))')
         .eq('invoice->>invoiceNumber', id)
         .maybeSingle();
 
@@ -54,7 +54,7 @@ export const getInvoiceById = async (id: string) => {
 export const getInvoiceByOrderId = async (orderId: string) => {
     const { data, error } = await supabaseAdmin
         .from('orders')
-        .select('*, customers(*)')
+        .select('*, customers(*), order_items(*, products(*))')
         .eq('id', orderId)
         .single();
 

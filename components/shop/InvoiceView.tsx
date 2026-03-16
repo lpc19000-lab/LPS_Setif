@@ -155,11 +155,25 @@ export default function InvoiceView({ invoice, locale }: InvoiceProps) {
                         <span>{isRtl ? 'المجموع الفرعي' : 'Subtotal'}</span>
                         <span className="text-gray-900 font-bold">{formatCurrency(invoice.totalAmount)}</span>
                     </div>
-                    <div className={`flex justify-between flex-wrap gap-2 items-center text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black w-full ${isRtl ? 'flex-row-reverse' : ''}`}>
-                        <span>{isRtl ? 'الشحن والتوصيل (Yalidine)' : 'Shipping & Delivery (Yalidine)'}</span>
-                        <span className="text-amber-600 font-bold uppercase text-[9px] sm:text-[10px] text-right">{isRtl ? 'تُحسب وتُدفع عند الاستلام' : 'Calculated & Paid on Delivery'}</span>
+                    <div className={`flex justify-between flex-wrap gap-2 items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 w-full ${isRtl ? 'flex-row-reverse' : ''}`}>
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-[#D4AF37]/10 rounded-lg flex items-center justify-center">
+                                <MapPin className="w-4 h-4 text-[#D4AF37]" />
+                            </div>
+                            <span className="text-gray-400 uppercase tracking-[0.2em] text-[9px] font-black">{isRtl ? 'الشحن والتوصيل (Yalidine)' : 'Shipping & Delivery (Yalidine)'}</span>
+                        </div>
+                        <span className="text-amber-600 font-bold uppercase text-[9px] sm:text-[10px] bg-amber-50 px-3 py-1 rounded-full border border-amber-100">{isRtl ? 'تُحسب وتُدفع عند الاستلام' : 'Calculated & Paid on Delivery'}</span>
                     </div>
-                    <div className="pt-4">
+                    <div className="pt-4 relative">
+                        {/* Paid Stamp */}
+                        {invoice.paymentStatus === 'PAID' && (
+                            <div className={`absolute -top-12 ${isRtl ? '-left-8' : '-right-8'} opacity-20 rotate-12 pointer-events-none select-none print:opacity-30`}>
+                                <div className="border-4 border-emerald-600 px-6 py-2 rounded-xl">
+                                    <span className="text-4xl font-black text-emerald-600 uppercase tracking-widest">PAID</span>
+                                    <div className="text-[10px] text-emerald-600 font-bold text-center mt-1 uppercase tracking-tighter tracking-[0.2em]">Validated Document</div>
+                                </div>
+                            </div>
+                        )}
                         <div className={`flex justify-between items-center bg-primary-dark p-8 rounded-[2rem] text-white shadow-2xl shadow-primary/20 relative overflow-hidden group ${isRtl ? 'flex-row-reverse' : ''}`}>
                             <div className="relative z-10">
                                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#D4AF37] mb-1 block">Total amount due</span>
