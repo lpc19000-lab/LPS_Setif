@@ -48,7 +48,7 @@ export default function AnnouncementMarquee() {
     if (!isVisible || announcements.length === 0) return null;
 
     return (
-        <div className="bg-[#1a1a1a] text-white/90 py-1.5 relative border-b border-white/5 overflow-hidden z-[60]">
+        <div className="bg-[#1a1a1a] text-white/90 py-1 relative border-b border-white/5 overflow-hidden">
             <div className="max-w-7xl mx-auto px-6 relative flex items-center gap-8">
                 <div className="hidden sm:flex items-center gap-2 shrink-0">
                     <Megaphone className="w-3 h-3 text-[#D4AF37]" />

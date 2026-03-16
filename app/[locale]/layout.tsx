@@ -64,8 +64,10 @@ export default async function RootLayout(props: {
             >
                 <NextIntlClientProvider messages={messages}>
                     <CartProvider>
-                        <AnnouncementMarquee />
-                        <Navbar customerName={customer?.name} settings={settings} />
+                        <header className="sticky top-0 left-0 w-full z-50 flex flex-col">
+                            <AnnouncementMarquee />
+                            <Navbar customerName={customer?.name} settings={settings} />
+                        </header>
                         <main className="min-h-screen">
                             {children}
                         </main>

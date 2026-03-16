@@ -46,12 +46,12 @@ export default function Navbar({ customerName, settings }: Readonly<NavbarProps 
 
     return (
         <nav
-            className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isHeroPage
+            className={`w-full transition-all duration-500 ${isHeroPage
                 ? "bg-transparent"
                 : "bg-white/90 backdrop-blur-lg border-b border-primary/10 shadow-sm"
                 }`}
         >
-            <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-2.5">
+            <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-2">
                 {/* Logo */}
                 <Link href={`/${locale}`} className="flex items-center gap-2" prefetch={true}>
                     {settings?.logo_url ? (
