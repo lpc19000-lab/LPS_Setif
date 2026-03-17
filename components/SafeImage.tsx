@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface SafeImageProps {
     src: string;
@@ -14,7 +14,7 @@ interface SafeImageProps {
     sizes?: string;
 }
 
-const FALLBACK_IMAGE = "/images/placeholder-perfume.png";
+const FALLBACK_IMAGE = "/images/placeholder-perfume.svg";
 
 export default function SafeImage({
     src,
@@ -28,6 +28,12 @@ export default function SafeImage({
 }: SafeImageProps) {
     const [imageSrc, setImageSrc] = useState(src || FALLBACK_IMAGE);
     const [hasError, setHasError] = useState(false);
+
+    // Update imageSrc when src prop changes
+    useEffect(() => {
+        setImageSrc(src || FALLBACK_IMAGE);
+        setHasError(false);
+    }, [src]);
 
     const handleError = () => {
         if (!hasError) {

@@ -29,12 +29,13 @@ function ProductCard({ product, i }: Readonly<{ product: Product; i: number }>) 
                 <div className={`product-card group cursor-pointer relative ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                     {/* Image */}
                     <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-                        <SafeImage
-                            src={product.imageUrl}
+                        <img
+                            src={product.imageUrl || "/images/placeholder-perfume.svg"}
                             alt={product.name}
-                            fill
-                            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = "/images/placeholder-perfume.svg";
+                            }}
                         />
                         {/* Hover Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

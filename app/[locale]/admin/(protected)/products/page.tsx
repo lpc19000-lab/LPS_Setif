@@ -32,7 +32,7 @@ export default async function AdminProductsPage({ params }: { params: Promise<{ 
         slug: p.slug,
         description: p.description,
         categoryId: p.category_id,
-        imageUrl: p.image_url,
+        imageUrl: p.image_url || p.image, // Fallback to p.image if p.image_url is missing
         basePrice: Number(p.base_price),
         stockWeight: Number(p.stock_weight || 0),
         lowStockThreshold: p.low_stock_threshold,
@@ -46,6 +46,8 @@ export default async function AdminProductsPage({ params }: { params: Promise<{ 
         volumes: p.volumes || [],
         images: p.images || [],
     }));
+
+    console.log(`[AdminProductsPage] Map check: ${serializedProducts[0]?.name} -> ${serializedProducts[0]?.imageUrl}`);
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
