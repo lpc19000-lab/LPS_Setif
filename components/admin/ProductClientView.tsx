@@ -32,6 +32,7 @@ export default function ProductClientView({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<ProductWithCategory | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
     const t = useTranslations("admin.products");
     const locale = useLocale();
 
@@ -57,11 +58,13 @@ export default function ProductClientView({
 
     const handleOpenModal = (product: ProductWithCategory | null = null) => {
         setEditingProduct(product);
+        setUploadedImageUrl(product?.imageUrl || null);
         setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
         setEditingProduct(null);
+        setUploadedImageUrl(null);
         setIsModalOpen(false);
     };
 
@@ -71,6 +74,8 @@ export default function ProductClientView({
         const formData = new FormData(e.currentTarget);
 
         const imageFile = formData.get("imageFile") as File;
+        let finalImageUrl = uploadedImageUrl;
+
         if (imageFile && imageFile.size > 0) {
             // Upload via API endpoint for Firebase Storage
             const uploadFormData = new FormData();
@@ -86,12 +91,18 @@ export default function ProductClientView({
                     return;
                 }
                 const uploadData = await uploadRes.json();
-                formData.set("imageUrl", uploadData.url);
+                finalImageUrl = uploadData.url;
+                setUploadedImageUrl(finalImageUrl);
             } catch {
                 alert("Image upload failed");
                 setIsLoading(false);
                 return;
             }
+        }
+
+        // Must append to formData before sending to server action
+        if (finalImageUrl) {
+            formData.set("imageUrl", finalImageUrl);
         }
 
         let res;
@@ -297,9 +308,18 @@ export default function ProductClientView({
                                     <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">Upload Image (Optional)</label>
                                     <input type="file" name="imageFile" accept="image/*" className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-2 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
                                 </div>
+                                {/* Hidden input to ensure imageUrl is submitted */}
+                                <input type="hidden" name="imageUrl" value={uploadedImageUrl || ""} />
+
                                 <div className="space-y-1.5 md:col-span-2">
                                     <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.image_label")} (Or provide URL)</label>
-                                    <input name="imageUrl" defaultValue={editingProduct?.imageUrl} className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="https://..." />
+                                    <input 
+                                        type="url"
+                                        value={uploadedImageUrl || ""} 
+                                        onChange={(e) => setUploadedImageUrl(e.target.value)}
+                                        className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" 
+                                        placeholder="https://..." 
+                                    />
                                 </div>
 
                                 {/* Pricing & Stock */}

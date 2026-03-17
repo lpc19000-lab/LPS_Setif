@@ -39,7 +39,7 @@ function ProductCard({ product, i }: Readonly<{ product: Product; i: number }>) 
                         {/* Hover Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         {/* Quick View Badge */}
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-primary-dark opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 shadow-lg">
+                        <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black ${locale === 'ar' ? 'tracking-normal' : 'uppercase tracking-[0.2em]'} text-primary-dark opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 shadow-lg`}>
                             {locale === 'ar' ? 'عرض' : 'View'}
                         </div>
                         {/* Category Badge */}
