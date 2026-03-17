@@ -80,18 +80,13 @@ export async function updateCategory(id: string, formData: FormData) {
 
 export async function deleteCategory(id: string) {
     try {
-        // Check for products in this category
-        const { data: products, error: checkError } = await supabaseAdmin
+        // Nullify category references in products before deleting
+        const { error: updateError } = await supabaseAdmin
             .from("products")
-            .select("id")
-            .eq("category_id", id)
-            .limit(1);
+            .update({ category_id: null })
+            .eq("category_id", id);
 
-        if (checkError) throw checkError;
-
-        if (products && products.length > 0) {
-            return { success: false, error: "Cannot delete category. There are products associated with it." };
-        }
+        if (updateError) throw updateError;
 
         const { error: deleteError } = await supabaseAdmin
             .from("categories")

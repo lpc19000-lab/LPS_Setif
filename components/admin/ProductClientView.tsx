@@ -37,7 +37,7 @@ export default function ProductClientView({
 
     const filteredProducts = products.filter((p) => {
         const pName = p.name || "";
-        const pBrand = p.brand || p.brandName || "";
+        const pBrand = p.brand || "";
         const pCategory = p.category?.name || "";
         const pDescription = p.description || "";
         const searchLower = search.toLowerCase().trim();
@@ -176,7 +176,7 @@ export default function ProductClientView({
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 relative shrink-0">
                                                 <Image
-                                                    src={product.imageUrl || "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=100"}
+                                                    src={product.image_url || "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=100"}
                                                     alt={product.name}
                                                     fill
                                                     className="object-cover"
@@ -184,7 +184,7 @@ export default function ProductClientView({
                                             </div>
                                                 <div className="flex flex-col">
                                                     <span className="text-sm font-bold text-gray-900 leading-tight">{product.name}</span>
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] mt-0.5">{product.brandName}</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] mt-0.5">{product.brand}</span>
                                                 </div>
                                         </div>
                                     </td>
@@ -194,14 +194,14 @@ export default function ProductClientView({
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 font-medium text-gray-900">
-                                        {formatCurrency(product.basePrice)}
+                                        {formatCurrency(product.base_price)}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span
-                                            className={`px-2.5 py-1 rounded-lg text-xs font-medium ${product.stockWeight < 500 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-600"
+                                            className={`px-2.5 py-1 rounded-lg text-xs font-medium ${product.stock_weight < 500 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-600"
                                                 }`}
                                         >
-                                            {product.stockWeight >= 1000 ? `${(product.stockWeight / 1000).toFixed(2)}kg` : `${product.stockWeight}g`} {t("available")}
+                                            {product.stock_weight >= 1000 ? `${(product.stock_weight / 1000).toFixed(2)}kg` : `${product.stock_weight}g`} {t("available")}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
@@ -299,13 +299,13 @@ export default function ProductClientView({
                                 </div>
                                 <div className="space-y-1.5 md:col-span-2">
                                     <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.image_label")} (Or provide URL)</label>
-                                    <input name="imageUrl" defaultValue={editingProduct?.imageUrl} className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="https://..." />
+                                    <input name="imageUrl" defaultValue={editingProduct?.image_url} className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" placeholder="https://..." />
                                 </div>
 
                                 {/* Pricing & Stock */}
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.price_label")}</label>
-                                    <input type="number" step="0.01" name="basePrice" defaultValue={editingProduct?.basePrice} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                    <input type="number" step="0.01" name="basePrice" defaultValue={editingProduct?.base_price} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.purchase_price_label")}</label>
@@ -313,7 +313,7 @@ export default function ProductClientView({
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1 rtl:ml-0 rtl:mr-1">{t("modal.stock_label")}</label>
-                                    <input type="number" name="stockWeight" defaultValue={editingProduct?.stockWeight || 5000} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
+                                    <input type="number" name="stockWeight" defaultValue={editingProduct?.stock_weight || 5000} required className="w-full bg-[#f8f9fa] border border-gray-200 text-sm rounded-xl focus:ring-2 focus:ring-[#D4AF37]/30 block px-4 py-3 outline-none" />
                                 </div>
 
                                 {/* Info */}

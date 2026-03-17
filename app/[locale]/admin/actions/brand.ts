@@ -68,23 +68,13 @@ export async function updateBrand(id: string, formData: FormData) {
 
 export async function deleteBrand(id: string) {
     try {
-        // Check for products with this brand
-        // We'll need to fetch the brand name first unless we update products table to use brand_id
-        const { data: brandData } = await supabaseAdmin.from("brands").select("name").eq("id", id).single();
-        
-        if (brandData) {
-            const { data: products, error: checkError } = await supabaseAdmin
-                .from("products")
-                .select("id")
-                .eq("brand", brandData.name)
-                .limit(1);
+        // Nullify brand references in products before deleting
+        const { error: updateError } = await supabaseAdmin
+            .from("products")
+            .update({ brand_id: null, brand: null })
+            .eq("brand_id", id);
 
-            if (checkError) throw checkError;
-
-            if (products && products.length > 0) {
-                return { success: false, error: "Cannot delete brand. There are products associated with it." };
-            }
-        }
+        if (updateError) throw updateError;
 
         const { error: deleteError } = await supabaseAdmin
             .from("brands")

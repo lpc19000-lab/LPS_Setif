@@ -56,12 +56,11 @@ export default function BrandClientView({ brands }: { brands: BrandWithCount[] }
     };
 
     const handleDelete = async (id: string, count: number) => {
-        if (count > 0) {
-            alert(t("delete_error", { count }));
-            return;
-        }
+        const message = count > 0 
+            ? t("delete_confirm") + " " + t("delete_error", { count })
+            : t("delete_confirm");
 
-        if (!confirm(t("delete_confirm"))) return;
+        if (!confirm(message)) return;
 
         setIsLoading(true);
         const res = await deleteBrand(id);
@@ -132,8 +131,8 @@ export default function BrandClientView({ brands }: { brands: BrandWithCount[] }
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(brand.id, brand._count.products)}
-                                                disabled={isLoading || brand._count.products > 0}
-                                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400"
+                                                disabled={isLoading}
+                                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>

@@ -56,12 +56,11 @@ export default function CategoryClientView({ categories }: { categories: Categor
     };
 
     const handleDelete = async (id: string, count: number) => {
-        if (count > 0) {
-            alert(t("delete_error", { count }));
-            return;
-        }
+        const message = count > 0 
+            ? t("delete_confirm") + " " + t("products_count", { count })
+            : t("delete_confirm");
 
-        if (!confirm(t("delete_confirm"))) return;
+        if (!confirm(message)) return;
 
         setIsLoading(true);
         const res = await deleteCategory(id);
@@ -134,9 +133,9 @@ export default function CategoryClientView({ categories }: { categories: Categor
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(category.id, category._count.products)}
-                                                disabled={isLoading || category._count.products > 0}
-                                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400"
-                                                title={category._count.products > 0 ? t("delete_error", { count: category._count.products }) : t("table.actions")}
+                                                disabled={isLoading}
+                                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title={t("table.actions")}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
