@@ -25,6 +25,8 @@ export async function createProduct(formData: FormData) {
         status: (formData.get("status") as string) || "ACTIVE",
     };
 
+    console.log(`[ServerAction:createProduct] Creating product: ${data.name}, Image: ${data.image_url}`);
+
     const collectionIds = (formData.getAll("collectionIds") as string[]).filter(Boolean);
     const tagIds = (formData.getAll("tagIds") as string[]).filter(Boolean);
 
@@ -92,6 +94,8 @@ export async function updateProduct(id: string, formData: FormData) {
         status: (formData.get("status") as string) || "ACTIVE",
         updated_at: new Date().toISOString(),
     };
+
+    console.log(`[ServerAction:updateProduct] Updating product ID: ${id}, New Image: ${data.image_url}`);
 
     // Sync brand name from brand_id
     if (data.brand_id) {

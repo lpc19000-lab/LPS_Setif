@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { Plus, Search, Edit2, Trash2, X, Eye, EyeOff } from "lucide-react";
-import Image from "next/image";
+import SafeImage from "@/components/SafeImage";
 import { createProduct, updateProduct, deleteProduct } from "@/app/admin/actions/product";
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 
 type ProductWithCategory = any;
 
@@ -35,6 +36,7 @@ export default function ProductClientView({
     const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
     const t = useTranslations("admin.products");
     const locale = useLocale();
+    const router = useRouter();
 
     const filteredProducts = products.filter((p) => {
         const pName = p.name || "";
@@ -71,13 +73,13 @@ export default function ProductClientView({
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
-        const formData = new FormData(e.currentTarget);
+        const form = e.currentTarget;
+        const tempFormData = new FormData(form);
 
-        const imageFile = formData.get("imageFile") as File;
+        const imageFile = tempFormData.get("imageFile") as File;
         let finalImageUrl = uploadedImageUrl;
 
         if (imageFile && imageFile.size > 0) {
-            // Upload via API endpoint for Firebase Storage
             const uploadFormData = new FormData();
             uploadFormData.append("file", imageFile);
             try {
@@ -100,22 +102,30 @@ export default function ProductClientView({
             }
         }
 
-        // Must append to formData before sending to server action
+        // Re-construct the final FormData right before submission to ensure accuracy
+        const finalFormData = new FormData(form);
         if (finalImageUrl) {
-            formData.set("imageUrl", finalImageUrl);
+            finalFormData.set("imageUrl", finalImageUrl);
         }
 
         let res;
-        if (editingProduct) {
-            res = await updateProduct(editingProduct.id, formData);
-        } else {
-            res = await createProduct(formData);
-        }
-        setIsLoading(false);
-        if (res.success) {
-            handleCloseModal();
-        } else {
-            alert(res.error);
+        try {
+            if (editingProduct) {
+                res = await updateProduct(editingProduct.id, finalFormData);
+            } else {
+                res = await createProduct(finalFormData);
+            }
+            
+            if (res.success) {
+                router.refresh(); // Crucial for showing the updated image/data
+                handleCloseModal();
+            } else {
+                alert(res.error || "Operation failed");
+            }
+        } catch (err: any) {
+            alert(err.message || "An error occurred");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -170,7 +180,7 @@ export default function ProductClientView({
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-gray-500 uppercase tracking-wider bg-gray-50/50">
+                        <thead className={`text-xs text-gray-500 uppercase ${locale === 'ar' ? 'tracking-normal' : 'tracking-wider'} bg-gray-50/50`}>
                             <tr>
                                 <th className="px-6 py-4 font-medium">{t("table.product")}</th>
                                 <th className="px-6 py-4 font-medium">{t("table.category")}</th>
@@ -186,8 +196,8 @@ export default function ProductClientView({
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 relative shrink-0">
-                                                <Image
-                                                    src={product.imageUrl || "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=100"}
+                                                <SafeImage
+                                                    src={product.imageUrl || ""}
                                                     alt={product.name}
                                                     fill
                                                     className="object-cover"
@@ -195,7 +205,7 @@ export default function ProductClientView({
                                             </div>
                                                 <div className="flex flex-col">
                                                     <span className="text-sm font-bold text-gray-900 leading-tight">{product.name}</span>
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] mt-0.5">{product.brandName}</span>
+                                                    <span className={`text-[10px] font-black uppercase ${locale === 'ar' ? 'tracking-normal' : 'tracking-widest'} text-[#D4AF37] mt-0.5`}>{product.brandName}</span>
                                                 </div>
                                         </div>
                                     </td>
@@ -216,7 +226,7 @@ export default function ProductClientView({
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${STATUS_COLORS[product.status] || "bg-gray-100 text-gray-500"}`}>
+                                         <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase ${locale === 'ar' ? 'tracking-normal' : 'tracking-wider'} ${STATUS_COLORS[product.status] || "bg-gray-100 text-gray-500"}`}>
                                             {t(`status.${product.status}`)}
                                         </span>
                                     </td>
