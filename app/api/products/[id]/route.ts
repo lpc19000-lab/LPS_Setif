@@ -5,11 +5,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const { id } = await params;
     
     try {
-        console.log(`[API/Product] Fetching: ${id}`);
-        let product = await getProductById(id);
-        
-        if (!product) {
-            console.log(`[API/Product] ID not found, trying slug: ${id}`);
+        // Robust check: if it looks like a UUID, try ID first, otherwise try slug.
+        // This prevents Postgres errors for comparing non-UUID strings to UUID columns.
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        let product = null;
+
+        if (isUUID) {
+            console.log(`[API/Product] ID format detected, trying getProductById: ${id}`);
+            product = await getProductById(id);
+        } else {
+            console.log(`[API/Product] Non-UUID format, trying getProductBySlug: ${id}`);
             product = await getProductBySlug(id);
         }
 
