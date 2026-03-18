@@ -1,0 +1,26 @@
+[
+  {
+    "name": "DELINA",
+    "id": "d6cb6b7d-ad31-4131-ad49-5b63f82a6ab3",
+    "status": "ERROR",
+    "url": "https://xmaapzkhtuowexdlpttd.supabase.co/storage/v1/object/public/products/d6cb6b7d-ad31-4131-ad49-5b63f82a6ab3.jpg"
+  },
+  {
+    "name": "Oud Maracujá",
+    "id": "8ef95ab6-37fc-4325-8b2d-9e13f415e0d8",
+    "status": "ERROR",
+    "url": "https://xmaapzkhtuowexdlpttd.supabase.co/storage/v1/object/public/images/products/1773832399344-hu0xxd.avif"
+  },
+  {
+    "name": "DEVOTION FEMME",
+    "id": "075a82e1-59b5-4937-90ff-1eae1401bce1",
+    "status": "ERROR",
+    "url": "https://xmaapzkhtuowexdlpttd.supabase.co/storage/v1/object/public/products/075a82e1-59b5-4937-90ff-1eae1401bce1.jpg"
+  },
+  {
+    "name": "WEEKEND",
+    "id": "955a6b74-c442-475c-8305-12c7029de8c0",
+    "status": "ERROR",
+    "url": "https://xmaapzkhtuowexdlpttd.supabase.co/storage/v1/object/public/products/955a6b74-c442-475c-8305-12c7029de8c0.avif"
+  }
+]
