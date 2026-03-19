@@ -169,13 +169,12 @@ export default function ProductPage() {
                         className="lg:sticky lg:top-32"
                     >
                         <div className="aspect-square rounded-[3rem] bg-white border border-gray-100 shadow-sm overflow-hidden p-12 flex items-center justify-center group relative">
-                            <img
-                                src={product.imageUrl || "/images/placeholder-perfume.svg"}
+                            <SafeImage
+                                src={product.imageUrl}
                                 alt={product.name}
-                                className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
-                                onError={(e) => {
-                                    (e.target as HTMLImageElement).src = "/images/placeholder-perfume.svg";
-                                }}
+                                fill
+                                className="object-contain group-hover:scale-110 transition-transform duration-1000"
+                                priority
                             />
 
                             {/* Overlay Badge */}
