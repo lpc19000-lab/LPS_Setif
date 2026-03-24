@@ -156,6 +156,13 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                                             <div className="bg-gray-100 px-3 py-1 rounded-full">
                                                 <p className="text-[10px] font-bold text-gray-500">{ch("qty")}: {item.quantity}</p>
                                             </div>
+                                            {item.volume && (
+                                                <div className="bg-primary/5 px-3 py-1 rounded-full border border-primary/10">
+                                                    <p className="text-[10px] font-black text-primary uppercase tracking-widest">
+                                                        {item.volume.weight >= 1000 ? `${item.volume.weight / 1000}kg` : `${item.volume.weight}g`}
+                                                    </p>
+                                                </div>
+                                            )}
                                             <p className={`text-sm font-bold text-gray-900 ${locale === 'ar' ? 'flex flex-row-reverse gap-1 justify-end' : ''}`}>
                                                 <span>{Number(item.price).toLocaleString(locale === 'ar' ? 'ar-DZ' : 'fr-FR')}</span>
                                                 <span>{com("labels.currency")}</span>

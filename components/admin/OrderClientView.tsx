@@ -382,6 +382,11 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                                                 <div>
                                                     <p className="text-sm font-bold text-gray-900">{item.product?.name || t("modal.unknown_product")}</p>
                                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{item.product?.brand}</p>
+                                                    {item.volume && (
+                                                        <p className="text-[10px] font-bold text-primary uppercase tracking-wider mt-0.5">
+                                                            {item.volume.weight >= 1000 ? `${item.volume.weight / 1000}kg` : `${item.volume.weight}g`}
+                                                        </p>
+                                                    )}
                                                     <p className="text-xs text-primary font-bold mt-1">{formatCurrency(item.price)} <span className="text-gray-400 font-medium">× {item.quantity}</span></p>
                                                 </div>
                                             </div>

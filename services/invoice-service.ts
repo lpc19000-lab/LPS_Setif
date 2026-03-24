@@ -23,6 +23,7 @@ export const getInvoices = async () => {
             customer: order.customers,
             items: (order.order_items || []).map((item: any) => ({
                 ...item,
+                volume: item.volume_data,
                 product: Array.isArray(item.products) ? item.products[0] : item.products
             }))
         }
@@ -51,6 +52,7 @@ export const getInvoiceById = async (id: string) => {
             customer: data.customers,
             items: (data.order_items || []).map((item: any) => ({
                 ...item,
+                volume: item.volume_data,
                 product: Array.isArray(item.products) ? item.products[0] : item.products
             }))
         }
