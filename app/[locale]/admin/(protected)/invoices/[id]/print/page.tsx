@@ -34,6 +34,8 @@ export default async function InvoicePrintPage({ params }: { params: Promise<{ i
             id: item.product_id,
             quantity: item.quantity,
             price: item.price,
+            volume: item.volume_data,
+            volumeId: item.volume_data?.id,
             product: { 
                 name: prod?.name || "Product", 
                 brand: prod?.brand || "",

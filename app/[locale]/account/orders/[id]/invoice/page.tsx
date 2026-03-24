@@ -58,7 +58,9 @@ export default async function CustomerInvoicePage({ params }: { params: Promise<
                     imageUrl: item.product?.imageUrl
                 },
                 quantity: item.quantity,
-                price: item.price
+                price: item.price,
+                volume: item.volume,
+                volumeId: item.volumeId
             }))
         }
     };

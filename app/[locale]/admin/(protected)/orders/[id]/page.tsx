@@ -118,6 +118,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                                 <thead className="text-xs text-gray-500 uppercase tracking-wider bg-gray-50/50">
                                     <tr>
                                         <th className="px-6 py-4 font-medium">Product</th>
+                                        <th className="px-6 py-4 font-medium text-center">Size</th>
                                         <th className="px-6 py-4 font-medium text-center">Qty</th>
                                         <th className="px-6 py-4 font-medium text-right">Unit Price</th>
                                         <th className="px-6 py-4 font-medium text-right">Total</th>
@@ -136,6 +137,15 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                                                         <div className="text-xs text-gray-500">{item.product?.brand || ""}</div>
                                                     </div>
                                                 </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className="px-2.5 py-1 bg-primary/5 text-primary border border-primary/10 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                                    {(() => {
+                                                        const weight = (item.volume && item.volume.weight) || (item.volume_data && item.volume_data.weight) || (typeof item.volumeId === 'string' && item.volumeId.startsWith('v') ? parseInt(item.volumeId.replace('v', '')) : null);
+                                                        if (!weight) return "N/A";
+                                                        return weight >= 1000 ? `${weight / 1000}kg` : `${weight}g`;
+                                                    })()}
+                                                </span>
                                             </td>
                                             <td className="px-6 py-4 text-center font-medium">{item.quantity} units</td>
                                             <td className="px-6 py-4 text-right text-gray-500">{formatCurrency(Number(item.price))}</td>
