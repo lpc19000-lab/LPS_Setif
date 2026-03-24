@@ -24,6 +24,7 @@ export const getInvoices = async () => {
             items: (order.order_items || []).map((item: any) => ({
                 ...item,
                 volume: item.volume_data,
+                volumeId: item.volume_data?.id,
                 product: Array.isArray(item.products) ? item.products[0] : item.products
             }))
         }
@@ -53,6 +54,7 @@ export const getInvoiceById = async (id: string) => {
             items: (data.order_items || []).map((item: any) => ({
                 ...item,
                 volume: item.volume_data,
+                volumeId: item.volume_data?.id,
                 product: Array.isArray(item.products) ? item.products[0] : item.products
             }))
         }
@@ -80,6 +82,8 @@ export const getInvoiceByOrderId = async (orderId: string) => {
             customer: data.customers,
             items: (data.order_items || []).map((item: any) => ({
                 ...item,
+                volume: item.volume_data,
+                volumeId: item.volume_data?.id,
                 product: Array.isArray(item.products) ? item.products[0] : item.products
             }))
         }
