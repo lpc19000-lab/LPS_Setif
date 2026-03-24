@@ -60,6 +60,7 @@ export default async function AdminOrdersPage({ params }: { params: Promise<{ lo
                 quantity: Number(i.quantity),
                 price: Number(i.price),
                 volumeId: i.volume_id,
+                volume: i.volume_data, // Ensure volume data is passed
                 weight: Number(i.weight || 0),
                 product
             };

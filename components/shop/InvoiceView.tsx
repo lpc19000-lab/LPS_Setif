@@ -141,11 +141,13 @@ export default function InvoiceView({ invoice, locale }: InvoiceProps) {
                                 <td className="py-8">
                                     <div className="font-bold text-lg text-gray-900 mb-1 group-hover:text-primary transition-colors">{item.product.name}</div>
                                     <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">{item.product.brand}</div>
-                                    {item.volume && (
-                                        <div className="text-[10px] font-black text-primary uppercase tracking-[0.15em] mt-1">
-                                            {item.volume.weight >= 1000 ? `${item.volume.weight / 1000}kg` : `${item.volume.weight}g`}
-                                        </div>
-                                    )}
+                                        <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">
+                                            {(() => {
+                                                const weight = (item.volume && item.volume.weight) || (typeof (item as any).volumeId === 'string' && (item as any).volumeId.startsWith('v') ? parseInt((item as any).volumeId.replace('v', '')) : null);
+                                                if (!weight) return null;
+                                                return weight >= 1000 ? `${weight / 1000}kg` : `${weight}g`;
+                                            })()}
+                                        </p>
                                 </td>
                                 <td className="py-8 text-center text-gray-600 font-bold font-mono">{item.quantity}</td>
                                 <td className={`py-8 text-gray-600 font-medium ${isRtl ? 'text-left' : 'text-right'}`}>{formatCurrency(item.price)}</td>

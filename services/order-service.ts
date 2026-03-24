@@ -117,8 +117,22 @@ export const createOrder = async (input: CreateOrderInput) => {
         const product = productsMap.get(item.productId);
         if (!product) throw new Error(`Product not found: ${item.productId}`);
         
-        const volume = (product.volumes || []).find((v: any) => v.id === item.volumeId);
+        let volume = (product.volumes || []).find((v: any) => v.id === item.volumeId);
         
+        // Handle default volumes (v100, v500, v1000) if not explicitly in the DB
+        if (!volume && item.volumeId?.startsWith('v')) {
+            const weight = parseInt(item.volumeId.replace('v', ''));
+            if (!isNaN(weight)) {
+                const basePrice = Number(product.base_price || 0);
+                const multiplier = weight === 100 ? 1 : weight === 500 ? 5 : 10;
+                volume = {
+                    id: item.volumeId,
+                    weight: weight,
+                    price: basePrice * multiplier
+                };
+            }
+        }
+
         let unitPrice = 0;
         if (volume?.price) {
             unitPrice = Number(volume.price);

@@ -384,7 +384,11 @@ export default function OrderClientView({ orders }: { orders: any[] }) {
                                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{item.product?.brand}</p>
                                                     {item.volume && (
                                                         <p className="text-[10px] font-bold text-primary uppercase tracking-wider mt-0.5">
-                                                            {item.volume.weight >= 1000 ? `${item.volume.weight / 1000}kg` : `${item.volume.weight}g`}
+                                                            {(() => {
+                                                                const weight = item.volume.weight || (typeof item.volume.id === 'string' && item.volume.id.startsWith('v') ? parseInt(item.volume.id.replace('v', '')) : null);
+                                                                if (!weight) return null;
+                                                                return weight >= 1000 ? `${weight / 1000}kg` : `${weight}g`;
+                                                            })()}
                                                         </p>
                                                     )}
                                                     <p className="text-xs text-primary font-bold mt-1">{formatCurrency(item.price)} <span className="text-gray-400 font-medium">× {item.quantity}</span></p>
